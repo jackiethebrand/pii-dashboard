@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pretty in Ink — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:#FDF7F5;--white:#FFFFFF;--ink:#1C1213;--ink-soft:#5C4449;--chrome:#B8A8AC;
+  --pink:#D4748F;--pink-dark:#A84F68;--pink-light:#F5E0E6;--pink-mid:#EAB8C5;
+  --green:#3D9970;--green-dark:#2A7A56;--green-light:#E8F5EF;
+  --gold:#C4952A;--gold-light:#FDF8ED;
+  --purple:#8B6BB5;--orange:#D4853A;--blue:#4A90C4;
+  --shadow-sm:0 3px 16px rgba(100,40,60,0.08);
+  --shadow-md:0 8px 32px rgba(100,40,60,0.16);
+  --border:rgba(180,140,150,0.14);
+}
+html,body{min-height:100vh;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+body{
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:40px 20px 80px;
+  background:
+    radial-gradient(ellipse at 85% 5%,rgba(212,116,143,0.13) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(61,153,112,0.07) 0%,transparent 45%),
+    var(--cream);
+}
+.brand{text-align:center;margin-bottom:32px;width:100%;max-width:520px;}
+.brand-mark{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:0.24em;color:var(--pink);text-transform:uppercase;margin-bottom:8px;}
+.brand-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(42px,9vw,68px);color:var(--ink);line-height:1;}
+.brand-logo em{font-style:italic;color:var(--pink);}
+.brand-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;font-weight:300;color:var(--chrome);margin-top:6px;}
+.femmepire{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;}
+.femme-dot{width:10px;height:10px;border-radius:50%;opacity:0.85;}
+.divider{width:100%;max-width:520px;height:1px;background:linear-gradient(90deg,transparent,var(--pink-mid),transparent);margin:4px 0 28px;}
+.hub-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:20px;}
+
+/* ── SECTION ── */
+.hub-section{background:var(--white);border-radius:24px;overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+.hub-section-header{padding:18px 22px 14px;}
+.hub-eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;font-weight:500;margin-bottom:4px;}
+.hub-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;line-height:1.1;}
+.hub-title em{font-style:italic;}
+.hub-desc{font-size:12px;color:var(--chrome);font-weight:300;margin-top:3px;}
+.hub-body{padding:0 14px 14px;}
+
+/* ── SINGLE CARD ── */
+.hub-card{
+  display:flex;flex-direction:column;text-decoration:none;
+  background:var(--cream);border-radius:16px;padding:18px 16px;
+  border:1.5px solid var(--border);
+  transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;overflow:hidden;
+}
+.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
+.hub-card:hover{transform:translateY(-2px) scale(1.01);box-shadow:var(--shadow-md);}
+.hub-card:active{transform:scale(0.98);}
+
+/* ── DUAL CARDS ── */
+.hub-dual{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ── EXPANDABLE CARD ── */
+.hub-expand-card{
+  background:var(--cream);border-radius:16px;
+  border:1.5px solid var(--border);overflow:hidden;
+  transition:all 0.2s ease;
+}
+.hub-expand-trigger{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px;cursor:pointer;text-decoration:none;
+  transition:background 0.15s;
+}
+.hub-expand-trigger:hover{background:rgba(212,116,143,0.05);}
+.hub-expand-trigger-left{display:flex;align-items:center;gap:12px;}
+.hub-expand-icon{font-size:22px;}
+.hub-expand-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--ink);}
+.hub-expand-name em{font-style:italic;}
+.hub-expand-chevron{font-size:14px;color:var(--chrome);transition:transform 0.2s;}
+.hub-expand-chevron.open{transform:rotate(180deg);}
+.hub-expand-menu{
+  max-height:0;overflow:hidden;
+  transition:max-height 0.3s ease;
+  border-top:0px solid var(--border);
+}
+.hub-expand-menu.open{max-height:200px;border-top-width:1px;}
+.hub-expand-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px 12px 24px;
+  text-decoration:none;color:var(--ink-soft);
+  font-size:13px;font-weight:400;
+  border-bottom:1px solid var(--border);
+  transition:background 0.12s;
+}
+.hub-expand-item:last-child{border-bottom:none;}
+.hub-expand-item:hover{background:rgba(212,116,143,0.06);}
+.hub-expand-item-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* card content */
+.card-icon{font-size:22px;margin-bottom:8px;}
+.card-label{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:3px;}
+.card-label em{font-style:italic;}
+.card-desc{font-size:10px;color:var(--chrome);font-weight:300;line-height:1.4;}
+.card-arrow{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:8px;transition:letter-spacing 0.18s;}
+.hub-card:hover .card-arrow{letter-spacing:0.16em;}
+
+/* section accent colors */
+.hub-section.appts .hub-eyebrow{color:var(--purple);}
+.hub-section.ledger .hub-eyebrow{color:var(--gold);}
+.hub-section.payments .hub-eyebrow{color:var(--pink);}
+.hub-card.appts-card::before{background:linear-gradient(90deg,#D4748F,#8B6BB5,#D4853A,#5A9E6F,#4A90C4);}
+.hub-card.appts-card .card-arrow{color:var(--purple);}
+.hub-card.ledger-card::before{background:linear-gradient(90deg,var(--gold),#F5D4B0);}
+.hub-card.ledger-card .card-arrow{color:var(--gold);}
+.hub-expand-card.layaway .hub-expand-trigger{border-left:3px solid var(--pink);}
+.hub-expand-card.afterpay .hub-expand-trigger{border-left:3px solid var(--green-dark);}
+
+.hub-footer{margin-top:20px;text-align:center;font-size:11px;color:var(--chrome);letter-spacing:0.1em;font-weight:300;}
+.hub-footer em{font-style:italic;color:var(--pink);font-family:'Cormorant Garamond',serif;font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <div class="brand-mark">Internal Tools</div>
+  <div class="brand-logo">Pretty <em>in Ink</em></div>
+  <div class="brand-sub">The Femmepire · Bowie, MD</div>
+  <div class="femmepire">
+    <div class="femme-dot" style="background:#D4748F;"></div>
+    <div class="femme-dot" style="background:#8B6BB5;"></div>
+    <div class="femme-dot" style="background:#D4853A;"></div>
+    <div class="femme-dot" style="background:#5A9E6F;"></div>
+    <div class="femme-dot" style="background:#4A90C4;"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="hub-wrap">
+
+  <!-- 1. UPCOMING APPOINTMENTS -->
+  <div class="hub-section appts">
+    <div class="hub-section-header">
+      <div class="hub-eyebrow">📅 Scheduling</div>
+      <div class="hub-title">Upcoming <em>Appointments</em></div>
+      <div class="hub-desc">Next 5 days per artist — sketch reminders, waiver checks</div>
+    </div>
+    <div class="hub-body">
+      <a href="pii-appointments.html" class="hub-card appts-card">
+        <span class="card-icon">🗓</span>
+        <div class="card-label">Appointments <em>Dashboard</em></div>
+        <div class="card-desc">Color-coded by artist · 72hr sketch alerts · waiver status per client</div>
+        <div class="card-arrow">Open →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- 2. ARTIST LEDGER -->
+  <div class="hub-section ledger">
+    <div class="hub-section-header">
+      <div class="hub-eyebrow">📒 Payroll</div>
+      <div class="hub-title">Artist <em>Ledger</em></div>
+      <div class="hub-desc">Bi-weekly pay periods · auto-filled from Appointy + Square</div>
+    </div>
+    <div class="hub-body">
+      <a href="pii-ledger.html" class="hub-card ledger-card">
+        <span class="card-icon">💰</span>
+        <div class="card-label">Pay Period <em>Ledger</em></div>
+        <div class="card-desc">Artist payout · tips · incentive bonus · projection vs running total</div>
+        <div class="card-arrow">Open →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- 3. TATTOO LAYAWAY -->
+  <div class="hub-section payments">
+    <div class="hub-section-header">
+      <div class="hub-eyebrow">💗 Payments</div>
+      <div class="hub-title">Tattoo <em>Layaway</em></div>
+      <div class="hub-desc">Payment plans and Afterpay invoices</div>
+    </div>
+    <div class="hub-body">
+      <div class="hub-dual">
+
+        <!-- Payment Plans expandable -->
+        <div class="hub-expand-card layaway">
+          <div class="hub-expand-trigger" onclick="toggleExpand('layaway')">
+            <div class="hub-expand-trigger-left">
+              <span class="hub-expand-icon">💗</span>
+              <div>
+                <div class="hub-expand-name">Payment <em>Plans</em></div>
+                <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Layaway tracking</div>
+              </div>
+            </div>
+            <span class="hub-expand-chevron" id="chevron-layaway">▼</span>
+          </div>
+          <div class="hub-expand-menu" id="menu-layaway">
+            <a href="pii-payment-calculator.html" class="hub-expand-item">
+              <div class="hub-expand-item-dot" style="background:var(--pink);"></div>
+              <span>New Payment Plan</span>
+            </a>
+            <a href="pii-dashboard.html" class="hub-expand-item">
+              <div class="hub-expand-item-dot" style="background:var(--pink-mid);"></div>
+              <span>Open Plans</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Afterpay expandable -->
+        <div class="hub-expand-card afterpay">
+          <div class="hub-expand-trigger" onclick="toggleExpand('afterpay')">
+            <div class="hub-expand-trigger-left">
+              <span class="hub-expand-icon">🟢</span>
+              <div>
+                <div class="hub-expand-name">Afterpay <em>Plans</em></div>
+                <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Invoice tracking</div>
+              </div>
+            </div>
+            <span class="hub-expand-chevron" id="chevron-afterpay">▼</span>
+          </div>
+          <div class="hub-expand-menu" id="menu-afterpay">
+            <a href="pii-afterpay-calculator.html" class="hub-expand-item">
+              <div class="hub-expand-item-dot" style="background:var(--green-dark);"></div>
+              <span>New Afterpay Plan</span>
+            </a>
+            <a href="pii-afterpay-dashboard.html" class="hub-expand-item">
+              <div class="hub-expand-item-dot" style="background:var(--green);"></div>
+              <span>Open Afterpay Plans</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="hub-footer"><em>Less Grunge, More Glitter</em> · For team use only</div>
+
+<script>
+function toggleExpand(id) {
+  const menu    = document.getElementById('menu-' + id);
+  const chevron = document.getElementById('chevron-' + id);
+  const isOpen  = menu.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.hub-expand-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.hub-expand-chevron').forEach(c => c.classList.remove('open'));
+  // Open this one if it was closed
+  if (!isOpen) {
+    menu.classList.add('open');
+    chevron.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>

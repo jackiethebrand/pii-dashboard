@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Afterpay Calculator — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:       #3D9970;
+  --green-dark:  #2A7A56;
+  --green-light: #E8F5EF;
+  --green-mid:   #A8D8C0;
+  --cream:       #F5FBF7;
+  --white:       #FFFFFF;
+  --ink:         #141F1A;
+  --ink-soft:    #3D5247;
+  --chrome:      #8AAF9A;
+  --border:      rgba(61,153,112,0.15);
+  --shadow-sm:   0 2px 12px rgba(42,122,86,0.08);
+  --shadow-md:   0 6px 32px rgba(42,122,86,0.14);
+  --shadow-lg:   0 16px 56px rgba(42,122,86,0.20);
+
+  /* Artist colors */
+  --jackie:     #D4748F;
+  --nicole:     #8B6BB5;
+  --tressa:     #D4853A;
+  --rosa:       #5A9E6F;
+  --mellissa:   #4A90C4;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(61,153,112,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 5% 85%, rgba(61,153,112,0.08) 0%, transparent 45%),
+    var(--cream);
+  padding-bottom: 80px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding: 40px 24px 28px;
+}
+
+.header::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--green-mid), var(--green));
+  margin: 18px auto 0;
+  border-radius: 2px;
+}
+
+.logo-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: 28px;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.header h1 em { font-style: italic; color: var(--green-dark); }
+
+.header-sub {
+  font-size: 12px;
+  color: var(--chrome);
+  margin-top: 8px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+/* ── NAV LINKS ── */
+.nav-links {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--green-mid);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: all 0.18s;
+}
+
+.nav-link:hover { border-color: var(--green); color: var(--green); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  padding: 28px 24px;
+  margin: 0 16px 16px;
+  border: 1px solid var(--border);
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--green-light);
+}
+
+/* ── INPUTS ── */
+.input-group {
+  margin-bottom: 14px;
+}
+
+.input-group label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 400;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.input-group input::-webkit-outer-spin-button,
+.input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(61,153,112,0.12);
+  background: var(--white);
+}
+
+.input-prefix-wrap {
+  position: relative;
+}
+
+.input-prefix {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--green);
+  pointer-events: none;
+}
+
+.input-prefix-wrap input { padding-left: 32px; font-size: 24px; }
+
+.input-hint {
+  font-size: 11px;
+  color: var(--chrome);
+  margin-top: 5px;
+  padding-left: 4px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: 12px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+  color: var(--white);
+  box-shadow: 0 4px 16px rgba(42,122,86,0.3);
+}
+
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--green-dark);
+  border: 1.5px solid var(--green-mid);
+  font-size: 13px;
+  padding: 12px;
+}
+
+.btn-danger {
+  background: transparent;
+  color: #C97070;
+  border: 1.5px solid rgba(201,112,112,0.3);
+  font-size: 12px;
+  padding: 10px;
+  margin-top: 6px;
+}
+
+/* ── RESULT BOX ── */
+.result-box {
+  background: linear-gradient(135deg, rgba(61,153,112,0.08), rgba(61,153,112,0.03));
+  border: 1px solid var(--green-mid);
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+.result-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  margin-bottom: 4px;
+}
+
+.result-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 300;
+  color: var(--green-dark);
+  line-height: 1;
+}
+
+.result-sub {
+  font-size: 11px;
+  color: var(--chrome);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.result-cell {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.result-cell-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  margin-bottom: 3px;
+}
+
+.result-cell-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.result-cell.balance .result-cell-value { color: var(--green-dark); }
+.result-cell.fee     .result-cell-value { color: #C97070; }
+
+/* ── CLIENT CARDS ── */
+.client-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.client-card {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: slideIn 0.25s ease both;
+}
+
+.client-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+@keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.client-card-accent { height: 4px; }
+
+.client-card-body { padding: 16px 18px; }
+
+.client-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.client-card-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.artist-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.appt-chip { text-align: right; }
+.appt-chip-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--chrome); }
+.appt-chip-date  { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--ink-soft); }
+
+.card-amounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.amount-block {
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.amount-block-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--chrome); margin-bottom: 2px; }
+.amount-block-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; }
+
+.progress-track { height: 4px; background: #E8F0EC; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.progress-fill  { height: 100%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20,31,26,0.55);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 16px 16px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-btn.active {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  color: var(--white);
+  font-weight: 500;
+}
+
+/* ── REFERENCE TABLE ── */
+.ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ref-table th {
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--green-dark); font-weight: 500; padding: 8px 10px;
+  text-align: left; background: var(--green-light);
+}
+.ref-table th:first-child { border-radius: 8px 0 0 0; }
+.ref-table th:last-child  { border-radius: 0 8px 0 0; }
+.ref-table td { padding: 9px 10px; border-bottom: 1px solid var(--green-light); color: var(--ink); font-weight: 300; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:nth-child(even) td { background: rgba(61,153,112,0.03); }
+.ref-table td:first-child { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 400; }
+.ref-table td.ap-total { color: var(--green-dark); font-weight: 500; }
+.ref-table td.fee { color: #C97070; }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 28px 16px; color: var(--chrome); font-size: 13px; font-weight: 300; font-style: italic; }
+
+/* ── SYNC STATUS ── */
+.sync-status { text-align: center; font-size: 11px; min-height: 18px; padding: 4px 0; }
+.sync-status.saving { color: var(--chrome); }
+.sync-status.saved  { color: var(--green); }
+.sync-status.error  { color: #C97070; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:16px 16px 0;">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1.5px solid #A8D8C0;border-radius:100px;font-size:11px;font-weight:500;color:#5C4449;text-decoration:none;letter-spacing:0.06em;font-family:'DM Sans',sans-serif;">🏠 Home</a>
+    <a href="pii-afterpay-dashboard.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1.5px solid #A8D8C0;border-radius:100px;font-size:11px;font-weight:500;color:#5C4449;text-decoration:none;letter-spacing:0.06em;font-family:'DM Sans',sans-serif;">📊 Open Afterpay Plans</a>
+  </div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-mark">Pretty in Ink Tattoos</div>
+  <h1>Afterpay <em>Invoice</em> Calculator</h1>
+  <p class="header-sub">For artist use — internal tool</p>
+  
+</div>
+
+<!-- NEW CLIENT SETUP -->
+<div class="card" id="setup-card">
+  <div class="card-title">New Afterpay Invoice</div>
+
+  <div class="input-group">
+    <label>Client Email <span style="font-size:10px;color:var(--chrome);text-transform:none;letter-spacing:0;">(optional — auto-fills name from Square)</span></label>
+    <div style="display:flex;gap:8px;">
+      <input type="email" id="client-email" placeholder="client@email.com"
+        style="flex:1;padding:12px 14px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:300;color:var(--ink);background:var(--cream);border:1.5px solid var(--border);border-radius:12px;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+      <button onclick="lookupFromSquare()" style="padding:12px 16px;background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;letter-spacing:0.04em;">🔍 Look Up</button>
+    </div>
+    <p class="input-hint">Enter their email to auto-fill their name from Square</p>
+  </div>
+
+  <div id="square-result" style="display:none;background:var(--green-light);border:1px solid var(--green-mid);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--ink-soft);line-height:1.6;"></div>
+
+  <div class="input-group">
+    <label>Client Name</label>
+    <input type="text" id="client-name" placeholder="e.g. Jasmine T." oninput="onSetupChange()">
+  </div>
+
+  <div class="input-group">
+    <label>Artist <span style="font-size:10px;color:var(--chrome);text-transform:none;letter-spacing:0;">(auto-fills from lookup)</span></label>
+    <div id="artist-display" style="padding:11px 14px;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;font-size:14px;color:var(--chrome);font-style:italic;margin-bottom:6px;">
+      Will auto-fill after lookup — or select below
+    </div>
+    <select id="artist-select" oninput="onArtistManualSelect()"
+      style="width:100%;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);border:1.5px solid var(--border);border-radius:10px;outline:none;appearance:none;-webkit-appearance:none;">
+      <option value="">Or select manually...</option>
+      <option value="Jackie">💗 Jackie</option>
+      <option value="Nicole">💜 Nicole</option>
+      <option value="Tressa">🧡 Tressa</option>
+      <option value="Rosa">💚 Rosa</option>
+      <option value="Mellissa">💙 Mellissa</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <label>Appointment Date</label>
+    <input type="date" id="appt-date">
+    <p class="input-hint">Find in Appointy on the client's appointment record</p>
+  </div>
+
+  <div class="input-group">
+    <label>Balance Due (from Appointy)</label>
+    <div class="input-prefix-wrap">
+      <span class="input-prefix">$</span>
+      <input type="number" id="balance-due" placeholder="0.00" step="0.01" min="0" oninput="onSetupChange()">
+    </div>
+    <p class="input-hint">⚠️ Enter manually from Appointy — open the appointment → copy the <strong>Balance Due</strong>. Square only knows the deposit amount, not the full tattoo balance.</p>
+  </div>
+
+  <button id="calc-btn" class="btn btn-primary hidden" onclick="calculateAndCreate()">
+    ✦ Calculate Afterpay Total &amp; Create Client Card
+  </button>
+  <div id="sync-status" class="sync-status"></div>
+</div>
+
+<!-- RESULT (shown after calculation) -->
+<div class="card hidden" id="result-card">
+  <div class="card-title">Afterpay Invoice Amount</div>
+
+  <div class="result-box">
+    <div class="result-label">Send This Amount as Your Invoice</div>
+    <div class="result-amount" id="result-total">$0.00</div>
+    <div class="result-sub">This is what to enter into Square as the custom amount</div>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-cell balance">
+      <div class="result-cell-label">Client Owes</div>
+      <div class="result-cell-value" id="result-balance">$0.00</div>
+    </div>
+    <div class="result-cell fee">
+      <div class="result-cell-label">Afterpay Fee</div>
+      <div class="result-cell-value" id="result-fee">$0.00</div>
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" onclick="resetSetup()" style="margin-top:16px;">+ New Invoice Calculation</button>
+</div>
+
+<!-- CLIENT CARDS SECTION -->
+<div class="tabs" id="tabs-bar">
+  <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">Active</button>
+  <button class="tab-btn" id="tab-archived" onclick="switchTab('archived')">Archived</button>
+  <button class="tab-btn" id="tab-deleted" onclick="switchTab('deleted')">Deleted</button>
+</div>
+
+<div class="card">
+  <div class="card-title">Afterpay Client Tracker</div>
+  <div class="client-list" id="client-list">
+    <div class="empty-state" id="empty-state">No Afterpay clients yet — use the form above to get started</div>
+  </div>
+</div>
+
+<!-- REFERENCE TABLE -->
+<div class="card">
+  <div class="card-title">Quick Reference — Common Balances</div>
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Client Owes</th>
+        <th class="ap-total">Invoice Amount</th>
+        <th class="fee">Afterpay Fee</th>
+      </tr>
+    </thead>
+    <tbody id="ref-table-body"></tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+
+<script>
+const BACKEND_URL = "https://pii-backend-production.up.railway.app";
+  const SHEET_URL   = "https://script.google.com/macros/s/AKfycbz3XojZzUAH30F1CK1qyBvsDd-zCe2KACv3_ZcigpPnuacZGJj-AURRN4t6TlqOQLpK/exec";
+const NOTIFY_EMAIL = "jackie@prettyinink.net";
+
+// ── AFTERPAY FEE FORMULA ──
+// Invoice total = balance + (balance * 0.06) + 0.30
+// Fee = (balance * 0.06) + 0.30
+function calcAfterPay(balance) {
+  const fee   = (balance * 0.06) + 0.30;
+  const total = balance + fee;
+  return { total, fee, balance };
+}
+
+const ARTISTS = {
+  Jackie:   { color: '#D4748F', bg: '#FDF0F3', mid: '#F2C8D4' },
+  Nicole:   { color: '#8B6BB5', bg: '#F5F0FC', mid: '#D8C8F0' },
+  Tressa:   { color: '#D4853A', bg: '#FDF4ED', mid: '#F5D4B0' },
+  Rosa:     { color: '#5A9E6F', bg: '#F0F8F3', mid: '#BCE0C8' },
+  Mellissa: { color: '#4A90C4', bg: '#EFF6FC', mid: '#B8D8F0' },
+};
+
+// ── STATE ──
+let clients    = [];
+let activeTab  = 'active';
+let currentClientId = null;
+
+// ── ON INPUT CHANGE ──
+function onSetupChange() {
+  const name = document.getElementById('client-name').value.trim();
+  const bal  = parseFloat(document.getElementById('balance-due').value);
+  document.getElementById('calc-btn').classList.toggle('hidden', !name || !bal || bal <= 0);
+}
+
+// ── CALCULATE + CREATE CARD ──
+function calculateAndCreate() {
+  const name    = document.getElementById('client-name').value.trim();
+  const artist  = document.getElementById('artist-select').value;
+  const appt    = document.getElementById('appt-date').value;
+  const balance = parseFloat(document.getElementById('balance-due').value);
+
+  if (!name || !balance || balance <= 0) return;
+
+  const { total, fee } = calcAfterPay(balance);
+  const clientId = 'AP_' + Date.now();
+
+  // Show result
+  document.getElementById('result-total').textContent   = fmt(total);
+  document.getElementById('result-balance').textContent = fmt(balance);
+  document.getElementById('result-fee').textContent     = fmt(fee);
+  document.getElementById('result-card').classList.remove('hidden');
+
+  // Lock inputs
+  document.getElementById('client-name').disabled   = true;
+  document.getElementById('artist-select').disabled  = true;
+  document.getElementById('appt-date').disabled      = true;
+  document.getElementById('balance-due').disabled    = true;
+  document.getElementById('calc-btn').classList.add('hidden');
+
+  // Create client record
+  const client = { clientId, name, artist, appt, balance, invoiceTotal: total, fee, status: 'Active', created: new Date().toISOString() };
+  clients.unshift(client);
+  currentClientId = clientId;
+  renderClients();
+
+  // Sync to sheet
+  syncToSheet('setAfterPayClient', {
+    clientId, clientName: name, artist, appointmentDate: appt,
+    balanceDue: balance, invoiceTotal: total, afterpayFee: fee,
+    status: 'Active'
+  });
+}
+
+// ── RESET SETUP ──
+function resetSetup() {
+  ['client-name','artist-select','appt-date','balance-due'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.disabled = false;
+  });
+  document.getElementById('calc-btn').classList.add('hidden');
+  document.getElementById('result-card').classList.add('hidden');
+  currentClientId = null;
+}
+
+// ── SWITCH TAB ──
+function switchTab(tab) {
+  activeTab = tab;
+  ['active','archived','deleted'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+  renderClients();
+}
+
+// ── RENDER CLIENTS ──
+function renderClients() {
+  const list     = document.getElementById('client-list');
+  const emptyEl  = document.getElementById('empty-state');
+  const filtered = clients.filter(c => {
+    if (activeTab === 'active')   return c.status === 'Active';
+    if (activeTab === 'archived') return c.status === 'Archived';
+    if (activeTab === 'deleted')  return c.status === 'Deleted';
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    const msgs = { active: 'No active Afterpay clients yet', archived: 'No archived clients', deleted: 'No deleted clients' };
+    emptyEl.textContent = msgs[activeTab] || 'Nothing here yet';
+    list.appendChild(emptyEl);
+    return;
+  }
+
+  emptyEl.classList.add('hidden');
+  list.innerHTML = filtered.map((c, i) => buildClientCard(c, i)).join('');
+}
+
+// ── BUILD CLIENT CARD ──
+function buildClientCard(c, i) {
+  const theme   = ARTISTS[c.artist] || ARTISTS['Jackie'];
+  const apptStr = c.appt
+    ? new Date(c.appt + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+    : 'TBD';
+
+  return `
+    <div class="client-card" onclick="openModal('${c.clientId}')" style="animation-delay:${i * 0.05}s;">
+      <div class="client-card-accent" style="background:linear-gradient(90deg,${theme.color},${theme.color}88);"></div>
+      <div class="client-card-body">
+        <div class="client-card-top">
+          <div>
+            <div class="client-card-name">${escHtml(c.name)}</div>
+            <div class="artist-badge" style="background:${theme.bg};color:${theme.color};">
+              <span style="width:6px;height:6px;border-radius:50%;background:${theme.color};display:inline-block;"></span>
+              ${escHtml(c.artist||'—')}
+            </div>
+          </div>
+          <div class="appt-chip">
+            <div class="appt-chip-label">Appointment</div>
+            <div class="appt-chip-date">${apptStr}</div>
+          </div>
+        </div>
+        <div class="card-amounts">
+          <div class="amount-block" style="background:${theme.bg};">
+            <div class="amount-block-label" style="color:${theme.color};">Balance Due</div>
+            <div class="amount-block-value" style="color:${theme.color};">${fmt(c.balance)}</div>
+          </div>
+          <div class="amount-block" style="background:#FDF0F0;">
+            <div class="amount-block-label" style="color:#C97070;">AP Fee</div>
+            <div class="amount-block-value" style="color:#C97070;">${fmt(c.fee)}</div>
+          </div>
+          <div class="amount-block" style="background:var(--green-light);">
+            <div class="amount-block-label" style="color:var(--green-dark);">Invoice Total</div>
+            <div class="amount-block-value" style="color:var(--green-dark);">${fmt(c.invoiceTotal)}</div>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${c.status==='Active'?0:100}%;background:linear-gradient(90deg,${theme.mid},${theme.color});"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── OPEN MODAL ──
+function openModal(clientId) {
+  const c = clients.find(cl => cl.clientId === clientId);
+  if (!c) return;
+
+  const theme   = ARTISTS[c.artist] || ARTISTS['Jackie'];
+  const apptStr = c.appt
+    ? new Date(c.appt + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+    : 'TBD';
+  const isActive = c.status === 'Active';
+
+  document.getElementById('modal-overlay').innerHTML = `
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="height:5px;background:linear-gradient(90deg,${theme.color},${theme.color}88);border-radius:20px 20px 0 0;"></div>
+      <div style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:26px;">${escHtml(c.name)}</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:${theme.bg};color:${theme.color};font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:${theme.color};display:inline-block;"></span>
+              ${escHtml(c.artist||'')}
+            </div>
+          </div>
+          <button onclick="closeModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--chrome);">✕</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+          <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--chrome);margin-bottom:2px;">Appointment</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:16px;">${apptStr}</div>
+          </div>
+          <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--chrome);margin-bottom:2px;">Status</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:${isActive?'var(--green-dark)':'var(--chrome)'};">${c.status}</div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,rgba(61,153,112,0.08),rgba(61,153,112,0.03));border:1px solid var(--green-mid);border-radius:14px;padding:18px;text-align:center;margin-bottom:14px;">
+          <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--chrome);margin-bottom:4px;">Invoice Amount to Send Client</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:var(--green-dark);line-height:1;">${fmt(c.invoiceTotal)}</div>
+          <div style="font-size:11px;color:var(--chrome);margin-top:4px;font-style:italic;">Enter this into Square as the custom amount</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;">
+          <div style="background:${theme.bg};border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${theme.color};margin-bottom:2px;">Balance Due</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${theme.color};">${fmt(c.balance)}</div>
+          </div>
+          <div style="background:#FDF0F0;border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#C97070;margin-bottom:2px;">AP Fee</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#C97070;">${fmt(c.fee)}</div>
+          </div>
+          <div style="background:var(--green-light);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green-dark);margin-bottom:2px;">Total</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--green-dark);">${fmt(c.invoiceTotal)}</div>
+          </div>
+        </div>
+
+        ${isActive ? `
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--chrome);margin-bottom:4px;font-weight:500;">Actions</div>
+          <button onclick="markPaid('${c.clientId}')" style="padding:14px;background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.06em;">✓ Mark as Paid & Archive</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button onclick="archiveAP('${c.clientId}')" style="padding:12px;background:#f5f0f0;border:1.5px solid #e0d0d4;border-radius:12px;font-size:12px;font-weight:500;color:var(--ink-soft);cursor:pointer;">📦 Archive</button>
+            <button onclick="deleteAP('${c.clientId}')" style="padding:12px;background:#fdf0f0;border:1.5px solid #f0c8c8;border-radius:12px;font-size:12px;font-weight:500;color:#c97070;cursor:pointer;">🗑 Delete</button>
+          </div>
+        </div>` : `
+        <div style="padding:12px;background:var(--green-light);border-radius:12px;text-align:center;font-size:12px;color:var(--green-dark);font-weight:500;">
+          ✓ This invoice is ${c.status}
+        </div>`}
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function markPaid(clientId) {
+  if (!confirm('Mark this invoice as paid and archive it? Jackie will receive a record by email.')) return;
+  closeModal();
+  updateClientStatus(clientId, 'Paid');
+  syncToSheet('archiveAfterPayClient', { clientId, reason: 'Paid' });
+}
+
+function archiveAP(clientId) {
+  if (!confirm('Archive this Afterpay invoice? Jackie will receive a record by email.')) return;
+  closeModal();
+  updateClientStatus(clientId, 'Archived');
+  syncToSheet('archiveAfterPayClient', { clientId, reason: 'Archived' });
+}
+
+function deleteAP(clientId) {
+  if (!confirm('Delete this Afterpay invoice? Jackie will receive a record before deletion.')) return;
+  closeModal();
+  updateClientStatus(clientId, 'Deleted');
+  syncToSheet('deleteAfterPayClient', { clientId });
+}
+
+function updateClientStatus(clientId, status) {
+  const c = clients.find(cl => cl.clientId === clientId);
+  if (c) c.status = status;
+  renderClients();
+}
+
+// ── REFERENCE TABLE ──
+const commonAmounts = [100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000];
+const tbody = document.getElementById('ref-table-body');
+commonAmounts.forEach(amount => {
+  const { total, fee } = calcAfterPay(amount);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${fmt(amount)}</td><td class="ap-total">${fmt(total)}</td><td class="fee">${fmt(fee)}</td>`;
+  tbody.appendChild(tr);
+});
+
+// ── SYNC ──
+let cbId = 0;
+function syncToSheet(action, data) {
+  showSync('saving');
+  const cb  = 'apSync_' + (++cbId);
+  const params = new URLSearchParams({ action, callback: cb });
+  Object.keys(data).forEach(k => params.set(k, data[k] !== undefined ? data[k] : ''));
+  const script = document.createElement('script');
+  script.src   = SHEET_URL + '?' + params;
+  const timer  = setTimeout(() => { cleanup(); showSync('saved'); }, 6000);
+  window[cb]   = () => { cleanup(); clearTimeout(timer); showSync('saved'); };
+  script.onerror = () => { cleanup(); clearTimeout(timer); showSync('saved'); };
+  function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+  document.head.appendChild(script);
+}
+
+function showSync(state) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  el.className = 'sync-status ' + state;
+  const msgs = { saving: '⟳ Saving...', saved: '✓ Saved', error: '✕ Sync failed' };
+  el.textContent = msgs[state] || '';
+  if (state === 'saved') setTimeout(() => { el.textContent=''; el.className='sync-status'; }, 3000);
+}
+
+function onArtistManualSelect() {
+    const val = document.getElementById('artist-select').value;
+    if (val) {
+      const display = document.getElementById('artist-display');
+      const emojis = { Jackie:'💗', Nicole:'💜', Tressa:'🧡', Rosa:'💚', Mellissa:'💙' };
+      display.textContent = (emojis[val]||'')+' '+val;
+      display.style.color = 'var(--ink)'; display.style.fontStyle = 'normal';
+    }
+    onSetupChange();
+  }
+
+  function setArtist(name) {
+    if (!name) return;
+    const artists = ['Jackie','Nicole','Tressa','Rosa','Mellissa'];
+    const emojis  = { Jackie:'💗', Nicole:'💜', Tressa:'🧡', Rosa:'💚', Mellissa:'💙' };
+    const match   = artists.find(a => name.toLowerCase().includes(a.toLowerCase()));
+    if (match) {
+      document.getElementById('artist-select').value = match;
+      const display = document.getElementById('artist-display');
+      display.textContent = (emojis[match]||'')+' '+match+' (from Appointy)';
+      display.style.color = 'var(--ink)'; display.style.fontStyle = 'normal';
+    }
+  }
+
+  function fmt(n)    { return '$' + (n||0).toFixed(2); }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>

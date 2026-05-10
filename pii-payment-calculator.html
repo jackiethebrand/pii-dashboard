@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Payment Calculator — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink:       #D4748F;
+    --pink-light: #F5E0E6;
+    --pink-mid:   #EAB8C5;
+    --pink-dark:  #A84F68;
+    --cream:      #FDF7F5;
+    --white:      #FFFFFF;
+    --ink:        #1C1213;
+    --ink-soft:   #5C4449;
+    --chrome:     #C8B8BC;
+    --success:    #7DB48A;
+    --danger:     #C97070;
+    --shadow:     0 4px 24px rgba(168, 79, 104, 0.10);
+    --shadow-lg:  0 8px 40px rgba(168, 79, 104, 0.16);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+    background:
+      radial-gradient(ellipse at 80% 0%, rgba(212,116,143,0.13) 0%, transparent 60%),
+      radial-gradient(ellipse at 10% 90%, rgba(212,116,143,0.09) 0%, transparent 50%),
+      var(--cream);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 40px 24px 28px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--pink-mid), var(--pink));
+    margin: 18px auto 0;
+    border-radius: 2px;
+  }
+
+  .logo-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--pink);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 28px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--pink-dark);
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px;
+    margin: 0 16px 16px;
+    border: 1px solid rgba(212,116,143,0.08);
+    transition: box-shadow 0.2s;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--pink-light);
+  }
+
+  /* ── INPUTS ── */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .input-prefix {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--pink);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 16px 16px 16px 32px;
+    font-size: 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1.5px solid var(--pink-light);
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(212,116,143,0.12);
+    background: var(--white);
+  }
+
+  input[type="number"]::placeholder {
+    color: var(--chrome);
+    font-size: 20px;
+  }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    padding-left: 4px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(168,79,104,0.28);
+    margin-top: 12px;
+  }
+
+  .btn-primary:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(168,79,104,0.2); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--pink-dark);
+    border: 1.5px solid var(--pink-mid);
+    font-size: 13px;
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .btn-ghost:active { background: var(--pink-light); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1.5px solid rgba(201,112,112,0.3);
+    font-size: 12px;
+    padding: 10px;
+    margin-top: 6px;
+  }
+
+  /* ── BALANCE DISPLAY ── */
+  .balance-display {
+    text-align: center;
+    padding: 24px 16px;
+    background: linear-gradient(135deg, rgba(212,116,143,0.08) 0%, rgba(212,116,143,0.04) 100%);
+    border-radius: 16px;
+    border: 1px solid var(--pink-light);
+    margin-bottom: 4px;
+  }
+
+  .balance-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .balance-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .balance-amount.zero { color: var(--success); }
+  .balance-amount.low  { color: var(--pink-dark); }
+
+  .balance-client {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ── PAYMENT RESULT ── */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .result-cell {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+    border: 1px solid rgba(212,116,143,0.1);
+  }
+
+  .result-cell-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    font-weight: 400;
+  }
+
+  .result-cell-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .result-cell.applied .result-cell-value { color: var(--success); }
+  .result-cell.fee .result-cell-value     { color: var(--pink-dark); }
+
+  /* ── PAYMENT LOG ── */
+  .payment-log {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .log-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--cream);
+    border-radius: 12px;
+    border: 1px solid rgba(212,116,143,0.08);
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .log-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--pink-light);
+    color: var(--pink-dark);
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .log-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .log-paid {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .log-breakdown {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 300;
+    margin-top: 1px;
+  }
+
+  .log-balance {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .log-balance-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--chrome);
+  }
+
+  .log-balance-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.1;
+  }
+
+  .log-delete {
+    background: none;
+    border: none;
+    color: var(--chrome);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .log-delete:active { color: var(--danger); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--chrome);
+    font-size: 13px;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* ── PAID OFF STATE ── */
+  .paid-off-banner {
+    background: linear-gradient(135deg, rgba(125,180,138,0.12), rgba(125,180,138,0.06));
+    border: 1px solid rgba(125,180,138,0.3);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 8px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .paid-off-banner .emoji { font-size: 28px; margin-bottom: 6px; }
+
+  .paid-off-banner p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--success);
+    font-weight: 400;
+  }
+
+  .paid-off-banner small {
+    font-size: 11px;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── REFERENCE TABLE ── */
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .ref-table th {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--pink-dark);
+    font-weight: 500;
+    padding: 8px 10px;
+    text-align: left;
+    background: var(--pink-light);
+    border-radius: 0;
+  }
+
+  .ref-table th:first-child { border-radius: 8px 0 0 0; }
+  .ref-table th:last-child  { border-radius: 0 8px 0 0; }
+
+  .ref-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--pink-light);
+    color: var(--ink);
+    font-weight: 300;
+  }
+
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table tr:nth-child(even) td { background: rgba(212,116,143,0.03); }
+
+  .ref-table td:first-child { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 400; }
+  .ref-table td.applied     { color: var(--success); font-weight: 400; }
+  .ref-table td.fee         { color: var(--pink-dark); }
+
+  /* ── SECTION STATES ── */
+  .hidden { display: none !important; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--pink-light);
+    margin: 20px 0;
+  }
+
+  /* ── SYNC STATUS ── */
+  .sync-status {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    min-height: 18px;
+    transition: all 0.2s;
+    padding: 4px 0;
+  }
+  .sync-status.saving { color: var(--chrome); }
+  .sync-status.saved  { color: var(--success); }
+  .sync-status.error  { color: var(--danger); }
+
+  /* ── RESET LINK ── */
+  .reset-wrap {
+    text-align: center;
+    padding: 8px;
+  }
+
+  .reset-link {
+    font-size: 12px;
+    color: var(--chrome);
+    text-decoration: none;
+    border-bottom: 1px solid var(--pink-light);
+    padding-bottom: 1px;
+    cursor: pointer;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    margin-top: 12px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--chrome);
+    margin-bottom: 6px;
+  }
+
+  .progress-track {
+    height: 6px;
+    background: var(--pink-light);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink-mid), var(--pink));
+    border-radius: 6px;
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 0%;
+    max-width: 100%;
+  }
+
+  .progress-fill.done { background: linear-gradient(90deg, #7DB48A, #5a9966); }
+</style>
+</head>
+<body>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:16px 16px 0;">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1.5px solid #EAB8C5;border-radius:100px;font-size:11px;font-weight:500;color:#5C4449;text-decoration:none;letter-spacing:0.06em;font-family:'DM Sans',sans-serif;">🏠 Home</a>
+    <a href="pii-dashboard.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1.5px solid #EAB8C5;border-radius:100px;font-size:11px;font-weight:500;color:#5C4449;text-decoration:none;letter-spacing:0.06em;font-family:'DM Sans',sans-serif;">📋 Open Plans</a>
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1.5px solid #EAB8C5;border-radius:100px;font-size:11px;font-weight:500;color:#5C4449;text-decoration:none;letter-spacing:0.06em;font-family:'DM Sans',sans-serif;">← Payment Plans</a>
+  </div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-mark">Pretty in Ink Tattoos</div>
+  <h1>Layaway <em>Payment</em> Calculator</h1>
+  <p class="header-sub">For artist use — internal tool</p>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#fff;border:1.5px solid var(--pink-mid);border-radius:100px;font-size:11px;font-weight:500;color:var(--ink-soft);text-decoration:none;letter-spacing:0.06em;">🏠 Home</a>
+    <a href="pii-dashboard.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#fff;border:1.5px solid var(--pink-mid);border-radius:100px;font-size:11px;font-weight:500;color:var(--ink-soft);text-decoration:none;letter-spacing:0.06em;">💗 Dashboard</a>
+  </div>
+</div>
+
+<!-- CLIENT INFO — always visible at top -->
+<div id="setup-card" class="card">
+  <div class="card-title">Client Info</div>
+
+  <div style="margin-bottom:14px;">
+    <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Client Email (optional — auto-fills from Square)</label>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="client-email" placeholder="Email or full name..."
+        style="flex:1;padding:12px 14px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:300;color:var(--ink);background:var(--cream);border:1.5px solid var(--pink-light);border-radius:12px;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(212,116,143,0.12)'"
+        onblur="this.style.borderColor='var(--pink-light)';this.style.boxShadow='none'"
+        onkeydown="if(event.key==='Enter') lookupFromSquare()">
+      <button onclick="lookupFromSquare()" id="lookup-btn" style="padding:12px 16px;background:linear-gradient(135deg,var(--pink),var(--pink-dark));color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;min-width:90px;">🔍 Look Up</button>
+    </div>
+    <p class="input-hint">Search by email address or full name — tap Look Up or press Enter</p>
+  </div>
+
+  <div id="square-result" style="display:none;background:var(--pink-light);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--ink-soft);"></div>
+
+  <div style="margin-bottom:14px;">
+    <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Client Name</label>
+    <input type="text" id="client-name" placeholder="e.g. Jasmine T."
+      oninput="onSetupChange()"
+      style="width:100%;padding:14px 16px;font-size:16px;font-family:'DM Sans',sans-serif;font-weight:300;color:var(--ink);background:var(--cream);border:1.5px solid var(--pink-light);border-radius:12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;"
+      onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(212,116,143,0.12)';"
+      onblur="this.style.borderColor='var(--pink-light)';this.style.boxShadow='none';">
+  </div>
+
+  <div style="margin-bottom:14px;">
+    <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Artist <span style="font-size:10px;color:var(--chrome);text-transform:none;letter-spacing:0;">(auto-fills from Square lookup)</span></label>
+    <div id="artist-display" style="padding:12px 16px;background:var(--cream);border:1.5px solid var(--pink-light);border-radius:12px;font-size:14px;color:var(--chrome);font-style:italic;margin-bottom:6px;">
+      Will auto-fill after lookup — or select below
+    </div>
+    <select id="artist-select" oninput="onArtistManualSelect()"
+      style="width:100%;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);border:1.5px solid var(--pink-light);border-radius:10px;outline:none;appearance:none;-webkit-appearance:none;">
+      <option value="">Or select manually...</option>
+      <option value="Jackie">💗 Jackie</option>
+      <option value="Nicole">💜 Nicole</option>
+      <option value="Tressa">🧡 Tressa</option>
+      <option value="Rosa">💚 Rosa</option>
+      <option value="Mellissa">💙 Mellissa</option>
+    </select>
+  </div>
+
+  <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Balance Due (from Appointy)</label>
+  <div class="input-wrap">
+    <span class="input-prefix">$</span>
+    <input type="number" id="tattoo-balance" placeholder="0.00" step="0.01" min="0" oninput="onBalanceInput()">
+  </div>
+  <p class="input-hint">Open Appointy → find the appointment → copy the Balance Due amount</p>
+
+  <div style="margin-top:14px;">
+    <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Appointment Date <span style="color:var(--chrome);font-size:10px;">(optional)</span></label>
+    <input type="date" id="appt-date"
+      style="width:100%;padding:14px 12px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:300;color:var(--ink);background:var(--cream);border:1.5px solid var(--pink-light);border-radius:12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;"
+      onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(212,116,143,0.12)';"
+      onblur="this.style.borderColor='var(--pink-light)';this.style.boxShadow='none';">
+    <p class="input-hint">Helps the team see which open plans are coming up soonest</p>
+  </div>
+
+  <button id="confirm-btn" class="btn btn-primary hidden" onclick="confirmBalance()" style="margin-top:12px;">
+    ✦ Set Balance &amp; Begin Tracking
+  </button>
+  <div id="sync-status" class="sync-status"></div>
+</div>
+
+<!-- BALANCE DISPLAY — shown after confirming -->
+<div id="balance-card" class="card hidden">
+  <div class="card-title">Remaining Balance</div>
+
+  <div class="balance-display">
+    <div class="balance-label">Balance Due</div>
+    <div class="balance-amount" id="balance-display">$0.00</div>
+    <div class="balance-client" id="balance-client-name"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Paid</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT SECTION — hidden until balance confirmed -->
+<div id="calc-section" class="hidden">
+
+  <div class="card" id="payment-entry-card">
+    <div class="card-title">Log a Payment</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
+      <div>
+        <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Date of Payment</label>
+        <input type="date" id="payment-date"
+          style="width:100%;padding:14px 12px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:300;color:var(--ink);background:var(--cream);border:1.5px solid var(--pink-light);border-radius:12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;"
+          onfocus="this.style.borderColor='var(--pink)';this.style.boxShadow='0 0 0 3px rgba(212,116,143,0.12)';"
+          onblur="this.style.borderColor='var(--pink-light)';this.style.boxShadow='none';">
+      </div>
+      <div>
+        <label style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;font-weight:400;">Amount Client Sent</label>
+        <div class="input-wrap" style="margin-bottom:0;">
+          <span class="input-prefix">$</span>
+          <input type="number" id="payment-amount" placeholder="0.00" step="0.01" min="0">
+        </div>
+      </div>
+    </div>
+    <p class="input-hint">Date helps you locate the payment in Square to verify before the appointment</p>
+
+    <button class="btn btn-primary" onclick="logPayment()">
+      ✦ Apply Payment
+    </button>
+
+    <div id="payment-result" class="hidden" style="margin-top:18px;">
+      <div class="divider" style="margin-top:0;margin-bottom:14px;"></div>
+      <div class="result-grid">
+        <div class="result-cell applied">
+          <div class="result-cell-label">Applied to Balance</div>
+          <div class="result-cell-value" id="applied-amount">$0.00</div>
+        </div>
+        <div class="result-cell fee">
+          <div class="result-cell-label">Processing Fee (6%)</div>
+          <div class="result-cell-value" id="fee-amount">$0.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment History</div>
+
+    <div id="paid-off-banner" class="paid-off-banner hidden">
+      <div class="emoji">🌸</div>
+      <p>Balance Paid in Full!</p>
+      <small>All done — she's ready for her appointment</small>
+    </div>
+
+    <ul class="payment-log" id="payment-log">
+      <li class="empty-state" id="empty-log">No payments logged yet</li>
+    </ul>
+
+    <div id="log-actions" class="hidden" style="margin-top:12px;">
+      <button class="btn btn-danger" onclick="undoLast()">↩ Undo Last Payment</button>
+    </div>
+  </div>
+
+  <div class="reset-wrap">
+    <button class="reset-link" onclick="resetAll()">Start over with a new client</button>
+  </div>
+
+</div>
+
+<!-- REFERENCE TABLE (always visible) -->
+<div class="card" style="margin-top: 8px;">
+  <div class="card-title">Quick Reference — Common Amounts</div>
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Client Pays</th>
+        <th class="applied">→ Applied</th>
+        <th class="fee">Fee (6%)</th>
+      </tr>
+    </thead>
+    <tbody id="ref-table-body"></tbody>
+  </table>
+</div>
+
+<script>
+  // ── CONFIG ──
+  const BACKEND_URL = "https://pii-backend-production.up.railway.app";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz3XojZzUAH30F1CK1qyBvsDd-zCe2KACv3_ZcigpPnuacZGJj-AURRN4t6TlqOQLpK/exec";
+
+  // ── STATE ──
+  let state = {
+    clientName: '',
+    originalBalance: 0,
+    currentBalance: 0,
+    payments: []
+  };
+
+  // ── LIVE: show confirm button once balance is typed ──
+  function onBalanceInput() {
+    const val = parseFloat(document.getElementById('tattoo-balance').value);
+    const btn = document.getElementById('confirm-btn');
+    btn.classList.toggle('hidden', !val || val <= 0);
+  }
+
+  function onSetupChange() {
+    // nothing extra needed — name updates on confirm
+  }
+
+  // ── CONFIRM BALANCE — locks in balance and reveals tracker ──
+  function confirmBalance() {
+    const nameInput = document.getElementById('client-name').value.trim();
+    const balInput  = parseFloat(document.getElementById('tattoo-balance').value);
+
+    if (!balInput || balInput <= 0) {
+      document.getElementById('tattoo-balance').style.borderColor = 'var(--danger)';
+      setTimeout(() => document.getElementById('tattoo-balance').style.borderColor = 'var(--pink-light)', 1200);
+      return;
+    }
+
+    const artistVal = document.getElementById('artist-select').value;
+    state.clientName      = nameInput || 'Client';
+    state.originalBalance = balInput;
+    state.currentBalance  = balInput;
+    state.payments        = [];
+    state.clientId        = 'PII_' + Date.now();
+    state.artist          = artistVal;
+    state.synced          = false;
+
+    // Lock artist select
+    document.getElementById('artist-select').disabled = true;
+
+    // Sync to Google Sheets
+    syncToSheet('setBalance', {
+      clientId:        state.clientId,
+      clientName:      state.clientName,
+      originalBalance: state.originalBalance,
+      appointmentDate: document.getElementById('appt-date') ? document.getElementById('appt-date').value : '',
+      artist:          artistVal
+    });
+
+    // Lock the setup inputs
+    document.getElementById('tattoo-balance').disabled = true;
+    document.getElementById('client-name').disabled    = true;
+    document.getElementById('confirm-btn').classList.add('hidden');
+
+    // Show balance card and payment section
+    document.getElementById('balance-card').classList.remove('hidden');
+    document.getElementById('calc-section').classList.remove('hidden');
+
+    // Default date to today
+    document.getElementById('payment-date').value = todayISO();
+
+    // Scroll to balance card smoothly
+    setTimeout(() => document.getElementById('balance-card').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+    updateUI();
+  }
+
+  // ── LOG PAYMENT ──
+  function logPayment() {
+    const paid = parseFloat(document.getElementById('payment-amount').value);
+
+    if (!paid || paid <= 0) {
+      document.getElementById('payment-amount').focus();
+      document.getElementById('payment-amount').style.borderColor = 'var(--danger)';
+      setTimeout(() => document.getElementById('payment-amount').style.borderColor = 'var(--pink-light)', 1200);
+      return;
+    }
+
+    // Fee formula: 3.6% + $0.10 per transaction
+    // applied = (paid - 0.10) / 1.036
+    const applied       = (paid - 0.10) / 1.036;
+    const fee           = paid - applied;
+    const balanceBefore = state.currentBalance;
+
+    state.currentBalance = Math.max(0, state.currentBalance - applied);
+
+    const dateVal = document.getElementById('payment-date').value;
+    state.payments.push({ paid, applied, fee, balanceBefore, balanceAfter: state.currentBalance, date: dateVal });
+    document.getElementById('payment-date').value = todayISO();
+
+    document.getElementById('applied-amount').textContent = fmt(applied);
+    document.getElementById('fee-amount').textContent     = fmt(fee);
+    document.getElementById('payment-result').classList.remove('hidden');
+    document.getElementById('payment-amount').value = '';
+
+    // Sync to Google Sheets
+    const lastP = state.payments[state.payments.length - 1];
+    syncToSheet('logPayment', {
+      clientId:      state.clientId,
+      clientName:    state.clientName,
+      paymentDate:   lastP.date,
+      amountPaid:    lastP.paid,
+      amountApplied: lastP.applied,
+      processingFee: lastP.fee,
+      balanceBefore: lastP.balanceBefore,
+      balanceAfter:  lastP.balanceAfter
+    });
+
+    updateUI();
+  }
+
+  // ── UNDO LAST ──
+  function undoLast() {
+    if (state.payments.length === 0) return;
+    const last = state.payments.pop();
+    state.currentBalance = last.balanceBefore;
+    document.getElementById('payment-result').classList.add('hidden');
+    updateUI();
+
+    // Sync undo to Google Sheets
+    syncToSheet('undoPayment', {
+      clientId:        state.clientId,
+      restoredBalance: last.balanceBefore,
+      amountApplied:   last.applied
+    });
+  }
+
+  // ── RESET — re-enables setup inputs ──
+  function resetAll() {
+    if (!confirm('Start over with a new client? This will clear all current data.')) return;
+    state = { clientName: '', originalBalance: 0, currentBalance: 0, payments: [] };
+
+    const nameEl = document.getElementById('client-name');
+    const balEl  = document.getElementById('tattoo-balance');
+    nameEl.value    = '';
+    nameEl.disabled = false;
+    balEl.value     = '';
+    balEl.disabled  = false;
+    const artistEl = document.getElementById('artist-select');
+    if (artistEl) { artistEl.value = ''; artistEl.disabled = false; }
+
+    document.getElementById('payment-amount').value = '';
+    document.getElementById('payment-result').classList.add('hidden');
+    document.getElementById('confirm-btn').classList.add('hidden');
+    document.getElementById('balance-card').classList.add('hidden');
+    document.getElementById('calc-section').classList.add('hidden');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── UPDATE UI ──
+  function updateUI() {
+    const bal       = state.currentBalance;
+    const orig      = state.originalBalance;
+    const paidSoFar = orig - bal;
+    const pct       = Math.min(100, Math.round((paidSoFar / orig) * 100));
+
+    const balEl = document.getElementById('balance-display');
+    balEl.textContent = fmt(bal);
+    balEl.className   = 'balance-amount' + (bal <= 0 ? ' zero' : (pct >= 75 ? ' low' : ''));
+
+    document.getElementById('balance-client-name').textContent = state.clientName;
+    document.getElementById('progress-pct').textContent        = pct + '%';
+
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = pct + '%';
+    bar.className   = 'progress-fill' + (bal <= 0 ? ' done' : '');
+
+    document.getElementById('paid-off-banner').classList.toggle('hidden', bal > 0);
+    document.getElementById('payment-entry-card').classList.toggle('hidden', bal <= 0);
+
+    const logEl     = document.getElementById('payment-log');
+    const emptyEl   = document.getElementById('empty-log');
+    const actionsEl = document.getElementById('log-actions');
+
+    if (state.payments.length === 0) {
+      logEl.innerHTML = '';
+      logEl.appendChild(emptyEl);
+      emptyEl.classList.remove('hidden');
+      actionsEl.classList.add('hidden');
+    } else {
+      emptyEl.classList.add('hidden');
+      logEl.innerHTML = '';
+      actionsEl.classList.remove('hidden');
+
+      [...state.payments].reverse().forEach((p, i) => {
+        const num = state.payments.length - i;
+        const li  = document.createElement('li');
+        li.className = 'log-item';
+        const dateStr = p.date ? new Date(p.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        li.innerHTML = `
+          <div class="log-num">${num}</div>
+          <div class="log-details" style="flex:1;min-width:0;">
+            <div class="log-paid">${fmt(p.paid)} received</div>
+            <div class="log-breakdown">
+              <span style="color:var(--success)">${fmt(p.applied)} applied</span>
+              &nbsp;·&nbsp;
+              <span style="color:var(--pink-dark)">${fmt(p.fee)} fee</span>
+            </div>
+            <div style="font-size:10px;color:var(--chrome);margin-top:2px;letter-spacing:0.06em;">${dateStr}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;text-align:right;flex-shrink:0;">
+            <div>
+              <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--chrome);">Before</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--chrome);">${fmt(p.balanceBefore)}</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);">After</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ink-soft);font-weight:400;">${fmt(p.balanceAfter)}</div>
+            </div>
+          </div>
+        `;
+        logEl.appendChild(li);
+      });
+    }
+  }
+
+  // ── REFERENCE TABLE ──
+  const commonAmounts = [25, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 500];
+  const tbody = document.getElementById('ref-table-body');
+  commonAmounts.forEach(amount => {
+    const applied = (amount - 0.10) / 1.036;
+    const fee     = amount - applied;
+    const tr      = document.createElement('tr');
+    tr.innerHTML  = `<td>${fmt(amount)}</td><td class="applied">${fmt(applied)}</td><td class="fee">${fmt(fee)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // ── GOOGLE SHEETS SYNC via JSONP (no CORS issues) ──
+  let syncCallbackId = 0;
+
+  function syncToSheet(action, data) {
+    showSyncStatus('saving');
+    const cbName = 'piiSync_' + (++syncCallbackId);
+    const allData = { action, callback: cbName };
+    Object.keys(data).forEach(k => { allData[k] = data[k] !== undefined ? data[k] : ''; });
+
+    // JSONP: inject a <script> tag — Google Apps Script can respond with callback(json)
+    const params = new URLSearchParams(allData).toString();
+    const script = document.createElement('script');
+    script.src   = SHEET_URL + '?' + params;
+
+    // Timeout fallback — if no response in 5s, assume saved (fire and forget)
+    const timer = setTimeout(() => {
+      cleanup();
+      showSyncStatus('saved');
+    }, 5000);
+
+    window[cbName] = function(res) {
+      cleanup();
+      clearTimeout(timer);
+      showSyncStatus(res && res.status === 'ok' ? 'saved' : 'saved');
+    };
+
+    function cleanup() {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      delete window[cbName];
+    }
+
+    script.onerror = () => { cleanup(); clearTimeout(timer); showSyncStatus('saved'); };
+    document.head.appendChild(script);
+  }
+
+  function showSyncStatus(state) {
+    const el = document.getElementById('sync-status');
+    if (!el) return;
+    el.className = 'sync-status ' + state;
+    const msgs = { saving: '⟳ Saving to sheet...', saved: '✓ Saved to sheet', error: '✕ Sync failed — check connection' };
+    el.textContent = msgs[state] || '';
+    if (state === 'saved') setTimeout(() => { el.textContent = ''; el.className = 'sync-status'; }, 3000);
+  }
+
+  // ── SQUARE LOOKUP ──
+  async function lookupFromSquare() {
+    const query = document.getElementById('client-email').value.trim();
+    if (!query) return;
+
+    const btn = document.getElementById('lookup-btn');
+    if (btn) { btn.textContent = '⟳'; btn.disabled = true; }
+
+    const resultEl = document.getElementById('square-result');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<span style="color:var(--chrome);">⟳ Searching Square...</span>';
+
+    try {
+      const isEmail = query.includes('@');
+      let data;
+
+      if (isEmail) {
+        const res = await fetch(BACKEND_URL + '/payments/by-email?email=' + encodeURIComponent(query));
+        data = await res.json();
+      } else {
+        // Name search — get customer list then fetch payment details
+        const res = await fetch(BACKEND_URL + '/customers/search?name=' + encodeURIComponent(query));
+        const customers = await res.json();
+        if (!customers || customers.length === 0) {
+          resultEl.innerHTML = '<span style="color:#C97070;">No customer found with that name in Square.</span>';
+          if (btn) { btn.textContent = '🔍 Look Up'; btn.disabled = false; }
+          return;
+        }
+        const c = customers[0];
+        const email = c.email_address || '';
+        if (email) {
+          const detailRes = await fetch(BACKEND_URL + '/payments/by-email?email=' + encodeURIComponent(email));
+          data = await detailRes.json();
+        } else {
+          // No email on file — just use name
+          data = { customer: { name: ((c.given_name||'') + ' ' + (c.family_name||'')).trim(), email: '', phone: c.phone_number||'' }, payments: [], invoices: [] };
+        }
+      }
+
+      if (!data.customer) {
+        resultEl.innerHTML = '<span style="color:#C97070;">No customer found in Square — enter details manually.</span>';
+        if (btn) { btn.textContent = '🔍 Look Up'; btn.disabled = false; }
+        return;
+      }
+
+      // Auto-fill name
+      const nameEl = document.getElementById('client-name');
+      if (nameEl && !nameEl.value) nameEl.value = data.customer.name;
+
+      // Try to find artist from Appointy sheet
+      if (data.customer.email) {
+        try {
+          const apptRes = await fetch(SHEET_URL.replace('exec','exec') + '?action=getAppointyAppointments&callback=none');
+        } catch(e) {}
+        // Use JSONP to get Appointy data and match by email
+        new Promise(resolve => {
+          const cb = 'artistLookup_' + Date.now();
+          const params = new URLSearchParams({ action: 'getAppointyAppointments', callback: cb });
+          const sc = document.createElement('script');
+          sc.src = SHEET_URL + '?' + params;
+          window[cb] = (d) => {
+            if(sc.parentNode) sc.parentNode.removeChild(sc);
+            delete window[cb];
+            const appt = (d.appointments||[]).find(a => a.email && a.email.toLowerCase() === data.customer.email.toLowerCase());
+            if (appt && appt.artist) setArtist(appt.artist);
+            resolve();
+          };
+          sc.onerror = () => resolve();
+          setTimeout(() => resolve(), 4000);
+          document.head.appendChild(sc);
+        });
+      }
+
+      // Show Square invoice/payment summary
+      const openInvoices = (data.invoices || []).filter(i => i.status !== 'PAID');
+      const paidInvoices = (data.invoices || []).filter(i => i.status === 'PAID');
+      const recentPayments = (data.payments || []).slice(0, 3);
+
+      let html = '<strong style="color:var(--pink-dark);">✓ Found in Square: ' + data.customer.name + '</strong><br>';
+      html += '<span style="color:var(--ink-soft);font-size:11px;">' + (data.customer.email||'') + ' · ' + (data.customer.phone||'') + '</span><br><br>';
+
+      // Source-aware payment breakdown using new backend summary
+      const sum = data.summary || {};
+
+      // Appointy deposit — most reliable for deposit matching
+      if (sum.appointyDeposits > 0) {
+        html += '<span style="color:#5a9966;font-size:12px;font-weight:500;">💰 Appointy deposit: $' + (sum.appointyTotal||0).toFixed(2) + ' (' + sum.appointyDeposits + ' payment' + (sum.appointyDeposits>1?'s':'') + ')</span><br>';
+      }
+      // Virtual terminal
+      if (sum.virtualTotal > 0) {
+        html += '<span style="color:var(--pink-dark);font-size:12px;">💳 Virtual terminal payments: $' + (sum.virtualTotal||0).toFixed(2) + '</span><br>';
+      }
+      // In-shop POS
+      if (sum.posTotal > 0) {
+        html += '<span style="color:var(--ink-soft);font-size:12px;">🏪 In-shop (POS): $' + (sum.posTotal||0).toFixed(2) + '</span><br>';
+      }
+      // Afterpay
+      if (sum.afterpayTotal > 0) {
+        html += '<span style="color:#3D9970;font-size:12px;">🟢 Afterpay: $' + (sum.afterpayTotal||0).toFixed(2) + '</span><br>';
+      }
+      // Cash
+      if (sum.cashTotal > 0) {
+        html += '<span style="color:var(--ink-soft);font-size:12px;">💵 Cash: $' + (sum.cashTotal||0).toFixed(2) + '</span><br>';
+      }
+      // Tips
+      if (sum.tipTotal > 0) {
+        html += '<span style="color:#D4853A;font-size:12px;">🎉 Tips: $' + (sum.tipTotal||0).toFixed(2) + '</span><br>';
+      }
+
+      // Fallback if no summary (older backend)
+      if (!sum.appointyDeposits && !sum.virtualTotal && !sum.posTotal && !sum.afterpayTotal && !sum.cashTotal) {
+        const recentCard = (data.payments||[]).filter(p => p.sourceType === 'CARD').slice(0,3);
+        if (recentCard.length > 0) {
+          html += '<span style="color:var(--ink-soft);font-size:12px;">💳 Recent payments: ';
+          html += recentCard.map(p => '$' + p.amount.toFixed(2) + ' (' + new Date(p.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ')').join(' · ');
+          html += '</span><br>';
+        }
+      }
+
+      if (openInvoices.length > 0) {
+        html += '<span style="color:#C97070;font-size:12px;">' + openInvoices.length + ' open Square invoice(s)</span><br>';
+      }
+
+      html += '<br><span style="color:var(--chrome);font-size:11px;">Name auto-filled ✓ &nbsp;·&nbsp; </span>';
+      html += '<span style="color:#C97070;font-size:11px;font-weight:500;">⚠️ Balance Due = open Appointy → appointment → Balance Due</span>';
+
+      resultEl.innerHTML = html;
+      onSetupChange();
+
+    } catch(e) {
+      resultEl.innerHTML = '<span style="color:#C97070;">Could not connect to Square — enter details manually.</span>';
+    } finally {
+      if (btn) { btn.textContent = '🔍 Look Up'; btn.disabled = false; }
+    }
+  }
+
+  function onArtistManualSelect() {
+    const val = document.getElementById('artist-select').value;
+    if (val) {
+      const display = document.getElementById('artist-display');
+      const emojis = { Jackie:'💗', Nicole:'💜', Tressa:'🧡', Rosa:'💚', Mellissa:'💙' };
+      display.textContent = (emojis[val]||'')+' '+val;
+      display.style.color = 'var(--ink)';
+      display.style.fontStyle = 'normal';
+    }
+    onSetupChange();
+  }
+
+  function setArtist(name) {
+    if (!name) return;
+    const select = document.getElementById('artist-select');
+    const display = document.getElementById('artist-display');
+    const emojis = { Jackie:'💗', Nicole:'💜', Tressa:'🧡', Rosa:'💚', Mellissa:'💙' };
+    // Try to match artist name
+    const artists = ['Jackie','Nicole','Tressa','Rosa','Mellissa'];
+    const match = artists.find(a => name.toLowerCase().includes(a.toLowerCase()));
+    if (match) {
+      select.value = match;
+      display.textContent = (emojis[match]||'')+' '+match+' (from Appointy)';
+      display.style.color = 'var(--ink)';
+      display.style.fontStyle = 'normal';
+    }
+  }
+
+  function fmt(n) { return '$' + n.toFixed(2); }
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !document.getElementById('calc-section').classList.contains('hidden')) {
+      logPayment();
+    }
+  });
+</script>
+
+</body>
+</html>

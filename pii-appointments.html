@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointments — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:     #FDF7F5;
+  --white:     #FFFFFF;
+  --ink:       #1C1213;
+  --ink-soft:  #5C4449;
+  --chrome:    #B8A8AC;
+  --border:    rgba(180,140,150,0.14);
+  --shadow-sm: 0 2px 12px rgba(100,40,60,0.07);
+  --shadow-md: 0 6px 32px rgba(100,40,60,0.13);
+
+  --jackie:    #D4748F; --jackie-bg: #FDF0F3; --jackie-mid: #F2C8D4; --jackie-dark: #A84F68;
+  --nicole:    #8B6BB5; --nicole-bg: #F5F0FC; --nicole-mid: #D8C8F0; --nicole-dark: #6B4B9A;
+  --tressa:    #D4853A; --tressa-bg: #FDF4ED; --tressa-mid: #F5D4B0; --tressa-dark: #A86028;
+  --rosa:      #5A9E6F; --rosa-bg:   #F0F8F3; --rosa-mid:   #BCE0C8; --rosa-dark:   #3A7850;
+  --mellissa:  #4A90C4; --mellissa-bg:#EFF6FC; --mellissa-mid:#B8D8F0; --mellissa-dark:#2A6A9A;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(212,116,143,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 5% 90%, rgba(139,107,181,0.07) 0%, transparent 45%),
+    var(--cream);
+  padding-bottom: 80px;
+}
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 16px 16px 0;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--jackie-mid);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: all 0.18s;
+}
+
+.nav-link:hover { border-color: var(--jackie); color: var(--jackie); }
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding: 32px 24px 24px;
+}
+
+.header-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--jackie);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(28px, 5vw, 44px);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.header h1 em { font-style: italic; color: var(--jackie); }
+
+.header-meta {
+  font-size: 12px;
+  color: var(--chrome);
+  margin-top: 8px;
+  font-weight: 300;
+}
+
+.header::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jackie-mid), var(--jackie));
+  margin: 16px auto 0;
+  border-radius: 2px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.filter-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.filter-btn.active { font-weight: 600; border-width: 2px; color: var(--white); }
+.filter-btn[data-artist="all"].active    { background: var(--ink); border-color: var(--ink); }
+.filter-btn[data-artist="Jackie"].active   { background: var(--jackie);   border-color: var(--jackie); }
+.filter-btn[data-artist="Nicole"].active   { background: var(--nicole);   border-color: var(--nicole); }
+.filter-btn[data-artist="Tressa"].active   { background: var(--tressa);   border-color: var(--tressa); }
+.filter-btn[data-artist="Rosa"].active     { background: var(--rosa);     border-color: var(--rosa); }
+.filter-btn[data-artist="Mellissa"].active { background: var(--mellissa); border-color: var(--mellissa); }
+
+.action-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--jackie-mid);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.refresh-btn:hover { border-color: var(--jackie); color: var(--jackie); }
+.refresh-btn.spinning { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  max-width: 1200px;
+  margin: 0 auto 28px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 18px 18px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--jackie), var(--nicole), var(--tressa), var(--rosa), var(--mellissa));
+}
+
+.stat-label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--chrome); font-weight: 500; margin-bottom: 4px; }
+.stat-value { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--ink); line-height: 1; }
+.stat-sub   { font-size: 11px; color: var(--chrome); margin-top: 3px; font-weight: 300; }
+
+
+
+/* ── ARTIST SECTIONS ── */
+.artist-sections {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.artist-section { }
+
+.artist-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid;
+}
+
+.artist-section-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.artist-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.artist-name-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.artist-count {
+  font-size: 11px;
+  color: var(--chrome);
+  margin-top: 1px;
+  font-weight: 300;
+}
+
+.show-all-link {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1.5px solid;
+  transition: all 0.18s;
+}
+
+/* ── APPOINTMENT CARDS ── */
+.appt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.appt-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: fadeUp 0.3s ease both;
+}
+
+.appt-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.appt-card-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+}
+
+.appt-card-inner { padding-left: 8px; }
+
+.appt-urgency {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.appt-client {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+
+.appt-service {
+  font-size: 11px;
+  color: var(--chrome);
+  margin-bottom: 8px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.appt-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.appt-date-block { }
+.appt-date-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--chrome); }
+.appt-date-value { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--ink-soft); }
+.appt-time-value { font-size: 11px; color: var(--chrome); }
+
+.appt-amount {
+  text-align: right;
+}
+.appt-amount-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--chrome); }
+.appt-amount-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; }
+
+/* ── EMPTY / STATE ── */
+.state-box { text-align: center; padding: 40px 20px; color: var(--chrome); }
+.state-box .icon { font-size: 36px; margin-bottom: 12px; }
+.state-box .msg  { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--ink); margin-bottom: 6px; }
+.state-box .sub  { font-size: 12px; font-weight: 300; }
+
+.last-updated { font-size: 10px; color: var(--chrome); letter-spacing: 0.08em; }
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  .toolbar { padding: 0 12px; }
+  .stats-bar, .urgent-banner, .artist-sections { padding: 0 12px; }
+  .appt-grid { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="pii-dashboard.html" class="nav-link">💗 Payment Plans</a>
+  <a href="pii-afterpay-dashboard.html" class="nav-link">🟢 Afterpay</a>
+</div>
+
+<div class="header">
+  <div class="header-eyebrow">Pretty in Ink Tattoos</div>
+  <h1>Appointments <em>Dashboard</em></h1>
+  <div class="header-meta" id="header-meta">Loading...</div>
+</div>
+
+<div class="toolbar">
+  <div class="filter-group">
+    <span class="filter-label">Artist:</span>
+    <button class="filter-btn active" data-artist="all"      onclick="filterBy('all')">All</button>
+    <button class="filter-btn" data-artist="Jackie"   onclick="filterBy('Jackie')">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--jackie);margin-right:4px;vertical-align:middle;"></span>Jackie
+    </button>
+    <button class="filter-btn" data-artist="Nicole"   onclick="filterBy('Nicole')">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--nicole);margin-right:4px;vertical-align:middle;"></span>Nicole
+    </button>
+    <button class="filter-btn" data-artist="Tressa"   onclick="filterBy('Tressa')">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--tressa);margin-right:4px;vertical-align:middle;"></span>Tressa
+    </button>
+    <button class="filter-btn" data-artist="Rosa"     onclick="filterBy('Rosa')">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rosa);margin-right:4px;vertical-align:middle;"></span>Rosa
+    </button>
+    <button class="filter-btn" data-artist="Mellissa" onclick="filterBy('Mellissa')">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mellissa);margin-right:4px;vertical-align:middle;"></span>Mellissa
+    </button>
+  </div>
+  <div class="action-group">
+    <span class="last-updated" id="last-updated"></span>
+    <button class="refresh-btn" onclick="loadAppointments()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+<div class="artist-sections" id="artist-sections"></div>
+<div id="state-area"></div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbz3XojZzUAH30F1CK1qyBvsDd-zCe2KACv3_ZcigpPnuacZGJj-AURRN4t6TlqOQLpK/exec";
+const ARTISTS   = ['Jackie','Nicole','Tressa','Rosa','Mellissa'];
+const COLORS    = {
+  Jackie:   { color:'#D4748F', bg:'#FDF0F3', mid:'#F2C8D4', dark:'#A84F68' },
+  Nicole:   { color:'#8B6BB5', bg:'#F5F0FC', mid:'#D8C8F0', dark:'#6B4B9A' },
+  Tressa:   { color:'#D4853A', bg:'#FDF4ED', mid:'#F5D4B0', dark:'#A86028' },
+  Rosa:     { color:'#5A9E6F', bg:'#F0F8F3', mid:'#BCE0C8', dark:'#3A7850' },
+  Mellissa: { color:'#4A90C4', bg:'#EFF6FC', mid:'#B8D8F0', dark:'#2A6A9A' },
+};
+
+let allAppointments = [];
+let activeFilter    = 'all';
+const URGENT_DAYS   = 5; // Show on main dashboard if within this many days
+
+// ── LOAD ──────────────────────────────────────────────
+async function loadAppointments() {
+  setRefreshing(true);
+  showState('loading');
+
+  try {
+    const data = await jsonp(SHEET_URL + '?action=getAppointyAppointments');
+    if (data.status !== 'ok') throw new Error('bad response');
+
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    allAppointments = (data.appointments || [])
+      .filter(a => a.clientName && !a.canceled)
+      .map(a => ({
+        ...a,
+        parsedDate: parseApptDate(a.appointmentDate),
+        daysUntil:  daysUntil(parseApptDate(a.appointmentDate)),
+      }))
+      .filter(a => a.parsedDate && a.daysUntil >= 0) // only future
+      .sort((a, b) => a.parsedDate - b.parsedDate);
+
+    renderStats();
+    renderSections(activeFilter);
+
+    document.getElementById('last-updated').textContent =
+      'Updated ' + new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    document.getElementById('header-meta').textContent =
+      allAppointments.length + ' upcoming appointment' + (allAppointments.length !== 1 ? 's' : '') +
+      ' · ' + new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  } catch(e) {
+    showState('error');
+  } finally {
+    setRefreshing(false);
+  }
+}
+
+// ── RENDER STATS ──────────────────────────────────────
+function renderStats() {
+  const today    = allAppointments.filter(a => a.daysUntil === 0).length;
+  const thisWeek = allAppointments.filter(a => a.daysUntil <= 7).length;
+  const upcoming = allAppointments.filter(a => a.daysUntil <= 30).length;
+  const total    = allAppointments.length;
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value" style="${today > 0 ? 'color:#C97070;' : ''}">${today}</div>
+      <div class="stat-sub">appointments today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Week</div>
+      <div class="stat-value">${thisWeek}</div>
+      <div class="stat-sub">within 7 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Month</div>
+      <div class="stat-value">${upcoming}</div>
+      <div class="stat-sub">within 30 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">All Upcoming</div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-sub">total scheduled</div>
+    </div>
+  `;
+}
+
+// ── RENDER URGENT BANNER ──────────────────────────────
+
+
+// ── RENDER ARTIST SECTIONS ────────────────────────────
+function renderSections(filter) {
+  const sections = document.getElementById('artist-sections');
+  const stateArea = document.getElementById('state-area');
+  stateArea.innerHTML = '';
+
+  const filtered = filter === 'all'
+    ? allAppointments
+    : allAppointments.filter(a => a.artist === filter);
+
+  if (filtered.length === 0) {
+    sections.innerHTML = '';
+    showState('empty', filter);
+    return;
+  }
+
+  sections.innerHTML = '';
+
+  // Group by artist — maintain Femmepire order
+  const artists = filter === 'all' ? ARTISTS : [filter];
+
+  artists.forEach(artist => {
+    const appts = filtered.filter(a => a.artist === artist);
+    if (appts.length === 0) return;
+
+    const theme   = COLORS[artist];
+    // Only show next 5 days on main dashboard
+    const showing = appts.filter(a => a.daysUntil <= URGENT_DAYS);
+    const hasMore = appts.length > showing.length;
+
+    const section = document.createElement('div');
+    section.className = 'artist-section';
+    section.setAttribute('data-artist', artist);
+
+    const sketchCount = showing.filter(a => {
+      const h = a.parsedDate ? Math.round((a.parsedDate - new Date()) / 3600000) : 999;
+      return h <= 72 && h > 0 && artist !== 'Mellissa';
+    }).length;
+
+    section.innerHTML = `
+      <div class="artist-section-header" style="border-color:${theme.mid};">
+        <div class="artist-section-left">
+          <div class="artist-avatar" style="background:${theme.color};">${artist[0]}</div>
+          <div>
+            <div class="artist-name-label" style="color:${theme.dark};">${artist}</div>
+            <div class="artist-count">
+              ${appts.length} total · ${showing.length} in next 5 days
+              ${sketchCount > 0 ? `<span style="color:#8A6500;font-weight:600;"> · ✏️ ${sketchCount} sketch${sketchCount > 1 ? 'es' : ''} due</span>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="appt-grid" id="grid-${artist}">
+        ${showing.length === 0
+          ? `<div style="padding:16px;font-size:13px;color:var(--chrome);font-style:italic;">No appointments in the next 5 days</div>`
+          : showing.map((a, i) => buildApptCard(a, theme, i)).join('')}
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="pii-artist-appointments.html?artist=${encodeURIComponent(artist)}"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:${theme.color};text-decoration:none;font-weight:500;padding:8px 18px;border:1.5px solid ${theme.mid};border-radius:100px;background:${theme.bg};transition:all 0.18s;">
+          ${showing.length === 0 ? 'View all appointments →' : `View all ${appts.length} appointments →`}
+        </a>
+      </div>
+    `;
+
+    sections.appendChild(section);
+  });
+}
+
+// ── BUILD APPOINTMENT CARD ────────────────────────────
+function buildApptCard(a, theme, idx) {
+  const days      = a.daysUntil;
+  const hoursLeft = a.parsedDate ? Math.round((a.parsedDate - new Date()) / 3600000) : 999;
+  const isToday   = days === 0;
+  const isTmrw    = days === 1;
+  const needs72hr = hoursLeft <= 72 && hoursLeft > 0 && a.artist !== 'Mellissa'; // Mellissa is a piercer, no sketches
+
+  let urgencyColor = theme.color;
+  let urgencyText  = '';
+  if (isToday)      { urgencyColor = '#C97070'; urgencyText = '🔴 TODAY'; }
+  else if (isTmrw)  { urgencyColor = '#D4853A'; urgencyText = '🟠 TOMORROW'; }
+  else if (days <= 3){ urgencyColor = '#D4853A'; urgencyText = `⚡ ${days} days away`; }
+  else              { urgencyText = `${days} days away`; }
+
+  const dateStr = a.parsedDate
+    ? a.parsedDate.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' })
+    : 'TBD';
+
+  const timeStr = a.appointmentDate
+    ? extractTime(a.appointmentDate)
+    : '';
+
+  const service = truncate(a.service || '—', 45);
+  const amount  = a.balanceDue > 0 ? fmt(a.balanceDue) : '';
+
+  // Check if sketch was already marked sent (stored in sessionStorage)
+  const sketchKey = 'sketch_sent_' + (a.parsedDate ? a.parsedDate.toISOString().split('T')[0] : '') + '_' + escHtml(a.clientName).replace(/\s/g,'');
+  const sketchSent = sessionStorage.getItem(sketchKey) === '1';
+
+  const sketchBadge = needs72hr && !sketchSent
+    ? `<div style="display:inline-flex;align-items:center;gap:6px;background:#FFF3CD;border:1.5px solid #F0C040;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:#8A6500;margin-bottom:8px;">
+        ✏️ SKETCH DUE — Send to client now
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-weight:400;font-size:10px;color:#8A6500;border-left:1px solid #F0C040;padding-left:8px;margin-left:2px;">
+          <input type="checkbox" onchange="markSketchSent(this,'${sketchKey}')" style="width:13px;height:13px;cursor:pointer;accent-color:#8A6500;">
+          Sent ✓
+        </label>
+       </div>`
+    : needs72hr && sketchSent
+    ? `<div style="display:inline-flex;align-items:center;gap:5px;background:#E8F5EF;border:1px solid #BCE0C8;border-radius:8px;padding:4px 10px;font-size:10px;color:#3A7850;margin-bottom:6px;">✓ Sketch sent</div>`
+    : '';
+
+  return `
+    <div class="appt-card" style="animation-delay:${idx * 0.05}s;${needs72hr ? 'border:1.5px solid #F0C040;box-shadow:0 0 0 2px rgba(240,192,64,0.2);' : ''}">
+      <div class="appt-card-bar" style="background:${needs72hr ? 'linear-gradient(180deg,#F0C040,#F5D060)' : `linear-gradient(180deg,${theme.color},${theme.mid})`};"></div>
+      <div class="appt-card-inner">
+        ${sketchBadge}
+        ${urgencyText ? `<div class="appt-urgency" style="color:${urgencyColor};">${urgencyText}</div>` : ''}
+        <div class="appt-client">${escHtml(a.clientName)}</div>
+        <div class="appt-service">${escHtml(service)}</div>
+        <div id="waiver-${a.clientName.replace(/\s+/g,'-').replace(/[^a-z0-9-]/gi,'')}-${dateStr.replace(/\s/g,'')}" style="margin-bottom:6px;">
+          <span style="font-size:10px;color:var(--chrome);">⟳ checking waiver...</span>
+        </div>
+        <div class="appt-meta">
+          <div class="appt-date-block">
+            <div class="appt-date-label">Appointment</div>
+            <div class="appt-date-value" style="color:${isToday ? '#C97070' : 'var(--ink-soft)'};">${dateStr}</div>
+            ${timeStr ? `<div class="appt-time-value">${timeStr}</div>` : ''}
+          </div>
+          ${amount ? `
+          <div class="appt-amount">
+            <div class="appt-amount-label">Balance</div>
+            <div class="appt-amount-value" style="color:${theme.color};">${amount}</div>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── FILTER ────────────────────────────────────────────
+function filterBy(artist) {
+  activeFilter = artist;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.artist === artist);
+  });
+  renderSections(artist);
+}
+
+// ── STATES ────────────────────────────────────────────
+function showState(type, filter) {
+  const sections  = document.getElementById('artist-sections');
+  const stateArea = document.getElementById('state-area');
+  if (type === 'loading') {
+    sections.innerHTML = '';
+    stateArea.innerHTML = '<div class="state-box"><div class="icon">🌸</div><div class="msg">Loading appointments...</div><div class="sub">Pulling from Appointy</div></div>';
+  } else if (type === 'error') {
+    stateArea.innerHTML = '<div class="state-box"><div class="icon">✕</div><div class="msg">Couldn\'t connect</div><div class="sub">Check connection and refresh</div></div>';
+  } else if (type === 'empty') {
+    const name = filter === 'all' ? 'No upcoming appointments found' : `No upcoming appointments for ${filter}`;
+    stateArea.innerHTML = `<div class="state-box"><div class="icon">✨</div><div class="msg">${name}</div><div class="sub">All caught up!</div></div>`;
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function parseApptDate(raw) {
+  if (!raw) return null;
+  const s = raw.toString().trim();
+  const d = new Date(s.includes('T') ? s : s.replace(' ', 'T'));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function daysUntil(date) {
+  if (!date) return Infinity;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d     = new Date(date); d.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function extractTime(raw) {
+  if (!raw) return '';
+  const s = raw.toString().trim();
+  const match = s.match(/(\d{1,2}):(\d{2})/);
+  if (!match) return '';
+  let h = parseInt(match[1]), m = match[2];
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${m} ${ampm}`;
+}
+
+function fmt(n)       { return '$' + (n||0).toFixed(2); }
+function truncate(s,n){ return s.length > n ? s.slice(0,n) + '...' : s; }
+function escHtml(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function setRefreshing(val) {
+  const btn = document.querySelector('.refresh-btn');
+  if (btn) btn.classList.toggle('spinning', val);
+}
+
+// ── JSONP ─────────────────────────────────────────────
+let cbId = 0;
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb   = 'apptDash_' + (++cbId);
+    const sep  = url.includes('?') ? '&' : '?';
+    const script = document.createElement('script');
+    script.src   = url + sep + 'callback=' + cb;
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 12000);
+    window[cb]   = data => { cleanup(); clearTimeout(timer); resolve(data); };
+    script.onerror = () => { cleanup(); clearTimeout(timer); reject(new Error('error')); };
+    function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+    document.head.appendChild(script);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────
+loadAppointments();
+</script>
+</body>
+</html>

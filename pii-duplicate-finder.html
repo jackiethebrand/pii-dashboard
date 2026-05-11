@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duplicate Customer Finder — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:#FDF7F5;--white:#FFFFFF;--ink:#1C1213;--ink-soft:#5C4449;--chrome:#B8A8AC;
+  --pink:#D4748F;--pink-dark:#A84F68;--pink-light:#F5E0E6;--pink-mid:#EAB8C5;
+  --green:#5A9966;--green-light:#E8F5EF;
+  --gold:#C4952A;--red:#C97070;--red-light:#FDF0F0;
+  --border:rgba(180,140,150,0.15);--shadow-sm:0 2px 12px rgba(100,40,60,0.07);
+  --shadow-md:0 8px 32px rgba(100,40,60,0.13);
+}
+html,body{min-height:100vh;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+body{
+  background:radial-gradient(ellipse at 90% 5%,rgba(212,116,143,0.10) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 90%,rgba(196,149,42,0.07) 0%,transparent 45%),var(--cream);
+  padding:40px 20px 80px;
+}
+.header{text-align:center;margin-bottom:32px;}
+.header-eyebrow{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:0.22em;color:var(--pink);text-transform:uppercase;margin-bottom:6px;}
+.header h1{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(28px,5vw,46px);color:var(--ink);line-height:1;}
+.header h1 em{font-style:italic;color:var(--pink);}
+.header::after{content:'';display:block;width:40px;height:2px;background:linear-gradient(90deg,var(--pink-mid),var(--pink));margin:16px auto 0;border-radius:2px;}
+
+.wrap{max-width:900px;margin:0 auto;}
+
+.action-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
+.load-btn{
+  padding:12px 28px;border-radius:100px;border:none;
+  background:linear-gradient(135deg,var(--pink),var(--pink-dark));
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;letter-spacing:0.06em;transition:all 0.18s;
+  box-shadow:0 3px 12px rgba(212,116,143,0.3);
+}
+.load-btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(212,116,143,0.4);}
+.load-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+.stats-bar{display:flex;gap:12px;flex-wrap:wrap;}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:12px;color:var(--ink-soft);box-shadow:var(--shadow-sm);}
+.stat strong{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink);display:block;line-height:1;}
+.stat.red strong{color:var(--red);}
+.stat.green strong{color:var(--green);}
+
+.status-box{text-align:center;padding:60px 20px;color:var(--chrome);}
+.status-icon{font-size:36px;margin-bottom:12px;}
+.status-msg{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink);margin-bottom:6px;}
+.status-sub{font-size:12px;font-weight:300;}
+@keyframes pulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+.loading{animation:pulse 1.5s ease-in-out infinite;}
+
+.group-card{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden;}
+.group-header{padding:14px 18px;background:var(--red-light);border-bottom:1px solid rgba(201,112,112,0.15);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.group-email{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--red);font-weight:400;}
+.group-count{font-size:11px;color:var(--red);background:rgba(201,112,112,0.12);padding:3px 10px;border-radius:100px;font-weight:500;}
+.merge-btn{
+  padding:7px 16px;border-radius:100px;border:none;
+  background:var(--red);color:var(--white);
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(201,112,112,0.3);
+}
+.merge-btn:hover{background:var(--pink-dark);transform:translateY(-1px);}
+.merge-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.merge-btn.done{background:var(--green);}
+
+.profile-row{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+.profile-row:last-child{border-bottom:none;}
+.profile-info{display:flex;flex-direction:column;gap:2px;}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ink);}
+.profile-meta{font-size:11px;color:var(--chrome);font-family:'DM Mono',monospace;}
+.source-badge{
+  font-size:10px;font-weight:500;padding:2px 8px;border-radius:100px;
+  font-family:'DM Sans',sans-serif;letter-spacing:0.08em;white-space:nowrap;
+}
+.source-THIRD_PARTY{background:#FDF4ED;color:#D4853A;}
+.source-MERGE{background:var(--green-light);color:var(--green);}
+.source-APPOINTY{background:var(--pink-light);color:var(--pink-dark);}
+.source-OTHER{background:var(--cream);color:var(--chrome);}
+
+.notice{background:var(--gold-light,#FDF8ED);border:1px solid rgba(196,149,42,0.2);border-radius:12px;padding:14px 18px;font-size:12px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6;}
+.notice strong{color:var(--gold);}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-size:11px;font-weight:500;color:var(--ink-soft);cursor:pointer;transition:all 0.15s;}
+.filter-btn.active{background:var(--pink);border-color:var(--pink);color:var(--white);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-eyebrow">Pretty in Ink · Internal Tool</div>
+    <h1>Duplicate <em>Customer Finder</em></h1>
+  </div>
+
+  <div class="notice">
+    <strong>How this works:</strong> Pulls all Square customers, groups by email address, and finds profiles sharing the same email. Use the Merge button to open that email's profiles in Square so you can merge them manually. Merging in Square combines profile info but payments on old profile IDs remain — our backend handles that automatically.
+  </div>
+
+  <div class="action-bar">
+    <div class="stats-bar" id="stats-bar"></div>
+    <button class="load-btn" id="load-btn" onclick="loadCustomers()">🔍 Find Duplicates</button>
+  </div>
+
+  <div class="filter-bar" id="filter-bar" style="display:none;">
+    <button class="filter-btn active" onclick="setFilter('all')">All Duplicates</button>
+    <button class="filter-btn" onclick="setFilter('upcoming')">⚡ Upcoming Appts First</button>
+    <button class="filter-btn" onclick="setFilter('THIRD_PARTY')">WaiverMaster</button>
+    <button class="filter-btn" onclick="setFilter('MERGE')">Already Merged</button>
+  </div>
+
+  <div id="results">
+    <div class="status-box">
+      <div class="status-icon">✦</div>
+      <div class="status-msg">Ready to scan</div>
+      <div class="status-sub">Click Find Duplicates to pull all Square customers</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BACKEND    = 'https://pii-backend-production.up.railway.app';
+const SHEET_URL  = 'https://script.google.com/macros/s/AKfycby5Y-U6bAjY5JizIZ63i_oQFqtTDBcTmvmzL0Vqfb1WdBHghNW1dHrVcPEjkrLVp5H8/exec';
+
+let allGroups    = [];
+let filterMode   = 'all';
+let upcomingEmails = new Set();
+
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb     = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    script.src   = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
+    window[cb]   = data => { cleanup(); clearTimeout(timer); resolve(data); };
+    script.onerror = () => { cleanup(); clearTimeout(timer); reject(new Error('error')); };
+    function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+    document.head.appendChild(script);
+  });
+}
+
+async function loadCustomers() {
+  const btn = document.getElementById('load-btn');
+  btn.disabled = true;
+  btn.textContent = '⟳ Loading...';
+  document.getElementById('stats-bar').innerHTML = '';
+  document.getElementById('filter-bar').style.display = 'none';
+  document.getElementById('results').innerHTML = `
+    <div class="status-box loading">
+      <div class="status-icon">⟳</div>
+      <div class="status-msg">Pulling customers & appointments...</div>
+      <div class="status-sub">This may take a few seconds</div>
+    </div>`;
+
+  try {
+    // Pull Square customers AND Appointy appointments in parallel
+    const [squareData, apptData] = await Promise.all([
+      fetch(`${BACKEND}/customers/all${window._nextCursor ? '?cursor='+encodeURIComponent(window._nextCursor) : ''}`).then(r => r.json()),
+      jsonp(SHEET_URL + '?action=getAppointyAppointments').catch(() => ({ appointments: [] }))
+    ]);
+
+    const customers = squareData.customers || [];
+    window._nextCursor  = squareData.nextCursor || null;
+    window._totalLoaded = (window._totalLoaded || 0) + customers.length;
+
+    // Find emails with appointments in the next 2 weeks
+    const now      = new Date();
+    const twoWeeks = new Date(now.getTime() + 14 * 86400000);
+    upcomingEmails = new Set();
+    (apptData.appointments || []).forEach(a => {
+      if (!a.email) return;
+      const d = a.appointmentDate ? new Date(a.appointmentDate) : null;
+      if (d && d >= now && d <= twoWeeks) {
+        upcomingEmails.add(a.email.toLowerCase().trim());
+      }
+    });
+
+    // Group by email
+    const byEmail = {};
+    customers.forEach(c => {
+      const email = (c.email_address || '').toLowerCase().trim();
+      if (!email) return;
+      if (!byEmail[email]) byEmail[email] = [];
+      byEmail[email].push(c);
+    });
+
+    // Find duplicates
+    allGroups = Object.entries(byEmail)
+      .filter(([, profiles]) => profiles.length > 1)
+      .sort((a, b) => b[1].length - a[1].length);
+
+    const noEmail   = customers.filter(c => !c.email_address).length;
+    const withEmail = customers.filter(c => c.email_address).length;
+    const dupCount  = allGroups.reduce((s, [, p]) => s + p.length, 0);
+
+    const upcomingDups = allGroups.filter(([email]) => upcomingEmails.has(email)).length;
+
+    document.getElementById('stats-bar').innerHTML = `
+      <div class="stat"><strong>${customers.length}</strong>Total Customers</div>
+      <div class="stat red"><strong>${allGroups.length}</strong>Duplicate Groups</div>
+      <div class="stat red"><strong>${dupCount}</strong>Duplicate Profiles</div>
+      <div class="stat" style="border-color:var(--pink-mid);"><strong style="color:var(--pink);">${upcomingDups}</strong>Upcoming Appts</div>
+      ${data.nextCursor ? `<div class="stat" style="cursor:pointer;border-color:var(--pink-mid);" onclick="loadNextBatch()"><strong style="color:var(--pink);">→</strong>Load Next 1000</div>` : '<div class="stat"><strong style="color:var(--green);">✓</strong>All loaded</div>'}
+    `;
+
+    document.getElementById('filter-bar').style.display = allGroups.length > 0 ? 'flex' : 'none';
+    renderGroups();
+
+  } catch(e) {
+    document.getElementById('results').innerHTML = `
+      <div class="status-box">
+        <div class="status-icon">✕</div>
+        <div class="status-msg">Failed to load</div>
+        <div class="status-sub">${e.message}</div>
+      </div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔄 Refresh';
+}
+
+async function loadNextBatch() {
+  if (!window._nextCursor) return;
+  const btn = document.getElementById('load-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ Loading next batch...'; }
+  document.getElementById('results').innerHTML = `
+    <div class="status-box loading">
+      <div class="status-icon">⟳</div>
+      <div class="status-msg">Loading next 1000 customers...</div>
+    </div>`;
+  await loadCustomers();
+}
+
+function setFilter(mode) {
+  filterMode = mode;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  const idx = ['all','upcoming','THIRD_PARTY','MERGE'].indexOf(mode);
+  const btns = document.querySelectorAll('.filter-btn');
+  if (btns[idx]) btns[idx].classList.add('active');
+  renderGroups();
+}
+
+function renderGroups() {
+  let groups = allGroups;
+
+  if (filterMode === 'upcoming') {
+    // Show upcoming appointment duplicates first, then rest
+    const urgent = groups.filter(([email]) => upcomingEmails.has(email));
+    const rest   = groups.filter(([email]) => !upcomingEmails.has(email));
+    groups = [...urgent, ...rest];
+  } else if (filterMode !== 'all') {
+    groups = groups.filter(([, profiles]) =>
+      profiles.some(p => p.creation_source === filterMode)
+    );
+  }
+
+  if (groups.length === 0) {
+    document.getElementById('results').innerHTML = `
+      <div class="status-box">
+        <div class="status-icon">✅</div>
+        <div class="status-msg">${filterMode === 'all' ? 'No duplicates found' : 'No matches for this filter'}</div>
+        <div class="status-sub">${filterMode === 'all' ? 'Your Square customer list looks clean!' : 'Try a different filter'}</div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('results').innerHTML = groups.map(([email, profiles]) => `
+    <div class="group-card">
+      <div class="group-header" style="${upcomingEmails.has(email) ? 'background:var(--pink-light);border-color:var(--pink-mid);' : ''}">
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${upcomingEmails.has(email) ? '<span style="font-size:11px;background:var(--pink);color:white;padding:2px 8px;border-radius:100px;font-weight:600;">⚡ UPCOMING APPT</span>' : ''}
+          <div class="group-email" style="${upcomingEmails.has(email) ? 'color:var(--pink-dark);' : ''}">${escHtml(email)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="group-count" style="${upcomingEmails.has(email) ? 'background:var(--pink-light);color:var(--pink-dark);' : ''}">${profiles.length} profiles</span>
+          <button class="merge-btn" style="${upcomingEmails.has(email) ? 'background:var(--pink-dark);' : ''}" onclick="openSquare('${escHtml(email)}', this)">
+            Open in Square →
+          </button>
+        </div>
+      </div>
+      ${profiles.map(p => `
+        <div class="profile-row">
+          <div class="profile-info">
+            <div class="profile-name">${escHtml((p.given_name + ' ' + p.family_name).trim()) || '(no name)'}</div>
+            <div class="profile-meta">${p.id} · Created ${fmtDate(p.created_at)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${p.note && p.note.includes('WaiverMaster') ? '<span style="font-size:10px;color:var(--chrome);">📋 WaiverMaster</span>' : ''}
+            ${p.note && p.note.includes('Merged') ? '<span style="font-size:10px;color:var(--chrome);">🔀 Merged</span>' : ''}
+            <span class="source-badge source-${p.creation_source || 'OTHER'}">${fmtSource(p.creation_source)}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function openSquare(email, btn) {
+  // Open Square customer search for this email
+  window.open(`https://squareup.com/dashboard/customers?query=${encodeURIComponent(email)}`, '_blank');
+  btn.textContent = '✓ Opened';
+  btn.classList.add('done');
+  setTimeout(() => { btn.textContent = 'Open in Square →'; btn.classList.remove('done'); }, 3000);
+}
+
+function fmtSource(s) {
+  if (!s) return 'Unknown';
+  if (s === 'THIRD_PARTY') return 'WaiverMaster';
+  if (s === 'MERGE') return 'Merged';
+  if (s === 'APPOINTY') return 'Appointy';
+  if (s === 'FIRST_PARTY') return 'Square';
+  return s;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

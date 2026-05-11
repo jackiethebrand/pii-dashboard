@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Appointments — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream:#FDF7F5; --white:#FFFFFF; --ink:#1C1213; --ink-soft:#5C4449; --chrome:#B8A8AC; --border:rgba(180,140,150,0.14);
+  --shadow-sm:0 2px 12px rgba(100,40,60,0.07); --shadow-md:0 6px 32px rgba(100,40,60,0.13);
+  --artist:#D4748F; --artist-bg:#FDF0F3; --artist-mid:#F2C8D4; --artist-dark:#A84F68;
+}
+html, body { min-height:100vh; background:var(--cream); font-family:'DM Sans',sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased; }
+body { padding-bottom:80px; }
+.nav { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; padding:16px 16px 0; }
+.nav-link { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:var(--white); border:1.5px solid var(--artist-mid); border-radius:100px; font-size:11px; font-weight:500; color:var(--ink-soft); text-decoration:none; letter-spacing:0.06em; transition:all 0.18s; }
+.nav-link:hover { border-color:var(--artist); color:var(--artist); }
+.header { text-align:center; padding:28px 24px 20px; }
+.header-eyebrow { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.2em; color:var(--artist); text-transform:uppercase; margin-bottom:6px; }
+.header h1 { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(28px,5vw,44px); color:var(--ink); }
+.header h1 em { font-style:italic; color:var(--artist); }
+.header-meta { font-size:12px; color:var(--chrome); margin-top:6px; font-weight:300; }
+.header::after { content:''; display:block; width:40px; height:2px; background:linear-gradient(90deg,var(--artist-mid),var(--artist)); margin:14px auto 0; border-radius:2px; }
+.toolbar { max-width:900px; margin:0 auto 20px; padding:0 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+.refresh-btn { display:flex; align-items:center; gap:6px; padding:8px 16px; background:var(--white); border:1.5px solid var(--artist-mid); border-radius:100px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--ink-soft); cursor:pointer; transition:all 0.18s; }
+.refresh-btn:hover { border-color:var(--artist); color:var(--artist); }
+.last-updated { font-size:10px; color:var(--chrome); letter-spacing:0.08em; }
+.stats-bar { max-width:900px; margin:0 auto 24px; padding:0 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+.stat-card { background:var(--white); border-radius:14px; padding:16px; box-shadow:var(--shadow-sm); border:1px solid var(--border); position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--artist); }
+.stat-label { font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--chrome); font-weight:500; margin-bottom:4px; }
+.stat-value { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--ink); line-height:1; }
+.stat-sub { font-size:11px; color:var(--chrome); margin-top:3px; }
+.appt-list { max-width:900px; margin:0 auto; padding:0 20px; display:flex; flex-direction:column; gap:10px; }
+.appt-row { background:var(--white); border-radius:14px; padding:16px 20px; box-shadow:var(--shadow-sm); border:1px solid var(--border); display:grid; grid-template-columns:120px 1fr auto; gap:16px; align-items:center; position:relative; overflow:hidden; transition:box-shadow 0.2s; animation:fadeUp 0.25s ease both; }
+.appt-row:hover { box-shadow:var(--shadow-md); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);} }
+.appt-row-bar { position:absolute; left:0;top:0;bottom:0;width:4px;background:var(--artist); }
+.appt-date-col { padding-left:8px; }
+.appt-date-main { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--ink-soft); line-height:1.1; }
+.appt-date-day  { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--chrome); }
+.appt-time      { font-size:11px; color:var(--chrome); margin-top:2px; }
+.appt-info-col { }
+.appt-name    { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--ink); line-height:1.1; }
+.appt-service { font-size:11px; color:var(--chrome); margin-top:3px; line-height:1.4; }
+.appt-badges  { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+.badge { padding:2px 8px; border-radius:100px; font-size:10px; font-weight:500; }
+.appt-right-col { text-align:right; }
+.appt-balance { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--artist); }
+.appt-days    { font-size:10px; color:var(--chrome); margin-top:2px; }
+.urgency-today    { color:#C97070!important; }
+.urgency-tomorrow { color:#D4853A!important; }
+.urgency-soon     { color:#D4853A!important; }
+.section-month { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; color:var(--chrome); padding:16px 20px 8px; max-width:900px; margin:0 auto; }
+.state-box { text-align:center; padding:60px 20px; color:var(--chrome); }
+.state-box .icon { font-size:36px; margin-bottom:12px; }
+.state-box .msg  { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink); margin-bottom:6px; }
+.state-box .sub  { font-size:12px; }
+@media(max-width:600px) {
+  .appt-row { grid-template-columns:90px 1fr; }
+  .appt-right-col { grid-column:2; }
+  .stats-bar { grid-template-columns:repeat(2,1fr); }
+  .appt-list, .stats-bar, .toolbar { padding:0 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="nav" id="nav-bar">
+  <a href="pii-appointments.html" class="nav-link">← All Appointments</a>
+  <a href="index.html" class="nav-link">🏠 Home</a>
+</div>
+
+<div class="header" id="page-header">
+  <div class="header-eyebrow">Pretty in Ink Tattoos</div>
+  <h1 id="page-title">Loading...</h1>
+  <div class="header-meta" id="header-meta"></div>
+</div>
+
+<div class="toolbar">
+  <span class="last-updated" id="last-updated"></span>
+  <button class="refresh-btn" onclick="loadArtist()">↻ Refresh</button>
+</div>
+
+<div class="stats-bar" id="stats-bar"></div>
+<div id="appt-content"></div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbz3XojZzUAH30F1CK1qyBvsDd-zCe2KACv3_ZcigpPnuacZGJj-AURRN4t6TlqOQLpK/exec";
+const COLORS = {
+  Jackie:   { color:'#D4748F', bg:'#FDF0F3', mid:'#F2C8D4', dark:'#A84F68' },
+  Nicole:   { color:'#8B6BB5', bg:'#F5F0FC', mid:'#D8C8F0', dark:'#6B4B9A' },
+  Tressa:   { color:'#D4853A', bg:'#FDF4ED', mid:'#F5D4B0', dark:'#A86028' },
+  Rosa:     { color:'#5A9E6F', bg:'#F0F8F3', mid:'#BCE0C8', dark:'#3A7850' },
+  Mellissa: { color:'#4A90C4', bg:'#EFF6FC', mid:'#B8D8F0', dark:'#2A6A9A' },
+};
+
+// Get artist from URL param
+const params = new URLSearchParams(window.location.search);
+const ARTIST  = params.get('artist') || 'Jackie';
+const theme   = COLORS[ARTIST] || COLORS['Jackie'];
+
+// Apply artist color to CSS vars
+document.documentElement.style.setProperty('--artist',     theme.color);
+document.documentElement.style.setProperty('--artist-bg',  theme.bg);
+document.documentElement.style.setProperty('--artist-mid', theme.mid);
+document.documentElement.style.setProperty('--artist-dark',theme.dark);
+
+async function loadArtist() {
+  document.getElementById('appt-content').innerHTML =
+    '<div class="state-box"><div class="icon">🌸</div><div class="msg">Loading...</div></div>';
+
+  try {
+    const data = await jsonp(SHEET_URL + '?action=getAppointyAppointments');
+    if (data.status !== 'ok') throw new Error('bad');
+
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    const appts = (data.appointments || [])
+      .filter(a => a.artist === ARTIST && a.clientName && !a.canceled)
+      .map(a => ({ ...a, parsedDate: parseDate(a.appointmentDate), daysUntil: daysUntil(parseDate(a.appointmentDate)) }))
+      .filter(a => a.parsedDate && a.daysUntil >= 0)
+      .sort((a, b) => a.parsedDate - b.parsedDate);
+
+    // Update page title and nav
+    document.getElementById('page-title').innerHTML = `${ARTIST}'s <em>Appointments</em>`;
+    document.getElementById('header-meta').textContent =
+      appts.length + ' upcoming appointment' + (appts.length !== 1 ? 's' : '');
+    document.getElementById('last-updated').textContent =
+      'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+    renderStats(appts);
+    renderList(appts);
+
+  } catch(e) {
+    document.getElementById('appt-content').innerHTML =
+      '<div class="state-box"><div class="icon">✕</div><div class="msg">Couldn\'t load</div><div class="sub">Check connection and refresh</div></div>';
+  }
+}
+
+function renderStats(appts) {
+  const today    = appts.filter(a => a.daysUntil === 0).length;
+  const thisWeek = appts.filter(a => a.daysUntil <= 7).length;
+  const thisMonth= appts.filter(a => a.daysUntil <= 30).length;
+  const revenue  = appts.reduce((s,a) => s + (parseFloat(a.balanceDue)||0), 0);
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Today</div><div class="stat-value" style="${today>0?'color:#C97070;':''}">${today}</div><div class="stat-sub">today</div></div>
+    <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value">${thisWeek}</div><div class="stat-sub">within 7 days</div></div>
+    <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-value">${thisMonth}</div><div class="stat-sub">within 30 days</div></div>
+    <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" style="font-size:22px;">$${revenue.toFixed(0)}</div><div class="stat-sub">upcoming</div></div>
+  `;
+}
+
+function renderList(appts) {
+  if (appts.length === 0) {
+    document.getElementById('appt-content').innerHTML =
+      '<div class="state-box"><div class="icon">✨</div><div class="msg">No upcoming appointments</div><div class="sub">All caught up!</div></div>';
+    return;
+  }
+
+  const content = document.getElementById('appt-content');
+  content.innerHTML = '';
+
+  // Group by month
+  const groups = {};
+  appts.forEach(a => {
+    const key = a.parsedDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(a);
+  });
+
+  Object.entries(groups).forEach(([month, list]) => {
+    const monthEl = document.createElement('div');
+    monthEl.className = 'section-month';
+    monthEl.textContent = month;
+    content.appendChild(monthEl);
+
+    const listEl = document.createElement('div');
+    listEl.className = 'appt-list';
+    listEl.innerHTML = list.map((a,i) => buildRow(a,i)).join('');
+    content.appendChild(listEl);
+  });
+}
+
+function buildRow(a, i) {
+  const days    = a.daysUntil;
+  const dateStr = a.parsedDate.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const dayStr  = a.parsedDate.toLocaleDateString('en-US',{weekday:'long'});
+  const timeStr = extractTime(a.appointmentDate);
+  const balance = parseFloat(a.balanceDue)||0;
+
+  let urgClass = '', urgText = '';
+  if (days === 0)       { urgClass='urgency-today';    urgText='TODAY'; }
+  else if (days === 1)  { urgClass='urgency-tomorrow'; urgText='TOMORROW'; }
+  else if (days <= 5)   { urgClass='urgency-soon';     urgText=days+'d away'; }
+  else                  { urgText=days+'d'; }
+
+  const depositPaid = a.depositPaid === true || a.depositPaid === 'TRUE';
+
+  return `
+    <div class="appt-row" style="animation-delay:${i*0.04}s;">
+      <div class="appt-row-bar" style="background:${theme.color};"></div>
+      <div class="appt-date-col">
+        <div class="appt-date-day">${dayStr.slice(0,3).toUpperCase()}</div>
+        <div class="appt-date-main ${urgClass}">${dateStr}</div>
+        ${timeStr ? `<div class="appt-time">${timeStr}</div>` : ''}
+      </div>
+      <div class="appt-info-col">
+        <div class="appt-name">${escHtml(a.clientName)}</div>
+        <div class="appt-service">${escHtml(a.service||'—')}</div>
+        <div class="appt-badges">
+          ${urgText ? `<span class="badge ${urgClass}" style="background:${days<=1?'rgba(201,112,112,0.12)':days<=5?'rgba(212,133,58,0.12)':'rgba(180,160,170,0.12)'};">${urgText}</span>` : ''}
+          ${depositPaid ? `<span class="badge" style="background:#E8F5EF;color:#3A7850;">✓ Deposit</span>` : `<span class="badge" style="background:#FDF0F0;color:#C97070;">No Deposit</span>`}
+          ${a.email ? `<span class="badge" style="background:var(--artist-bg);color:${theme.color};font-size:9px;">${escHtml(a.email)}</span>` : ''}
+        </div>
+      </div>
+      <div class="appt-right-col">
+        ${balance > 0 ? `<div class="appt-balance">${fmt(balance)}</div>` : ''}
+        <div class="appt-days" style="${urgClass?'color:inherit;':''}">${a.parsedDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+      </div>
+    </div>`;
+}
+
+function parseDate(raw) {
+  if (!raw) return null;
+  const s = raw.toString().trim();
+  const d = new Date(s.includes('T') ? s : s.replace(' ','T'));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function daysUntil(date) {
+  if (!date) return Infinity;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(date); d.setHours(0,0,0,0);
+  return Math.round((d-today)/86400000);
+}
+
+function extractTime(raw) {
+  if (!raw) return '';
+  const match = raw.toString().match(/(\d{1,2}):(\d{2})/);
+  if (!match) return '';
+  let h = parseInt(match[1]); const m = match[2];
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h%12||12;
+  return `${h}:${m} ${ampm}`;
+}
+
+function fmt(n)     { return '$'+(n||0).toFixed(2); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let cbId = 0;
+function jsonp(url) {
+  return new Promise((resolve,reject) => {
+    const cb = 'artistAppt_'+(++cbId);
+    const script = document.createElement('script');
+    script.src = url + (url.includes('?')?'&':'?') + 'callback='+cb;
+    const timer = setTimeout(()=>{cleanup();reject(new Error('timeout'));},12000);
+    window[cb] = data=>{cleanup();clearTimeout(timer);resolve(data);};
+    script.onerror = ()=>{cleanup();clearTimeout(timer);reject(new Error('error'));};
+    function cleanup(){if(script.parentNode)script.parentNode.removeChild(script);delete window[cb];}
+    document.head.appendChild(script);
+  });
+}
+
+loadArtist();
+</script>
+</body>
+</html>

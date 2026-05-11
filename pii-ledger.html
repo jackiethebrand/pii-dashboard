@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Ledger — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:      #FDF7F5;
+  --white:      #FFFFFF;
+  --ink:        #1C1213;
+  --ink-soft:   #5C4449;
+  --chrome:     #B8A8AC;
+  --border:     rgba(180,140,150,0.15);
+  --shadow-sm:  0 2px 12px rgba(100,40,60,0.07);
+  --shadow-md:  0 8px 32px rgba(100,40,60,0.13);
+  --pink:       #D4748F;
+  --pink-dark:  #A84F68;
+  --pink-light: #F5E0E6;
+  --pink-mid:   #EAB8C5;
+  --green:      #5A9966;
+  --gold:       #C4952A;
+  --gold-light: #FDF8ED;
+
+  --jackie:     #D4748F; --jackie-bg: #FDF0F3; --jackie-mid: #F2C8D4;
+  --nicole:     #8B6BB5; --nicole-bg: #F5F0FC; --nicole-mid: #D8C8F0;
+  --tressa:     #D4853A; --tressa-bg: #FDF4ED; --tressa-mid: #F5D4B0;
+  --rosa:       #5A9E6F; --rosa-bg:   #F0F8F3; --rosa-mid:   #BCE0C8;
+  --mellissa:   #4A90C4; --mellissa-bg:#EFF6FC; --mellissa-mid:#B8D8F0;
+}
+
+html, body { min-height:100vh; font-family:'DM Sans',sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased; }
+
+.pin-overlay { position:fixed;inset:0;z-index:9999;background:var(--cream);display:flex;align-items:center;justify-content:center; }
+.pin-box { background:var(--white);border-radius:24px;padding:36px 32px;box-shadow:0 12px 48px rgba(100,40,60,0.16);text-align:center;width:320px;border:1px solid var(--border); }
+.pin-logo { font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);margin-bottom:4px; }
+.pin-logo em { font-style:italic;color:var(--pink); }
+.pin-sub { font-size:12px;color:var(--chrome);margin-bottom:24px;font-weight:300; }
+.pin-label { font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:10px; }
+.pin-dots { display:flex;justify-content:center;gap:10px;margin-bottom:20px; }
+.pin-dot { width:12px;height:12px;border-radius:50%;border:2px solid var(--pink-mid);background:transparent;transition:all 0.15s; }
+.pin-dot.filled { background:var(--pink);border-color:var(--pink); }
+.pin-keypad { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px; }
+.pin-key { padding:14px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--ink);cursor:pointer;transition:all 0.12s;user-select:none; }
+.pin-key:hover { background:var(--pink-light);border-color:var(--pink-mid); }
+.pin-key:active { transform:scale(0.94); }
+.pin-key.delete { font-family:'DM Sans',sans-serif;font-size:14px;color:var(--chrome); }
+.pin-error { font-size:12px;color:#C97070;min-height:18px;margin-top:4px; }
+
+body {
+  background:
+    radial-gradient(ellipse at 90% 5%, rgba(212,116,143,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 5% 90%, rgba(196,149,42,0.07) 0%, transparent 45%),
+    var(--cream);
+  padding-bottom: 80px;
+}
+
+.nav { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; padding:16px 16px 0; }
+.nav-link {
+  display:inline-flex; align-items:center; gap:6px; padding:8px 16px;
+  background:var(--white); border:1.5px solid var(--pink-mid); border-radius:100px;
+  font-size:11px; font-weight:500; color:var(--ink-soft); text-decoration:none;
+  letter-spacing:0.06em; transition:all 0.18s;
+}
+.nav-link:hover { border-color:var(--pink); color:var(--pink); }
+
+.header { text-align:center; padding:28px 24px 20px; }
+.header-eyebrow { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.22em; color:var(--pink); text-transform:uppercase; margin-bottom:6px; }
+.header h1 { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(28px,5vw,46px); color:var(--ink); line-height:1; }
+.header h1 em { font-style:italic; color:var(--pink); }
+.header::after { content:''; display:block; width:40px; height:2px; background:linear-gradient(90deg,var(--pink-mid),var(--pink)); margin:16px auto 0; border-radius:2px; }
+
+.controls { max-width:1400px; margin:0 auto 24px; padding:0 24px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+.control-group { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.control-label { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--chrome); font-weight:500; }
+
+.artist-btn {
+  padding:8px 16px; border-radius:100px; border:1.5px solid var(--border);
+  background:var(--white); font-family:'DM Sans',sans-serif; font-size:12px;
+  color:var(--ink-soft); cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.artist-btn.active { font-weight:600; color:var(--white); border-width:2px; }
+.artist-btn[data-artist="Jackie"].active   { background:var(--jackie);   border-color:var(--jackie); }
+.artist-btn[data-artist="Nicole"].active   { background:var(--nicole);   border-color:var(--nicole); }
+.artist-btn[data-artist="Tressa"].active   { background:var(--tressa);   border-color:var(--tressa); }
+.artist-btn[data-artist="Rosa"].active     { background:var(--rosa);     border-color:var(--rosa); }
+.artist-btn[data-artist="Mellissa"].active { background:var(--mellissa); border-color:var(--mellissa); }
+
+.period-select {
+  padding:9px 16px; border-radius:100px; border:1.5px solid var(--border);
+  background:var(--white); font-family:'DM Sans',sans-serif; font-size:12px;
+  color:var(--ink); cursor:pointer; outline:none; appearance:none; -webkit-appearance:none;
+  padding-right:32px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23B8A8AC'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+}
+
+.load-btn {
+  padding:9px 20px; border-radius:100px; border:none;
+  background:linear-gradient(135deg,var(--pink),var(--pink-dark));
+  color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500;
+  cursor:pointer; letter-spacing:0.06em; transition:all 0.18s;
+  box-shadow:0 3px 12px rgba(212,116,143,0.3);
+}
+.load-btn:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(212,116,143,0.4); }
+
+.summary-bar { max-width:1400px; margin:0 auto 20px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.sum-card { background:var(--white); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow-sm); border:1px solid var(--border); position:relative; overflow:hidden; }
+.sum-card::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; }
+.sum-card.income::before   { background:linear-gradient(90deg,var(--pink),var(--pink-mid)); }
+.sum-card.payout::before   { background:linear-gradient(90deg,var(--green),#BCE0C8); }
+.sum-card.tips::before     { background:linear-gradient(90deg,var(--gold),#F5D4B0); }
+.sum-card.bonus::before    { background:linear-gradient(90deg,#8B6BB5,#D8C8F0); }
+.sum-card.upsales::before  { background:linear-gradient(90deg,#4A90C4,#B8D8F0); }
+.sum-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--chrome); font-weight:500; margin-bottom:4px; }
+.sum-value { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--ink); line-height:1; }
+.sum-sub   { font-size:10px; color:var(--chrome); margin-top:3px; font-weight:300; }
+
+.upsales-row { max-width:1400px; margin:0 auto 20px; padding:0 24px; display:flex; gap:10px; flex-wrap:wrap; }
+.upsale-chip {
+  display:flex; align-items:center; gap:6px; padding:8px 14px;
+  background:var(--white); border:1px solid var(--border); border-radius:100px;
+  font-size:12px; color:var(--ink-soft); box-shadow:var(--shadow-sm);
+}
+.upsale-chip .count { font-family:'Cormorant Garamond',serif; font-size:18px; color:var(--ink); margin-right:2px; }
+
+.ledger-wrap { max-width:1400px; margin:0 auto; padding:0 24px; }
+.ledger-card { background:var(--white); border-radius:20px; box-shadow:var(--shadow-sm); border:1px solid var(--border); overflow:hidden; margin-bottom:16px; width:100%; }
+.ledger-header { padding:18px 22px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.ledger-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:400; }
+.ledger-period { font-size:11px; color:var(--chrome); font-weight:300; }
+
+.table-wrap { overflow-x:auto; width:100%; -webkit-overflow-scrolling:touch; }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+thead th {
+  padding:8px 8px; text-align:left; font-size:8px; letter-spacing:0.14em;
+  text-transform:uppercase; color:var(--chrome); font-weight:500;
+  background:var(--cream); border-bottom:1px solid var(--border); white-space:nowrap;
+}
+thead th:first-child { padding-left:16px; }
+thead th:last-child  { padding-right:16px; }
+tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:rgba(212,116,143,0.03); }
+tbody td { padding:10px 8px; vertical-align:middle; color:var(--ink); font-family:'DM Mono',monospace; font-size:11px; font-weight:300; }
+tbody td:first-child { padding-left:16px; font-family:'DM Sans',sans-serif; }
+tbody td:last-child  { padding-right:16px; }
+
+.td-client { font-family:'Cormorant Garamond',serif!important; font-size:16px!important; font-weight:400!important; color:var(--ink)!important; }
+.td-date   { color:var(--chrome)!important; font-size:11px!important; white-space:nowrap; }
+.td-money  { text-align:right; }
+.td-green  { color:var(--green)!important; }
+.td-gold   { color:var(--gold)!important; }
+.td-red    { color:#C97070!important; }
+.td-tip    { color:var(--gold)!important; }
+
+.td-deposit { position:relative; }
+.deposit-matched { display:flex; align-items:center; gap:4px; justify-content:flex-end; }
+.deposit-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.deposit-dot.matched   { background:var(--green); }
+.deposit-dot.unmatched { background:var(--chrome); }
+
+.totals-row td {
+  background:var(--cream)!important; font-weight:500!important;
+  border-top:2px solid var(--border)!important; font-family:'DM Mono',monospace!important;
+}
+.totals-row .td-label {
+  font-family:'Cormorant Garamond',serif!important; font-size:14px!important;
+  font-weight:400!important; color:var(--ink-soft)!important; letter-spacing:0.04em;
+}
+
+.state-box { text-align:center; padding:60px 20px; color:var(--chrome); }
+.state-icon { font-size:36px; margin-bottom:12px; }
+.state-msg  { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink); margin-bottom:6px; }
+.state-sub  { font-size:12px; font-weight:300; }
+
+.loading-row td { text-align:center; padding:32px; color:var(--chrome); font-family:'DM Sans',sans-serif; font-size:12px; animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+@media(max-width:640px) {
+  .controls { flex-direction:column; align-items:flex-start; }
+  .summary-bar { grid-template-columns:repeat(2,1fr); }
+  .ledger-wrap, .summary-bar, .upsales-row, .controls { padding:0 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-box">
+    <div class="pin-logo">Pretty <em>in Ink</em></div>
+    <div class="pin-sub">Artist Ledger · Enter your PIN</div>
+    <div class="pin-label">PIN</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <div></div>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key delete" onclick="pinDelete()">⌫</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <a class="nav-link" href="/">🏠 Home</a>
+  <a class="nav-link" href="/pii-appointments">📅 Appointments</a>
+  <a class="nav-link" href="/pii-dashboard">💗 Payment Plans</a>
+</div>
+
+<div class="header">
+  <div class="header-eyebrow">Pretty in Ink Tattoos</div>
+  <h1>Artist <em>Ledger</em></h1>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">Artist:</span>
+    <button class="artist-btn active" data-artist="Jackie"   onclick="selectArtist('Jackie')">💗 Jackie</button>
+    <button class="artist-btn"        data-artist="Nicole"   onclick="selectArtist('Nicole')">💜 Nicole</button>
+    <button class="artist-btn"        data-artist="Tressa"   onclick="selectArtist('Tressa')">🧡 Tressa</button>
+    <button class="artist-btn"        data-artist="Rosa"     onclick="selectArtist('Rosa')">💚 Rosa</button>
+    <button class="artist-btn"        data-artist="Mellissa" onclick="selectArtist('Mellissa')">💙 Mellissa</button>
+  </div>
+  <div class="control-group">
+    <span class="control-label">Pay Period:</span>
+    <select class="period-select" id="period-select"></select>
+    <button class="load-btn" onclick="loadLedger()">Load Ledger</button>
+  </div>
+</div>
+
+<div class="summary-bar" id="summary-bar" style="display:none;"></div>
+<div class="upsales-row" id="upsales-row" style="display:none;"></div>
+
+<div class="ledger-wrap">
+  <div class="ledger-card" id="ledger-card">
+    <div class="state-box">
+      <div class="state-icon">✦</div>
+      <div class="state-msg">Select an artist and pay period</div>
+      <div class="state-sub">then tap Load Ledger to auto-populate</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL   = "https://script.google.com/macros/s/AKfycby5Y-U6bAjY5JizIZ63i_oQFqtTDBcTmvmzL0Vqfb1WdBHghNW1dHrVcPEjkrLVp5H8/exec";
+const BACKEND_URL = "https://pii-backend-production.up.railway.app";
+
+// Anchor: Apr 19 2026 (Sunday), bi-weekly
+const ANCHOR    = new Date('2026-04-19T00:00:00');
+const PERIOD_MS = 14 * 24 * 60 * 60 * 1000;
+
+const ARTISTS = {
+  Jackie:   { pct:0.60, color:'#D4748F', bg:'#FDF0F3', mid:'#F2C8D4' },
+  Nicole:   { pct:0.60, color:'#8B6BB5', bg:'#F5F0FC', mid:'#D8C8F0' },
+  Tressa:   { pct:0.50, color:'#D4853A', bg:'#FDF4ED', mid:'#F5D4B0' },
+  Rosa:     { pct:0.50, color:'#5A9E6F', bg:'#F0F8F3', mid:'#BCE0C8' },
+  Mellissa: { pct:0.50, color:'#4A90C4', bg:'#EFF6FC', mid:'#B8D8F0' },
+};
+
+let currentArtist = 'Jackie';
+let _ledgerRows   = [];
+
+// ── BUILD PAY PERIODS ─────────────────────────────────────
+// Generates: current period + 1 ahead + 5 back, newest first
+function buildPeriods() {
+  const sel   = document.getElementById('period-select');
+  const today = new Date();
+
+  // Walk forward from anchor until we find the period that contains today
+  let periodStart = new Date(ANCHOR.getTime());
+  while (new Date(periodStart.getTime() + PERIOD_MS) <= today) {
+    periodStart = new Date(periodStart.getTime() + PERIOD_MS);
+  }
+  // periodStart is now the start of the current period
+
+  const periods = [];
+  // Build: 1 next period + current + 5 previous = 7 total, newest first
+  for (let i = 1; i >= -5; i--) {
+    const ps   = new Date(periodStart.getTime() + i * PERIOD_MS);
+    const pe   = new Date(ps.getTime() + PERIOD_MS - 86400000);
+    const isCurrent = i === 0;
+    const label = (isCurrent ? '● ' : '') + fmtDate(ps) + ' – ' + fmtDate(pe);
+    const value = ps.toISOString().split('T')[0] + '|' + pe.toISOString().split('T')[0];
+    periods.push({ label, value, isCurrent });
+  }
+
+  sel.innerHTML = periods.map(p => `<option value="${p.value}">${p.label}</option>`).join('');
+
+  // Auto-select current period
+  const cur = periods.find(p => p.isCurrent);
+  if (cur) sel.value = cur.value;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+// ── SELECT ARTIST ─────────────────────────────────────────
+function selectArtist(name) {
+  currentArtist = name;
+  document.querySelectorAll('.artist-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.artist === name);
+  });
+}
+
+// ── LOAD LEDGER ───────────────────────────────────────────
+async function loadLedger() {
+  const val = document.getElementById('period-select').value;
+  if (!val) return;
+  const [startStr, endStr] = val.split('|');
+  const theme = ARTISTS[currentArtist];
+
+  setLedgerLoading();
+  document.getElementById('summary-bar').style.display = 'none';
+  document.getElementById('upsales-row').style.display = 'none';
+
+  try {
+    const apptData = await jsonp(SHEET_URL + '?action=getAppointyAppointments');
+    const allAppts = apptData.appointments || [];
+
+    const periodStart = new Date(startStr + 'T00:00:00');
+    const periodEnd   = new Date(endStr   + 'T23:59:59');
+
+    const appointments = allAppts.filter(a => {
+      if (a.artist !== currentArtist) return false;
+      // Exclude unapproved appointments — depositPaid: false means booking was never completed
+      if (a.depositPaid === false || a.depositPaid === 'false' || a.depositPaid === 'FALSE') return false;
+      const d = parseDate(a.appointmentDate);
+      return d && d >= periodStart && d <= periodEnd;
+    }).sort((a,b) => parseDate(a.appointmentDate) - parseDate(b.appointmentDate));
+
+    // Each row catches its own errors so one bad lookup won't crash the whole ledger
+    const rows = await Promise.all(appointments.map(appt =>
+      buildRow(appt).catch(e => {
+        console.warn('Row build failed for', appt.clientName, e);
+        const apptD = parseDate(appt.appointmentDate);
+        const cost  = parseFloat(appt.cost || appt.balanceDue) || 0;
+        return {
+          appt, apptD,
+          apptDateStr: localDateStr(apptD),
+          isPastAppt: !!(apptD && apptD < new Date()),
+          cost, numbing: 0, aftercare: 0, merch: 0, addOns: 0,
+          totalWithFee: cost * 1.06,
+          deposit: 0, balance: cost * 1.06,
+          squareDeposit: null, squarePaid: null,
+          paid: null, tipAmt: null, tipError: false,
+        };
+      })
+    ));
+
+    applyAddonOverrides(rows);
+    renderLedger(rows, startStr, endStr, theme);
+    renderSummary(rows, theme);
+
+  } catch(e) {
+    console.error('Ledger load error:', e);
+    setLedgerError();
+  }
+}
+
+// ── BUILD ROW — all Square lookups for one appointment ────
+async function buildRow(appt) {
+  const cost      = parseFloat(appt.cost || appt.balanceDue) || 0;
+  const numbing   = parseFloat(appt.numbing)   || 0;
+  const aftercare = parseFloat(appt.aftercare) || 0;
+  const merch     = parseFloat(appt.tumbler)   || 0;
+  const addOns       = numbing + aftercare + merch;
+  const totalWithFee = (cost + addOns) * 1.06;
+
+  // FIX: parse appointment date HERE, before any Square lookups use it
+  const apptD       = parseDate(appt.appointmentDate);
+  const apptDateStr = localDateStr(apptD); // local date string, no UTC shift
+  const isPastAppt  = apptD && apptD < new Date();
+
+  // ── 1 & 2. PAYMENT LOOKUP via by-email-all ───────────────
+  // Single call fetches ALL payments across ALL profile IDs for this client,
+  // including pre-merge Appointy profiles. Scans booking date to find orphaned IDs.
+  let squareDeposit   = null;
+  let emailProfileIds = [];
+  let allProfileIds   = [];
+  let allClientPmts   = []; // all payments for this client across all profiles
+
+  // Fetch all payments for this client in one call
+  // booking_date tells the backend to scan that date for orphaned pre-merge profile IDs
+  const bookingDateStr = appt.bookingDate ? localDateStr(parseDate(appt.bookingDate)) : '';
+  if (appt.email) {
+    try {
+      let url = `${BACKEND_URL}/payments/by-email-all?email=${encodeURIComponent(appt.email)}&name=${encodeURIComponent(appt.clientName||'')}`;
+      if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      if (data && Array.isArray(data.profileIds)) {
+        emailProfileIds = data.profileIds;
+        allProfileIds   = [...data.profileIds];
+      }
+      if (data && Array.isArray(data.payments)) {
+        // Filter to only payments on known profile IDs — removes cross-client contamination
+        allClientPmts = data.payments.filter(p => allProfileIds.includes(p.customerId));
+      }
+    } catch(e) { console.warn('by-email-all failed for', appt.clientName, e); }
+  }
+
+  // Find deposit: most recent VT payment before the appointment date
+  if (allClientPmts.length > 0 && apptD) {
+    const deposits = allClientPmts.filter(p => {
+      if (p.source !== 'Virtual Terminal') return false;
+      if (p.amount < 5) return false;
+      return new Date(p.date) <= apptD;
+    }).sort((a,b) => new Date(b.date) - new Date(a.date));
+    squareDeposit = deposits[0] || null;
+  }
+
+  // ── 2. BALANCE PAYMENT LOOKUP (past appts only) ──────────
+  // Use allClientPmts already fetched — find POS/VT payment ON the appointment date
+  // that is NOT the deposit (different amount) and >= $5
+  let squarePaid = null;
+
+  if (isPastAppt && apptDateStr && allClientPmts.length > 0) {
+    const candidates = allClientPmts.filter(p => {
+      if (!p.date) return false;
+      const sameDay    = p.date === apptDateStr;
+      const notDeposit = Math.abs((p.amount || 0) - finalDeposit) > 1;
+      return sameDay && notDeposit && p.amount > 5;
+    });
+    squarePaid = candidates.find(p => p.source === 'Point of Sale')
+              || candidates.find(p => p.source === 'Virtual Terminal')
+              || candidates[0] || null;
+  }
+
+  // ── 3. TIP CALCULATION ───────────────────────────────────
+  const paid     = squarePaid ? (squarePaid.total || squarePaid.amount) : null;
+  let tipAmt     = null;
+  let tipError   = false;
+
+  if (paid !== null) {
+    if (squarePaid.tip && squarePaid.tip >= 1.00) {
+      // Square gives us the tip directly — only use if >= $1
+      tipAmt = squarePaid.tip;
+    } else {
+      // Derive tip = total paid - balance due
+      const derivedTip = paid - balance;
+      if (derivedTip < -0.10) {
+        tipError = true; // underpaid — flag it
+      } else if (derivedTip >= 1.00) {
+        // Only count as a tip if $1 or more (ignore rounding cents like $0.03)
+        tipAmt = derivedTip;
+      }
+      // derivedTip between -0.10 and 0.99 = rounding, no tip, no error
+    }
+  }
+
+  return { appt, apptD, apptDateStr, isPastAppt, cost, numbing, aftercare, merch, addOns, totalWithFee, deposit: finalDeposit, balance, squareDeposit, squarePaid, paid, tipAmt, tipError };
+}
+
+// ── ADD-ON DROPDOWNS ─────────────────────────────────────
+const NUMBING_OPTS   = [{v:0,l:'None'},{v:60,l:'Small $60'},{v:80,l:'Medium $80'},{v:100,l:'Large $100'},{v:120,l:'XL $120'}];
+const AFTERCARE_OPTS = [{v:0,l:'None'},{v:25,l:'Kit $25'},{v:10,l:'Saniderm $10'}];
+const MERCH_OPTS     = [{v:0,l:'None'},{v:25,l:'Shirt $25'},{v:10,l:'Sticker $10'}];
+
+function addonSelect(id, opts, current, rowIdx, field) {
+  const selOpts = opts.map(o =>
+    `<option value="${o.v}" ${o.v === current ? 'selected' : ''}>${o.l}</option>`
+  ).join('');
+  return `<select id="${id}" onchange="onAddonChange(${rowIdx},'${field}',this.value)"
+    style="font-size:11px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:6px;padding:3px 4px;background:var(--white);color:var(--ink);cursor:pointer;max-width:110px;">
+    ${selOpts}
+  </select>`;
+}
+
+function onAddonChange(rowIdx, field, val) {
+  const r = _ledgerRows[rowIdx];
+  if (!r) return;
+  r[field]       = parseFloat(val) || 0;
+  r.addOns       = r.numbing + r.aftercare + r.merch;
+  r.totalWithFee = (r.cost + r.addOns) * 1.06;
+  r.balance      = Math.max(0, r.totalWithFee - r.deposit);
+
+  const pct       = ARTISTS[currentArtist].pct;
+  const artistAmt = r.cost * pct;
+  const bonus     = r.addOns * 0.10;
+
+  if (r.paid !== null) {
+    const derived = r.paid - r.balance;
+    if (derived < -0.10) { r.tipError = true; r.tipAmt = null; }
+    else { r.tipError = false; r.tipAmt = derived >= 0.01 ? derived : null; }
+  }
+
+  const payout = artistAmt + (r.tipAmt || 0);
+  const set    = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+  set('total-'   + rowIdx, r.totalWithFee > 0 ? fmt(r.totalWithFee) : '—');
+  set('balance-' + rowIdx, r.balance > 0 ? fmt(r.balance) : '✓ Paid');
+  const bel = document.getElementById('balance-' + rowIdx);
+  if (bel) bel.style.color = r.balance > 0 ? 'var(--ink-soft)' : 'var(--green)';
+
+  set('artist-' + rowIdx, fmt(artistAmt));
+  set('bonus-'  + rowIdx, bonus > 0 ? fmt(bonus) : '—');
+  set('payout-' + rowIdx, r.tipAmt !== null || artistAmt > 0 ? fmt(payout) : '—');
+
+  const tipEl = document.getElementById('tip-' + rowIdx);
+  if (tipEl) {
+    if (r.tipError) tipEl.innerHTML = '<span style="color:#C97070;">—</span>';
+    else if (r.tipAmt && r.tipAmt > 0) tipEl.innerHTML = `<span style="color:var(--gold);font-weight:500;">${fmt(r.tipAmt)}</span>`;
+    else tipEl.innerHTML = '<span style="color:var(--chrome);">—</span>';
+  }
+
+  const saveBtn = document.getElementById('save-addons-btn');
+  if (saveBtn) saveBtn.style.display = 'inline-flex';
+
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
+}
+
+// ── RENDER LEDGER TABLE ───────────────────────────────────
+function renderLedger(rows, startStr, endStr, theme) {
+  const pct  = ARTISTS[currentArtist].pct;
+  const now  = new Date();
+  _ledgerRows = rows;
+
+  if (rows.length === 0) {
+    document.getElementById('ledger-card').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">🌸</div>
+        <div class="state-msg">No appointments this period</div>
+        <div class="state-sub">${currentArtist} · ${fmtDate(new Date(startStr))} – ${fmtDate(new Date(endStr))}</div>
+      </div>`;
+    return;
+  }
+
+  rows.sort((a,b) => (a.apptD || 0) - (b.apptD || 0));
+
+  let totCost=0, totDeposit=0, totTotal=0, totBalance=0, totPaid=0, totTips=0, totArtistPct=0, totBonus=0, totPayout=0;
+
+  const bodyRows = rows.map((r, i) => {
+    const { appt, apptD, isPastAppt, cost, numbing, aftercare, merch, addOns, totalWithFee, deposit, balance, squareDeposit, squarePaid, paid, tipAmt, tipError } = r;
+
+    const isReconciled    = isPastAppt && paid !== null && !tipError;
+    const isReconcileFlag = isPastAppt && (tipError || (paid !== null && paid < balance - 0.10) || (paid === null && balance > 0));
+
+    const dateStr = apptD ? apptD.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : '—';
+    const time    = apptD ? apptD.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
+
+    const artistAmt = cost * pct;
+    const bonus     = addOns * 0.10;
+    const payout    = artistAmt + (tipAmt || 0);
+
+    totCost      += cost;
+    totDeposit   += deposit;
+    totTotal     += totalWithFee;
+    totBalance   += balance;
+    totPaid      += paid || 0;
+    totTips      += tipAmt || 0;
+    totArtistPct += artistAmt;
+    totBonus     += bonus;
+    totPayout    += payout;
+
+    let rowStyle  = '';
+    let textStyle = '';
+    if (isReconcileFlag)  { rowStyle = 'background:rgba(232,160,32,0.07);'; textStyle = 'font-weight:500;'; }
+    else if (isReconciled){ rowStyle = 'background:rgba(90,153,102,0.03)';  textStyle = 'font-weight:600;'; }
+    else if (!isPastAppt) { rowStyle = 'background:rgba(180,160,170,0.04);';textStyle = 'font-style:italic;color:var(--chrome);'; }
+
+    const statusDot = isReconcileFlag
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E8A020;margin-right:4px;" title="Reconcile Flag"></span>`
+      : isReconciled
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;" title="Reconciled"></span>`
+      : !isPastAppt
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--chrome);margin-right:4px;" title="Upcoming"></span>`
+      : `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#C97070;margin-right:4px;" title="Pending"></span>`;
+
+    // Deposit cell
+    const depositCell = squareDeposit
+      ? `<div class="deposit-matched"><div class="deposit-dot matched"></div><span style="${textStyle}">${fmt(deposit)}</span>${squareDeposit.last4 ? `<span style="font-size:10px;color:var(--chrome);">···${squareDeposit.last4}</span>` : ''}</div>`
+      : `<div class="deposit-matched"><div class="deposit-dot unmatched"></div><span style="${textStyle}">${deposit > 0 ? fmt(deposit) : '—'}</span></div>`;
+
+    // Add-on dropdowns
+    const numbingDd   = addonSelect('numb-'+i,  NUMBING_OPTS,   numbing,   i, 'numbing');
+    const aftercareDd = addonSelect('aftc-'+i,  AFTERCARE_OPTS, aftercare, i, 'aftercare');
+    const merchDd     = addonSelect('merch-'+i, MERCH_OPTS,     merch,     i, 'merch');
+
+    // Paid cell
+    let paidCell = '—';
+    if (isPastAppt) {
+      if (paid !== null) {
+        const src   = squarePaid ? (squarePaid.source === 'Point of Sale' ? '🏪' : '💳') : '';
+        const last4 = squarePaid && squarePaid.last4 ? `<span style="font-size:10px;color:var(--chrome);">···${squarePaid.last4}</span>` : '';
+        if (tipError) {
+          paidCell = `<div style="display:flex;align-items:center;gap:4px;justify-content:flex-end;background:#FDF0F0;border:1px solid #F0C8C8;border-radius:6px;padding:3px 7px;"><span>⚠️</span><span style="color:#C97070;font-weight:600;">${fmt(paid)}</span></div>`;
+        } else {
+          paidCell = `<div style="display:flex;align-items:center;gap:3px;justify-content:flex-end;">${src}<span style="color:var(--green);${textStyle}">${fmt(paid)}</span>${last4}</div>`;
+        }
+      } else {
+        paidCell = `<span style="color:#C97070;font-size:11px;font-style:italic;">not found</span>`;
+      }
+    }
+
+    // Tip cell
+    const tipCell = !isPastAppt
+      ? `<span style="color:var(--chrome);">—</span>`
+      : tipError
+      ? `<span style="color:#C97070;">—</span>`
+      : tipAmt && tipAmt > 0
+      ? `<span style="color:var(--gold);${textStyle}">${fmt(tipAmt)}</span>`
+      : `<span style="color:var(--chrome);">—</span>`;
+
+    return `
+      <tr style="${rowStyle}" id="row-${i}">
+        <td class="td-date" style="${textStyle}">
+          ${statusDot}${dateStr}<br>
+          <span style="font-size:10px;margin-left:11px;">${time}</span>
+        </td>
+        <td style="${textStyle}">
+          <div class="td-client" style="${isReconciled?'font-weight:700;':!isPastAppt?'font-style:italic;color:var(--chrome);':''}">${escHtml(appt.clientName)}</div>
+          ${appt.canceled === 'TRUE' || appt.canceled === true
+            ? '<div style="font-size:9px;background:#FDF0F0;color:#C97070;padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block;">CANCELLED</div>' : ''}
+        </td>
+        <td class="td-money" style="${textStyle}">${cost > 0 ? fmt(cost) : '—'}</td>
+        <td class="td-money">${numbingDd}</td>
+        <td class="td-money">${aftercareDd}</td>
+        <td class="td-money">${merchDd}</td>
+        <td class="td-money" id="total-${i}"   style="${textStyle}">${totalWithFee > 0 ? fmt(totalWithFee) : '—'}</td>
+        <td class="td-money td-deposit">${depositCell}</td>
+        <td class="td-money" id="balance-${i}" style="color:${balance > 0 ? 'var(--ink-soft)' : 'var(--green)'};${textStyle}">${balance > 0 ? fmt(balance) : '✓ Paid'}</td>
+        <td class="td-money">${isPastAppt ? paidCell : '—'}</td>
+        <td class="td-money" id="tip-${i}">${tipCell}</td>
+        <td class="td-money td-green" id="artist-${i}" style="${textStyle}">${fmt(artistAmt)}</td>
+        <td class="td-money td-gold"  id="bonus-${i}"  style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
+        <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isReconciled ? fmt(payout) : '—'}</td>
+      </tr>`;
+  }).join('');
+
+  const totalPayout = totArtistPct + totBonus + totTips;
+
+  document.getElementById('ledger-card').innerHTML = `
+    <div class="ledger-header">
+      <div>
+        <div class="ledger-title">${currentArtist}'s Ledger</div>
+        <div class="ledger-period">${fmtDate(new Date(startStr))} – ${fmtDate(new Date(endStr))}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--chrome);flex-wrap:wrap;">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;"></span>Reconciled
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--chrome);display:inline-block;margin-left:6px;"></span>Upcoming
+          <span style="width:7px;height:7px;border-radius:50%;background:#C97070;display:inline-block;margin-left:6px;"></span>Pending
+          <span style="width:7px;height:7px;border-radius:50%;background:#E8A020;display:inline-block;margin-left:6px;"></span>Flag
+        </div>
+        <button id="save-addons-btn" onclick="saveAddonChanges()"
+          style="display:none;align-items:center;gap:6px;padding:7px 14px;background:${theme.color};color:#fff;border:none;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;">
+          💾 Save Add-on Changes
+        </button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Client</th>
+            <th style="text-align:right;">Cost</th>
+            <th style="text-align:right;">Numbing</th>
+            <th style="text-align:right;">Aftercare</th>
+            <th style="text-align:right;">Merch</th>
+            <th style="text-align:right;">Total ×1.06</th>
+            <th style="text-align:right;">Deposit</th>
+            <th style="text-align:right;">Balance</th>
+            <th style="text-align:right;">Paid</th>
+            <th style="text-align:right;">Tips</th>
+            <th style="text-align:right;">Artist %</th>
+            <th style="text-align:right;">Bonus 10%</th>
+            <th style="text-align:right;">Total Payout</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${bodyRows}
+          <tr class="totals-row">
+            <td colspan="2" class="td-label">Totals</td>
+            <td class="td-money">${fmt(totCost)}</td>
+            <td colspan="3"></td>
+            <td class="td-money">${fmt(totTotal)}</td>
+            <td class="td-money">${fmt(totDeposit)}</td>
+            <td class="td-money">${fmt(totBalance)}</td>
+            <td class="td-money">${fmt(totPaid)}</td>
+            <td class="td-money td-tip">${fmt(totTips)}</td>
+            <td class="td-money td-green">${fmt(totArtistPct)}</td>
+            <td class="td-money td-gold">${fmt(totBonus)}</td>
+            <td class="td-money" style="color:${theme.color};font-weight:700;">${fmt(totalPayout)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── RENDER SUMMARY ────────────────────────────────────────
+function renderSummary(rows, theme) {
+  const pct     = ARTISTS[currentArtist].pct;
+  const isAdmin = ['Jackie','Nicole','Mellissa'].includes(currentArtist);
+  const now     = new Date();
+
+  const pastRows       = rows.filter(r => r.isPastAppt);
+  const upcomingRows   = rows.filter(r => !r.isPastAppt);
+  const reconciledRows = pastRows.filter(r => r.paid !== null && !r.tipError);
+
+  let projArtistPct=0, projBonus=0, projShopIncome=0;
+  let totNumbing=0, totAftcare=0, totMerch=0, totNumbingCt=0, totAftcareCt=0, totMerchCt=0;
+  rows.forEach(r => {
+    projArtistPct  += r.cost * pct;
+    projBonus      += r.addOns * 0.10;
+    projShopIncome += r.totalWithFee;
+    totNumbing  += r.numbing;   if (r.numbing > 0)   totNumbingCt++;
+    totAftcare  += r.aftercare; if (r.aftercare > 0) totAftcareCt++;
+    totMerch    += r.merch;     if (r.merch > 0)     totMerchCt++;
+  });
+  const totUpsalesAmt = totNumbing + totAftcare + totMerch; // FIX: was missing
+
+  let runArtistPct=0, runBonus=0, runTips=0, runShopIncome=0;
+  reconciledRows.forEach(r => {
+    runArtistPct  += r.cost * pct;
+    runBonus      += r.addOns * 0.10;
+    runTips       += r.tipAmt || 0;
+    runShopIncome += r.totalWithFee;
+  });
+  const runTotal = runArtistPct + runBonus + runTips;
+
+  const summaryBar = document.getElementById('summary-bar');
+  summaryBar.style.display = 'grid';
+  summaryBar.innerHTML = `
+    ${isAdmin ? `
+    <div class="sum-card income">
+      <div class="sum-label">Shop Income 🔒</div>
+      <div class="sum-value">${fmt(projShopIncome)}</div>
+      <div class="sum-sub">projected period total</div>
+    </div>` : ''}
+    <div class="sum-card payout">
+      <div class="sum-label">Running Payout</div>
+      <div class="sum-value" style="color:var(--green);">${fmt(runTotal)}</div>
+      <div class="sum-sub">${reconciledRows.length} of ${rows.length} reconciled</div>
+    </div>
+    <div class="sum-card tips" style="position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${theme.color},${theme.mid});"></div>
+      <div class="sum-label">Projected Payout</div>
+      <div class="sum-value" style="font-size:22px;color:${theme.color};">${fmt(projArtistPct + projBonus)}</div>
+      <div class="sum-sub">based on all booked appts</div>
+    </div>
+    <div class="sum-card bonus">
+      <div class="sum-label">Incentive Bonus</div>
+      <div class="sum-value" style="font-size:22px;">${fmt(projBonus)}</div>
+      <div class="sum-sub">10% of all upsales</div>
+    </div>
+    <div class="sum-card upsales">
+      <div class="sum-label">Appointments</div>
+      <div class="sum-value">${rows.length}</div>
+      <div class="sum-sub">${reconciledRows.length} done · ${upcomingRows.length} upcoming</div>
+    </div>`;
+
+  const upsalesRow = document.getElementById('upsales-row');
+  upsalesRow.style.display  = 'flex';
+  upsalesRow.style.flexDirection = 'column';
+  upsalesRow.style.gap = '12px';
+
+  const chipsHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="upsale-chip"><span>💉</span><span class="count">${totNumbingCt}</span><span>Numbings</span><span style="color:var(--chrome);font-size:10px;">${fmt(totNumbing)}</span></div>
+      <div class="upsale-chip"><span>🧴</span><span class="count">${totAftcareCt}</span><span>Aftercare</span><span style="color:var(--chrome);font-size:10px;">${fmt(totAftcare)}</span></div>
+      <div class="upsale-chip"><span>🛍</span><span class="count">${totMerchCt}</span><span>Merch</span><span style="color:var(--chrome);font-size:10px;">${fmt(totMerch)}</span></div>
+    </div>`;
+
+  const snapshotHTML = `
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:${theme.bg};">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${theme.color};">Pay Period Snapshot</div>
+        <button onclick="saveLedgerToSheet()" id="save-btn"
+          style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:${theme.color};color:#fff;border:none;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;letter-spacing:0.06em;">
+          💾 Save to Google Sheets
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:14px;">
+
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--chrome);font-weight:500;margin-bottom:10px;">1 · Period Projection</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;margin-top:8px;">
+            <div style="font-size:12px;color:var(--ink-soft);">Artist Payout</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${fmt(projArtistPct)}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Incentive Bonus</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${fmt(projBonus)}</div>
+            <div style="height:1px;background:var(--border);grid-column:span 2;margin:3px 0;"></div>
+            <div style="font-size:12px;font-weight:600;color:${theme.color};">Projected Total</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${theme.color};text-align:right;">${fmt(projArtistPct + projBonus)}</div>
+          </div>
+        </div>
+
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--chrome);font-weight:500;margin-bottom:10px;">2 · Running Total</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;margin-top:8px;">
+            <div style="font-size:12px;color:var(--ink-soft);">Artist Payout</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${fmt(runArtistPct)}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Tips</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;color:var(--gold);">${fmt(runTips)}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Bonus</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${fmt(runBonus)}</div>
+            <div style="height:1px;background:var(--border);grid-column:span 2;margin:3px 0;"></div>
+            <div style="font-size:12px;font-weight:600;color:var(--green);">Current Total</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--green);text-align:right;">${fmt(runTotal)}</div>
+          </div>
+        </div>
+
+        <div style="background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--chrome);font-weight:500;margin-bottom:10px;">3 · Period Stats</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;margin-top:8px;">
+            <div style="font-size:12px;color:var(--ink-soft);">Total Appts</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${rows.length}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Done / Upcoming</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${pastRows.length} / ${upcomingRows.length}</div>
+            <div style="height:1px;background:var(--border);grid-column:span 2;margin:3px 0;"></div>
+            <div style="font-size:12px;color:var(--ink-soft);">💉 Numbing</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${totNumbingCt} · ${fmt(totNumbing)}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">🧴 Aftercare</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${totAftcareCt} · ${fmt(totAftcare)}</div>
+            <div style="font-size:12px;color:var(--ink-soft);">🛍 Merch</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;">${totMerchCt} · ${fmt(totMerch)}</div>
+            ${isAdmin ? `
+            <div style="height:1px;background:var(--border);grid-column:span 2;margin:3px 0;"></div>
+            <div style="font-size:11px;color:var(--chrome);">Shop Income 🔒</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;text-align:right;color:var(--chrome);">${fmt(projShopIncome)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:${theme.bg};border-top:1px solid var(--border);">
+        <div style="font-size:12px;color:${theme.color};font-weight:500;">TOTAL PAYOUT THIS PERIOD</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:${theme.color};">
+          ${fmt(runTotal)}
+          <span style="font-size:13px;font-family:'DM Sans',sans-serif;color:${theme.color};opacity:0.6;margin-left:6px;">(${fmt(projArtistPct + projBonus)} projected)</span>
+        </div>
+      </div>
+    </div>`;
+
+  upsalesRow.innerHTML = chipsHTML + snapshotHTML;
+
+  window._ledgerSnapshot = {
+    artist: currentArtist, isAdmin,
+    period: document.getElementById('period-select').options[document.getElementById('period-select').selectedIndex].text,
+    shopIncome: projShopIncome,
+    tattooAmt: runArtistPct, bonus: runBonus, tips: runTips, totalPayout: runTotal,
+    projectedPayout: projArtistPct + projBonus,
+    appointments: rows.length, reconciledCount: reconciledRows.length,
+    upcomingCount: upcomingRows.length,
+    upsalesCt:  totNumbingCt + totAftcareCt + totMerchCt,
+    upsalesAmt: totUpsalesAmt,  // FIX: was missing, caused Save to Sheets crash
+    numbing:  { count: totNumbingCt,  amt: totNumbing },
+    aftercare:{ count: totAftcareCt,  amt: totAftcare },
+    merch:    { count: totMerchCt,    amt: totMerch },
+    rows,
+  };
+}
+
+// ── SAVE ADD-ON CHANGES ───────────────────────────────────
+async function saveAddonChanges() {
+  const btn = document.getElementById('save-addons-btn');
+  if (btn) { btn.textContent = '⟳ Saving...'; btn.disabled = true; }
+
+  const overrides = {};
+  _ledgerRows.forEach(r => {
+    const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+    if (r.numbing || r.aftercare || r.merch) {
+      overrides[key] = { numbing: r.numbing, aftercare: r.aftercare, merch: r.merch };
+    }
+  });
+  try { localStorage.setItem('pii_addon_overrides', JSON.stringify(overrides)); } catch(e) {}
+
+  const val = document.getElementById('period-select').value;
+  const [startStr, endStr] = val.split('|');
+  renderLedger(_ledgerRows, startStr, endStr, ARTISTS[currentArtist]);
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
+  if (btn) { btn.textContent = '✓ Saved'; setTimeout(() => { btn.style.display='none'; btn.disabled=false; }, 2000); }
+}
+
+function applyAddonOverrides(rows) {
+  try {
+    const saved = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+    rows.forEach(r => {
+      const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+      if (saved[key]) {
+        r.numbing   = saved[key].numbing   || r.numbing;
+        r.aftercare = saved[key].aftercare || r.aftercare;
+        r.merch     = saved[key].merch     || r.merch;
+        r.addOns       = r.numbing + r.aftercare + r.merch;
+        r.totalWithFee = (r.cost + r.addOns) * 1.06;
+        r.balance      = Math.max(0, r.totalWithFee - r.deposit);
+      }
+    });
+  } catch(e) {}
+}
+
+// ── SAVE LEDGER TO GOOGLE SHEETS ─────────────────────────
+async function saveLedgerToSheet() {
+  const snap = window._ledgerSnapshot;
+  if (!snap) return;
+
+  const btn = document.getElementById('save-btn');
+  if (btn) { btn.textContent = '⟳ Saving...'; btn.disabled = true; }
+
+  const headers = [
+    'Date','Client','Cost','Deposit','Total x1.06','Balance','Paid','Tips',
+    'Artist %','Bonus 10%',
+    ...(snap.isAdmin ? ['Shop Income (Admin)'] : [])
+  ];
+
+  const dataRows = snap.rows.map(r => {
+    const dateStr = r.apptD ? r.apptD.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    return [
+      dateStr,
+      r.appt.clientName,
+      r.cost,
+      r.deposit,
+      r.totalWithFee.toFixed(2),
+      r.balance.toFixed(2),
+      r.paid !== null ? r.paid.toFixed(2) : '',
+      r.tipAmt ? r.tipAmt.toFixed(2) : '',
+      (r.cost * ARTISTS[snap.artist].pct).toFixed(2),
+      (r.addOns * 0.10).toFixed(2),
+      ...(snap.isAdmin ? [r.totalWithFee.toFixed(2)] : []),
+    ];
+  });
+
+  const summaryRows = [
+    [],
+    ['SUMMARY'],
+    ['Total Appointments', snap.appointments],
+    ['Tattoo Payout',      snap.tattooAmt.toFixed(2)],
+    ['Incentive Bonus',    snap.bonus.toFixed(2)],
+    ['Tips',               snap.tips.toFixed(2)],
+    ['TOTAL PAYOUT',       snap.totalPayout.toFixed(2)],
+    [],
+    ['UPSALES'],
+    ['Numbings',  snap.numbing.count,   snap.numbing.amt.toFixed(2)],
+    ['Aftercare', snap.aftercare.count, snap.aftercare.amt.toFixed(2)],
+    ['Merch',     snap.merch.count,     snap.merch.amt.toFixed(2)],
+    ['Total Upsales', snap.upsalesCt,   snap.upsalesAmt.toFixed(2)],
+    ...(snap.isAdmin ? [[], ['ADMIN ONLY'], ['Total Shop Income', snap.shopIncome.toFixed(2)]] : []),
+  ];
+
+  const sheetName = snap.artist + ' - ' + snap.period.replace('● ','');
+
+  try {
+    await new Promise(resolve => {
+      const cb = 'saveLedger_' + Date.now();
+      const params = new URLSearchParams({
+        action: 'saveLedger', callback: cb, sheetName,
+        headers:     JSON.stringify(headers),
+        dataRows:    JSON.stringify(dataRows),
+        summaryRows: JSON.stringify(summaryRows),
+        artist: snap.artist,
+        period: snap.period.replace('● ',''),
+      });
+      const script    = document.createElement('script');
+      script.src      = SHEET_URL + '?' + params;
+      window[cb]      = () => { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; resolve(); };
+      script.onerror  = () => resolve();
+      setTimeout(() => resolve(), 10000);
+      document.head.appendChild(script);
+    });
+
+    if (btn) { btn.textContent = '✓ Saved!'; btn.style.background = 'var(--green)'; }
+    setTimeout(() => { if (btn) { btn.textContent = '💾 Save to Google Sheets'; btn.style.background = ''; btn.disabled = false; } }, 3000);
+  } catch(e) {
+    if (btn) { btn.textContent = '✕ Failed'; btn.disabled = false; }
+  }
+}
+
+// ── LOADING / ERROR STATES ────────────────────────────────
+function setLedgerLoading() {
+  document.getElementById('ledger-card').innerHTML = `
+    <div class="ledger-header">
+      <div class="ledger-title">Loading ${currentArtist}'s Ledger...</div>
+    </div>
+    <div class="table-wrap"><table><tbody>
+      <tr class="loading-row"><td colspan="14">⟳ Pulling appointments from Appointy &amp; matching deposits from Square...</td></tr>
+    </tbody></table></div>`;
+}
+
+function setLedgerError() {
+  document.getElementById('ledger-card').innerHTML = `
+    <div class="state-box">
+      <div class="state-icon">✕</div>
+      <div class="state-msg">Couldn't load ledger</div>
+      <div class="state-sub">Check your connection and try again</div>
+    </div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function parseDate(raw) {
+  if (!raw) return null;
+  const s = raw.toString().trim();
+
+  // "Wed May 06 2026 21:30:00 GMT-0400 (Eastern Daylight Time)" — JS Date.toString() format
+  // Must parse in LOCAL time to avoid UTC shift flipping the day
+  const mJS = s.match(/^(\w{3})\s+(\w{3})\s+(\d{1,2})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})/);
+  if (mJS) {
+    const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    const d = new Date(parseInt(mJS[4]), months[mJS[2]], parseInt(mJS[3]), parseInt(mJS[5]), parseInt(mJS[6]), parseInt(mJS[7]));
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // ISO: 2026-05-05 or 2026-05-05T15:00:00 — append local midnight to avoid UTC shift
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const d = new Date(s.includes('T') ? s : s + 'T00:00:00');
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // "Tue, 05 May, 2026, 03:00 pm" or "05 May 2026 3:00 pm"
+  const m1 = s.match(/(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*[,\s]+(\d{4})(?:[,\s]+(\d{1,2}):(\d{2})\s*(am|pm))?/i);
+  if (m1) {
+    let h = m1[4] ? parseInt(m1[4]) : 0;
+    const m = m1[5] ? parseInt(m1[5]) : 0;
+    if (m1[6] && m1[6].toLowerCase() === 'pm' && h < 12) h += 12;
+    if (m1[6] && m1[6].toLowerCase() === 'am' && h === 12) h = 0;
+    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const d = new Date(parseInt(m1[3]), months.indexOf(m1[2].toLowerCase().substring(0,3)), parseInt(m1[1]), h, m);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // MM/DD/YYYY
+  const m2 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m2) {
+    const d = new Date(parseInt(m2[3]), parseInt(m2[1])-1, parseInt(m2[2]));
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // Google Sheets serial number
+  if (/^\d{5}$/.test(s)) {
+    // Serial is in UTC — convert to local date string then re-parse locally
+    const utc  = new Date((parseInt(s) - 25569) * 86400 * 1000);
+    const local = new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+    if (!isNaN(local.getTime())) return local;
+  }
+
+  // Last resort — native parse (may shift timezone, acceptable for fallback)
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// Get local YYYY-MM-DD string without UTC shift
+function localDateStr(d) {
+  if (!d || isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function fmt(n)     { return '$' + (n||0).toFixed(2); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let cbId = 0;
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb     = 'ledger_' + (++cbId);
+    const script = document.createElement('script');
+    script.src   = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
+    window[cb]   = data => { cleanup(); clearTimeout(timer); resolve(data); };
+    script.onerror = () => { cleanup(); clearTimeout(timer); reject(new Error('error')); };
+    function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+    document.head.appendChild(script);
+  });
+}
+
+// ── PIN SYSTEM ────────────────────────────────────────────
+const PINS       = { '1111':'Jackie','2222':'Nicole','3333':'Tressa','4444':'Rosa','5555':'Mellissa' };
+const ADMIN_PINS = ['1111','2222','5555'];
+let pinBuffer    = '';
+
+function pinKey(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(verifyPin, 150);
+}
+
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function updatePinDots() {
+  for (let i=0;i<4;i++) document.getElementById('dot-'+i).classList.toggle('filled', i < pinBuffer.length);
+}
+
+function verifyPin() {
+  const artist = PINS[pinBuffer];
+  if (artist) {
+    currentArtist = artist;
+    const isAdmin = ADMIN_PINS.includes(pinBuffer);
+    document.querySelectorAll('.artist-btn').forEach(b => {
+      b.style.display = (isAdmin || b.dataset.artist === artist) ? '' : 'none';
+      b.classList.toggle('active', b.dataset.artist === artist);
+    });
+    document.getElementById('pin-overlay').style.display = 'none';
+    loadLedger();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+    pinBuffer = '';
+    updatePinDots();
+    const box = document.querySelector('.pin-box');
+    let n = 0;
+    const shake = setInterval(() => {
+      box.style.transform = n%2===0 ? 'translateX(-8px)' : 'translateX(8px)';
+      if (++n >= 6) { clearInterval(shake); box.style.transform = ''; }
+    }, 50);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pin-overlay').style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') pinKey(e.key);
+  if (e.key === 'Backspace') pinDelete();
+});
+
+buildPeriods();
+</script>
+</body>
+</html>

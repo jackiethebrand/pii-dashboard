@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tattoo Layaway Dashboard — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink:#D4748F; --pink-dark:#A84F68; --pink-light:#F5E0E6; --pink-mid:#EAB8C5;
+  --green:#3D9970; --green-dark:#2A7A56; --green-light:#E8F5EF; --green-mid:#A8D8C0;
+  --cream:#FDF7F5; --ink:#1C1213; --ink-soft:#5C4449; --chrome:#B8A8AC; --white:#FFFFFF;
+  --purple:#8B6BB5; --orange:#D4853A; --blue:#4A90C4;
+}
+html, body { min-height:100vh; background:var(--cream); font-family:'DM Sans',sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased; }
+body {
+  display:flex; flex-direction:column; align-items:center;
+  min-height:100vh; padding:48px 24px 80px;
+  background: radial-gradient(ellipse at 85% 5%, rgba(212,116,143,0.13) 0%, transparent 50%),
+              radial-gradient(ellipse at 5% 85%, rgba(61,153,112,0.08) 0%, transparent 45%), var(--cream);
+}
+.brand { text-align:center; margin-bottom:16px; width:100%; max-width:460px; }
+.brand-eyebrow { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.24em; color:var(--pink); text-transform:uppercase; margin-bottom:10px; }
+.brand-name { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(36px,8vw,60px); color:var(--ink); line-height:1; letter-spacing:-0.01em; }
+.brand-name em { font-style:italic; color:var(--pink); }
+.brand-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px; font-weight:300; color:var(--chrome); margin-top:6px; }
+.brand-tag { font-size:11px; color:var(--chrome); margin-top:10px; letter-spacing:0.14em; font-weight:300; }
+.femmepire { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
+.femme-dot { width:9px; height:9px; border-radius:50%; opacity:0.85; }
+.main-divider { width:100%; max-width:460px; height:1px; background:linear-gradient(90deg,transparent,var(--pink-mid),transparent); margin:32px 0; }
+.section-wrap { width:100%; max-width:460px; margin-bottom:32px; }
+.section-header { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.section-icon { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.section-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; line-height:1.1; }
+.section-title em { font-style:italic; }
+.section-desc { font-size:12px; color:var(--chrome); font-weight:300; line-height:1.5; }
+.section-bar { height:3px; border-radius:3px; margin-bottom:16px; }
+.sub-tools { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.tool-card { display:flex; flex-direction:column; text-decoration:none; background:var(--white); border-radius:20px; padding:20px 18px; border:1.5px solid rgba(180,140,150,0.14); box-shadow:0 3px 16px rgba(100,40,60,0.07); transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1); position:relative; overflow:hidden; }
+.tool-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:20px 20px 0 0; }
+.tool-card.pp-calc::before { background:linear-gradient(90deg,var(--pink),var(--pink-dark)); }
+.tool-card.pp-dash::before  { background:linear-gradient(90deg,var(--pink-mid),var(--pink)); }
+.tool-card.ap-calc::before  { background:linear-gradient(90deg,var(--green),var(--green-dark)); }
+.tool-card.ap-dash::before  { background:linear-gradient(90deg,var(--green-mid),var(--green)); }
+.tool-card:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 10px 32px rgba(100,40,60,0.13); }
+.tool-card:active { transform:scale(0.97); }
+.tool-icon { font-size:24px; margin-bottom:10px; display:block; }
+.tool-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:400; color:var(--ink); line-height:1.15; margin-bottom:6px; flex:1; }
+.tool-title em { font-style:italic; }
+.tool-desc { font-size:11px; color:var(--chrome); font-weight:300; line-height:1.5; margin-bottom:12px; }
+.tool-arrow { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:gap 0.18s; }
+.tool-card.pp-calc .tool-arrow, .tool-card.pp-dash .tool-arrow { color:var(--pink); }
+.tool-card.ap-calc .tool-arrow, .tool-card.ap-dash .tool-arrow { color:var(--green-dark); }
+.tool-card:hover .tool-arrow { gap:8px; }
+.footer { margin-top:16px; text-align:center; }
+.footer-text { font-size:11px; color:var(--chrome); letter-spacing:0.1em; font-weight:300; }
+.footer-text em { font-style:italic; color:var(--pink); font-family:'Cormorant Garamond',serif; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <div class="brand-eyebrow">Internal Tools</div>
+  <div class="brand-name">Pretty <em>in Ink</em></div>
+  <div class="brand-sub">Tattoo Layaway Dashboard</div>
+  <div class="brand-tag">The Femmepire · Bowie, MD</div>
+  <div class="femmepire">
+    <div class="femme-dot" style="background:#D4748F;" title="Jackie"></div>
+    <div class="femme-dot" style="background:#8B6BB5;" title="Nicole"></div>
+    <div class="femme-dot" style="background:#D4853A;" title="Tressa"></div>
+    <div class="femme-dot" style="background:#5A9E6F;" title="Rosa"></div>
+    <div class="femme-dot" style="background:#4A90C4;" title="Mellissa"></div>
+  </div>
+</div>
+
+<div class="main-divider"></div>
+
+<div class="section-wrap">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--pink-light);">💗</div>
+    <div>
+      <div class="section-title">Payment <em>Plans</em></div>
+      <div class="section-desc">In-house layaway — client makes direct payments to the studio</div>
+    </div>
+  </div>
+  <div class="section-bar" style="background:linear-gradient(90deg,var(--pink),var(--pink-mid),transparent);"></div>
+  <div class="sub-tools">
+    <a href="pii-payment-calculator.html" class="tool-card pp-calc">
+      <span class="tool-icon">🧮</span>
+      <div class="tool-title">New <em>Payment Plan</em></div>
+      <div class="tool-desc">Log a client, enter their balance, and track each payment with fee splits.</div>
+      <div class="tool-arrow">Open →</div>
+    </a>
+    <a href="pii-dashboard.html" class="tool-card pp-dash">
+      <span class="tool-icon">📋</span>
+      <div class="tool-title">Open <em>Payment Plans</em></div>
+      <div class="tool-desc">View all active layaway plans sorted by soonest appointment.</div>
+      <div class="tool-arrow">Open →</div>
+    </a>
+  </div>
+</div>
+
+<div class="section-wrap">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--green-light);">🟢</div>
+    <div>
+      <div class="section-title" style="color:var(--green-dark);">Afterpay <em>Plans</em></div>
+      <div class="section-desc">Third-party financing — calculate the invoice total and track client status</div>
+    </div>
+  </div>
+  <div class="section-bar" style="background:linear-gradient(90deg,var(--green),var(--green-mid),transparent);"></div>
+  <div class="sub-tools">
+    <a href="pii-afterpay-calculator.html" class="tool-card ap-calc">
+      <span class="tool-icon">🧾</span>
+      <div class="tool-title">New <em>Afterpay Plan</em></div>
+      <div class="tool-desc">Calculate the invoice total (6% + $0.30 fee) and create a client card.</div>
+      <div class="tool-arrow">Open →</div>
+    </a>
+    <a href="pii-afterpay-dashboard.html" class="tool-card ap-dash">
+      <span class="tool-icon">📊</span>
+      <div class="tool-title">Open <em>Afterpay Plans</em></div>
+      <div class="tool-desc">View all active Afterpay invoices sorted by soonest appointment.</div>
+      <div class="tool-arrow">Open →</div>
+    </a>
+  </div>
+</div>
+
+<!-- Appointments section -->
+<div style="width:100%;max-width:460px;margin-bottom:32px;">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+    <div style="width:44px;height:44px;border-radius:14px;background:#F5E0E6;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📅</div>
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;">Appointment <em style="font-style:italic;">Scheduling</em></div>
+      <div style="font-size:12px;color:var(--chrome);font-weight:300;">Live view of all upcoming appointments — synced from Appointy</div>
+    </div>
+  </div>
+  <div style="height:3px;border-radius:3px;background:linear-gradient(90deg,#D4748F,#EAB8C5,transparent);margin-bottom:16px;"></div>
+  <a href="pii-appointments.html" class="tool-card" style="display:flex;flex-direction:column;text-decoration:none;background:var(--white);border-radius:20px;padding:20px 18px;border:1.5px solid rgba(180,140,150,0.14);box-shadow:0 3px 16px rgba(100,40,60,0.07);transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,#D4748F,#8B6BB5,#D4853A,#5A9E6F,#4A90C4);"></div>
+    <span style="font-size:24px;margin-bottom:10px;display:block;">🗓</span>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;color:var(--ink);line-height:1.15;margin-bottom:6px;flex:1;">Appointments <em style="font-style:italic;">Dashboard</em></div>
+    <div style="font-size:11px;color:var(--chrome);font-weight:300;line-height:1.5;margin-bottom:12px;">All upcoming appointments across the Femmepire — sorted by date, filtered by artist, with urgent alerts.</div>
+    <div style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#D4748F;">Open →</div>
+  </a>
+</div>
+
+<!-- Ledger section -->
+<div style="width:100%;max-width:460px;margin-bottom:32px;">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+    <div style="width:44px;height:44px;border-radius:14px;background:#FDF8ED;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📒</div>
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;">Artist <em style="font-style:italic;">Ledger</em></div>
+      <div style="font-size:12px;color:var(--chrome);font-weight:300;">Pay period tracker — auto-populated from Appointy + Square</div>
+    </div>
+  </div>
+  <div style="height:3px;border-radius:3px;background:linear-gradient(90deg,#C4952A,#F5D4B0,transparent);margin-bottom:16px;"></div>
+  <a href="pii-ledger.html" style="display:flex;flex-direction:column;text-decoration:none;background:var(--white);border-radius:20px;padding:20px 18px;border:1.5px solid rgba(180,140,150,0.14);box-shadow:0 3px 16px rgba(100,40,60,0.07);transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,#C4952A,#F5D4B0);"></div>
+    <span style="font-size:24px;margin-bottom:10px;display:block;">💰</span>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;color:var(--ink);line-height:1.15;margin-bottom:6px;">Artist <em style="font-style:italic;">Pay Ledger</em></div>
+    <div style="font-size:11px;color:var(--chrome);font-weight:300;line-height:1.5;margin-bottom:12px;">Bi-weekly pay period tracker. Auto-fills appointments, deposits, and add-ons. Click tips to edit. Artist % and bonus calculated automatically.</div>
+    <div style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#C4952A;">Open →</div>
+  </a>
+</div>
+
+<div class="footer">
+  <div class="footer-text"><em>Less Grunge, More Glitter</em> · For team use only</div>
+</div>
+
+</body>
+</html>

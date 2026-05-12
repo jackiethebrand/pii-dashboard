@@ -591,22 +591,21 @@ async function buildRow(appt) {
         allProfileIds   = [...data.profileIds];
       }
       if (data && Array.isArray(data.payments)) {
-        // Square may return customer_id or customerId — normalize both
+        // Normalize field names — Square may return customer_id or customerId
         const normalized = data.payments.map(p => ({
           ...p,
           customerId: p.customerId || p.customer_id || '',
-          // Normalize date to local YYYY-MM-DD — Square returns UTC ISO strings
           _localDate: localDateStr(parseDate(p.date || p.created_at || p.updated_at || '')),
         }));
-        // IMPORTANT: only pass payments if we found profile IDs — empty profileIds
-        // means the client wasn't found in Square, so return nothing rather than
-        // leaking other clients' payments through
-        if (allProfileIds.length > 0) {
-          allClientPmts = normalized.filter(p => allProfileIds.includes(p.customerId));
-        }
-        // Log all unique sources so we can see what Square is calling these payment types
+
+        // TRUST the backend — by-email-all already scoped payments to this client
+        // including orphaned pre-merge IDs found via booking_date scan.
+        // Do NOT re-filter by profileIds — balance payments are often on orphaned
+        // IDs that the backend found but didn't include in the profileIds array.
+        allClientPmts = normalized;
+
         const sources = [...new Set(normalized.map(p => p.source))];
-        console.log(`[PII] ${appt.clientName} — profileIds:`, allProfileIds, '| all payment sources in response:', sources, '| payments after profile filter:', allClientPmts.length, allClientPmts);
+        console.log(`[PII] ${appt.clientName} — profileIds:`, allProfileIds, '| sources:', sources, '| payments from backend:', allClientPmts.length, allClientPmts);
       }
     } catch(e) { console.warn('[PII] by-email-all failed for', appt.clientName, e); }
   }

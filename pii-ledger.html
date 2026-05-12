@@ -592,33 +592,40 @@ async function buildRow(appt) {
           ...p,
           customerId: p.customerId || p.customer_id || '',
           // Normalize date to local YYYY-MM-DD — Square returns UTC ISO strings
-          // e.g. "2026-05-06T14:30:00Z" → need to convert to local date
           _localDate: localDateStr(parseDate(p.date || p.created_at || p.updated_at || '')),
         }));
-        // Filter to only payments on known profile IDs — prevents cross-client contamination
-        allClientPmts = normalized.filter(p => allProfileIds.length === 0 || allProfileIds.includes(p.customerId));
-        console.log(`[PII] ${appt.clientName} — profileIds:`, allProfileIds, '| payments after filter:', allClientPmts.length, allClientPmts);
+        // IMPORTANT: only pass payments if we found profile IDs — empty profileIds
+        // means the client wasn't found in Square, so return nothing rather than
+        // leaking other clients' payments through
+        if (allProfileIds.length > 0) {
+          allClientPmts = normalized.filter(p => allProfileIds.includes(p.customerId));
+        }
+        // Log all unique sources so we can see what Square is calling these payment types
+        const sources = [...new Set(normalized.map(p => p.source))];
+        console.log(`[PII] ${appt.clientName} — profileIds:`, allProfileIds, '| all payment sources in response:', sources, '| payments after profile filter:', allClientPmts.length, allClientPmts);
       }
     } catch(e) { console.warn('[PII] by-email-all failed for', appt.clientName, e); }
   }
 
-  // Find deposit: most recent VT payment on or before the appointment date
-  // Compare using local date strings to avoid UTC timezone shift issues
+  // Find deposit: most recent VT/online payment on or before the appointment date
+  // Square source names vary — 'Virtual Terminal', 'Online', 'Ecommerce', 'Card on File' etc.
+  // We treat anything that is NOT 'Point of Sale' and happened before the appt as a potential deposit
   if (allClientPmts.length > 0 && apptD) {
-    const deposits = allClientPmts.filter(p => {
-      if (p.source !== 'Virtual Terminal') return false;
+    const depositCandidates = allClientPmts.filter(p => {
       if ((p.amount || 0) < 5) return false;
-      // Use pre-normalized _localDate for comparison to avoid UTC shift
       const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
-      return pDateStr <= apptDateStr; // string compare works for YYYY-MM-DD
+      const beforeAppt = pDateStr <= apptDateStr;
+      // Accept VT, Online, Ecommerce, Card on File, or anything non-POS as a deposit
+      const isNotPOS = p.source !== 'Point of Sale';
+      return beforeAppt && isNotPOS;
     }).sort((a,b) => {
       const da = a._localDate || '';
       const db = b._localDate || '';
       return db.localeCompare(da); // newest first
     });
-    squareDeposit = deposits[0] || null;
-    if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found:`, squareDeposit);
-    else console.log(`[PII] ${appt.clientName} — no deposit found. VT payments:`, allClientPmts.filter(p => p.source === 'Virtual Terminal'));
+    squareDeposit = depositCandidates[0] || null;
+    if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found (source: ${squareDeposit.source}):`, squareDeposit);
+    else console.log(`[PII] ${appt.clientName} — no deposit found. Non-POS payments:`, allClientPmts.filter(p => p.source !== 'Point of Sale'));
   }
 
   // finalDeposit: use Square VT amount if found, else fall back to Appointy depositPaid field
@@ -637,10 +644,12 @@ async function buildRow(appt) {
       const notDeposit = Math.abs((p.amount || 0) - finalDeposit) > 1;
       return sameDay && notDeposit && (p.amount || 0) > 5;
     });
-    squarePaid = candidates.find(p => p.source === 'Point of Sale')
-              || candidates.find(p => p.source === 'Virtual Terminal')
-              || candidates[0] || null;
-    console.log(`[PII] ${appt.clientName} — balance candidates on ${apptDateStr}:`, candidates, '→ selected:', squarePaid);
+    // Prefer POS payments; within that, prefer the one closest to the expected balance
+    const pos  = candidates.filter(p => p.source === 'Point of Sale');
+    const nonPos = candidates.filter(p => p.source !== 'Point of Sale');
+    const byClosest = (arr) => arr.sort((a,b) => Math.abs((a.amount||0) - balance) - Math.abs((b.amount||0) - balance));
+    squarePaid = byClosest(pos)[0] || byClosest(nonPos)[0] || null;
+    console.log(`[PII] ${appt.clientName} — balance candidates on ${apptDateStr} (expected ~$${balance.toFixed(2)}):`, candidates, '→ selected:', squarePaid);
   }
 
   // ── 3. TIP CALCULATION ───────────────────────────────────
@@ -682,6 +691,49 @@ function addonSelect(id, opts, current, rowIdx, field) {
     style="font-size:11px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);border-radius:6px;padding:3px 4px;background:var(--white);color:var(--ink);cursor:pointer;max-width:110px;">
     ${selOpts}
   </select>`;
+}
+
+function onCostChange(rowIdx, val) {
+  const r = _ledgerRows[rowIdx];
+  if (!r) return;
+  r.cost         = parseFloat(val) || 0;
+  r._costOverridden = true;
+  r.addOns       = r.numbing + r.aftercare + r.merch;
+  r.totalWithFee = (r.cost + r.addOns) * 1.06;
+  r.balance      = Math.max(0, r.totalWithFee - r.deposit);
+
+  const pct       = ARTISTS[currentArtist].pct;
+  const artistAmt = r.cost * pct;
+  const bonus     = r.addOns * 0.10;
+
+  if (r.paid !== null) {
+    const derived = r.paid - r.balance;
+    if (derived < -0.10) { r.tipError = true; r.tipAmt = null; }
+    else { r.tipError = false; r.tipAmt = derived >= 1.00 ? derived : null; }
+  }
+
+  const payout = artistAmt + (r.tipAmt || 0);
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+  set('total-'   + rowIdx, r.totalWithFee > 0 ? fmt(r.totalWithFee) : '—');
+  set('balance-' + rowIdx, r.balance > 0 ? fmt(r.balance) : '✓ Paid');
+  const bel = document.getElementById('balance-' + rowIdx);
+  if (bel) bel.style.color = r.balance > 0 ? 'var(--ink-soft)' : 'var(--green)';
+  set('artist-'  + rowIdx, fmt(artistAmt));
+  set('bonus-'   + rowIdx, bonus > 0 ? fmt(bonus) : '—');
+  set('payout-'  + rowIdx, r.tipAmt !== null || artistAmt > 0 ? fmt(payout) : '—');
+
+  const tipEl = document.getElementById('tip-' + rowIdx);
+  if (tipEl) {
+    if (r.tipError) tipEl.innerHTML = '<span style="color:#C97070;">—</span>';
+    else if (r.tipAmt && r.tipAmt > 0) tipEl.innerHTML = `<span style="color:var(--gold);font-weight:500;">${fmt(r.tipAmt)}</span>`;
+    else tipEl.innerHTML = '<span style="color:var(--chrome);">—</span>';
+  }
+
+  const saveBtn = document.getElementById('save-addons-btn');
+  if (saveBtn) saveBtn.style.display = 'inline-flex';
+
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
 }
 
 function onAddonChange(rowIdx, field, val) {
@@ -747,36 +799,49 @@ function renderLedger(rows, startStr, endStr, theme) {
 
   let totCost=0, totDeposit=0, totTotal=0, totBalance=0, totPaid=0, totTips=0, totArtistPct=0, totBonus=0, totPayout=0;
 
+  const cancelFlags = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+
   const bodyRows = rows.map((r, i) => {
     const { appt, apptD, isPastAppt, cost, numbing, aftercare, merch, addOns, totalWithFee, deposit, balance, squareDeposit, squarePaid, paid, tipAmt, tipError } = r;
 
-    const isReconciled    = isPastAppt && paid !== null && !tipError;
-    const isReconcileFlag = isPastAppt && (tipError || (paid !== null && paid < balance - 0.10) || (paid === null && balance > 0));
+    // Check if this row has a cancel flag
+    const cancelKey  = appt.clientName + '|' + (appt.appointmentDate || '');
+    const cancelFlag = cancelFlags[cancelKey];
+    const isCancelled = cancelFlag && (cancelFlag.type === 'cxld' || cancelFlag.type === 'noshow');
+
+    // Payout logic:
+    // - Normal:    cost × pct + addOns × 10% + tips
+    // - Cancelled/No-show: deposit × pct only (no bonus, no tips — nothing was done)
+    const artistAmt = isCancelled ? deposit * pct : cost * pct;
+    const bonus     = isCancelled ? 0 : addOns * 0.10;
+    const payout    = isCancelled ? artistAmt : artistAmt + (tipAmt || 0);
+
+    const isReconciled    = !isCancelled && isPastAppt && paid !== null && !tipError;
+    const isReconcileFlag = !isCancelled && isPastAppt && (tipError || (paid !== null && paid < balance - 0.10) || (paid === null && balance > 0));
 
     const dateStr = apptD ? apptD.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : '—';
     const time    = apptD ? apptD.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
 
-    const artistAmt = cost * pct;
-    const bonus     = addOns * 0.10;
-    const payout    = artistAmt + (tipAmt || 0);
-
     totCost      += cost;
     totDeposit   += deposit;
-    totTotal     += totalWithFee;
-    totBalance   += balance;
-    totPaid      += paid || 0;
-    totTips      += tipAmt || 0;
+    totTotal     += isCancelled ? 0 : totalWithFee;
+    totBalance   += isCancelled ? 0 : balance;
+    totPaid      += isCancelled ? 0 : (paid || 0);
+    totTips      += isCancelled ? 0 : (tipAmt || 0);
     totArtistPct += artistAmt;
     totBonus     += bonus;
     totPayout    += payout;
 
     let rowStyle  = '';
     let textStyle = '';
-    if (isReconcileFlag)  { rowStyle = 'background:rgba(232,160,32,0.07);'; textStyle = 'font-weight:500;'; }
-    else if (isReconciled){ rowStyle = 'background:rgba(90,153,102,0.03)';  textStyle = 'font-weight:600;'; }
-    else if (!isPastAppt) { rowStyle = 'background:rgba(180,160,170,0.04);';textStyle = 'font-style:italic;color:var(--chrome);'; }
+    if (isCancelled)       { rowStyle = 'background:rgba(201,112,112,0.05);'; textStyle = 'opacity:0.75;'; }
+    else if (isReconcileFlag)  { rowStyle = 'background:rgba(232,160,32,0.07);'; textStyle = 'font-weight:500;'; }
+    else if (isReconciled)     { rowStyle = 'background:rgba(90,153,102,0.03)';  textStyle = 'font-weight:600;'; }
+    else if (!isPastAppt)      { rowStyle = 'background:rgba(180,160,170,0.04);';textStyle = 'font-style:italic;color:var(--chrome);'; }
 
-    const statusDot = isReconcileFlag
+    const statusDot = isCancelled
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#C97070;margin-right:4px;" title="${cancelFlag.type === 'noshow' ? 'No-Show' : 'Cancelled'}"></span>`
+      : isReconcileFlag
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E8A020;margin-right:4px;" title="Reconcile Flag"></span>`
       : isReconciled
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;" title="Reconciled"></span>`
@@ -834,18 +899,27 @@ function renderLedger(rows, startStr, endStr, theme) {
             ? '<div style="font-size:9px;background:#FDF0F0;color:#C97070;padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block;">CANCELLED</div>' : ''}
           <span id="badge-${i}"></span>
         </td>
-        <td class="td-money" style="${textStyle}">${cost > 0 ? fmt(cost) : '—'}</td>
+        <td class="td-money" style="${textStyle}">
+          <input id="cost-${i}" type="number" value="${cost || ''}" min="0" step="5"
+            onchange="onCostChange(${i}, this.value)"
+            onfocus="this.style.borderColor='var(--pink-mid)';this.style.background='var(--white)';"
+            onblur="this.style.borderColor='transparent';this.style.background='transparent';"
+            style="width:72px;text-align:right;font-family:'DM Mono',monospace;font-size:11px;font-weight:300;border:1px solid transparent;border-radius:6px;padding:3px 5px;background:transparent;color:var(--ink);cursor:text;outline:none;">
+        </td>
         <td class="td-money">${numbingDd}</td>
         <td class="td-money">${aftercareDd}</td>
         <td class="td-money">${merchDd}</td>
-        <td class="td-money" id="total-${i}"   style="${textStyle}">${totalWithFee > 0 ? fmt(totalWithFee) : '—'}</td>
+        <td class="td-money" id="total-${i}"   style="${textStyle}">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : totalWithFee > 0 ? fmt(totalWithFee) : '—'}</td>
         <td class="td-money td-deposit">${depositCell}</td>
-        <td class="td-money" id="balance-${i}" style="color:${balance > 0 ? 'var(--ink-soft)' : 'var(--green)'};${textStyle}">${balance > 0 ? fmt(balance) : '✓ Paid'}</td>
-        <td class="td-money">${isPastAppt ? paidCell : '—'}</td>
-        <td class="td-money" id="tip-${i}">${tipCell}</td>
-        <td class="td-money td-green" id="artist-${i}" style="${textStyle}">${fmt(artistAmt)}</td>
+        <td class="td-money" id="balance-${i}" style="color:${isCancelled ? 'var(--chrome)' : balance > 0 ? 'var(--ink-soft)' : 'var(--green)'};${textStyle}">${isCancelled ? '—' : balance > 0 ? fmt(balance) : '✓ Paid'}</td>
+        <td class="td-money">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : isPastAppt ? paidCell : '—'}</td>
+        <td class="td-money" id="tip-${i}">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : tipCell}</td>
+        <td class="td-money td-green" id="artist-${i}" style="${textStyle}">
+          ${fmt(artistAmt)}
+          ${isCancelled ? '<div style="font-size:9px;color:var(--chrome);font-family:\'DM Sans\',sans-serif;">of deposit</div>' : ''}
+        </td>
         <td class="td-money td-gold"  id="bonus-${i}"  style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
-        <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isReconciled ? fmt(payout) : '—'}</td>
+        <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isCancelled ? fmt(payout) : isReconciled ? fmt(payout) : '—'}</td>
         <td style="text-align:center;">
           <button onclick="openCancelModal(${i})" title="Mark cancelled / no-show / rescheduled"
             style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--chrome);padding:4px 6px;border-radius:6px;transition:all 0.12s;"
@@ -924,13 +998,18 @@ function renderSummary(rows, theme) {
   const isAdmin = ['Jackie','Nicole','Mellissa'].includes(currentArtist);
   const now     = new Date();
 
+  const cancelFlags    = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+  const isCancelledRow = r => { const k = r.appt.clientName+'|'+(r.appt.appointmentDate||''); const f=cancelFlags[k]; return f && (f.type==='cxld'||f.type==='noshow'); };
+
   const pastRows       = rows.filter(r => r.isPastAppt);
   const upcomingRows   = rows.filter(r => !r.isPastAppt);
-  const reconciledRows = pastRows.filter(r => r.paid !== null && !r.tipError);
+  const cancelledRows  = rows.filter(r => isCancelledRow(r));
+  const activeRows     = rows.filter(r => !isCancelledRow(r));
+  const reconciledRows = pastRows.filter(r => !isCancelledRow(r) && r.paid !== null && !r.tipError);
 
   let projArtistPct=0, projBonus=0, projShopIncome=0;
   let totNumbing=0, totAftcare=0, totMerch=0, totNumbingCt=0, totAftcareCt=0, totMerchCt=0;
-  rows.forEach(r => {
+  activeRows.forEach(r => {
     projArtistPct  += r.cost * pct;
     projBonus      += r.addOns * 0.10;
     projShopIncome += r.totalWithFee;
@@ -938,7 +1017,9 @@ function renderSummary(rows, theme) {
     totAftcare  += r.aftercare; if (r.aftercare > 0) totAftcareCt++;
     totMerch    += r.merch;     if (r.merch > 0)     totMerchCt++;
   });
-  const totUpsalesAmt = totNumbing + totAftcare + totMerch; // FIX: was missing
+  // Add cancelled/no-show deposit payouts to projections
+  cancelledRows.forEach(r => { projArtistPct += r.deposit * pct; });
+  const totUpsalesAmt = totNumbing + totAftcare + totMerch;
 
   let runArtistPct=0, runBonus=0, runTips=0, runShopIncome=0;
   reconciledRows.forEach(r => {
@@ -947,6 +1028,8 @@ function renderSummary(rows, theme) {
     runTips       += r.tipAmt || 0;
     runShopIncome += r.totalWithFee;
   });
+  // Add confirmed cancelled payouts (deposit known) to running total
+  cancelledRows.filter(r => r.deposit > 0).forEach(r => { runArtistPct += r.deposit * pct; });
   const runTotal = runArtistPct + runBonus + runTips;
 
   const summaryBar = document.getElementById('summary-bar');
@@ -1089,8 +1172,8 @@ async function saveAddonChanges() {
   const overrides = {};
   _ledgerRows.forEach(r => {
     const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
-    if (r.numbing || r.aftercare || r.merch) {
-      overrides[key] = { numbing: r.numbing, aftercare: r.aftercare, merch: r.merch };
+    if (r.numbing || r.aftercare || r.merch || r._costOverridden) {
+      overrides[key] = { numbing: r.numbing, aftercare: r.aftercare, merch: r.merch, cost: r._costOverridden ? r.cost : undefined };
     }
   });
   try { localStorage.setItem('pii_addon_overrides', JSON.stringify(overrides)); } catch(e) {}
@@ -1111,6 +1194,10 @@ function applyAddonOverrides(rows) {
         r.numbing   = saved[key].numbing   || r.numbing;
         r.aftercare = saved[key].aftercare || r.aftercare;
         r.merch     = saved[key].merch     || r.merch;
+        if (saved[key].cost !== undefined) {
+          r.cost = saved[key].cost;
+          r._costOverridden = true;
+        }
         r.addOns       = r.numbing + r.aftercare + r.merch;
         r.totalWithFee = (r.cost + r.addOns) * 1.06;
         r.balance      = Math.max(0, r.totalWithFee - r.deposit);

@@ -180,6 +180,10 @@ tbody td:last-child  { padding-right:16px; }
 .loading-row td { text-align:center; padding:32px; color:var(--chrome); font-family:'DM Sans',sans-serif; font-size:12px; animation:pulse 1.5s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
 
+@keyframes pulse {
+  0%, 100% { opacity:1; }
+  50%       { opacity:0.4; }
+}
 @media(max-width:640px) {
   .controls { flex-direction:column; align-items:flex-start; }
   .summary-bar { grid-template-columns:repeat(2,1fr); }
@@ -809,12 +813,25 @@ function renderLedger(rows, startStr, endStr, theme) {
     const cancelFlag = cancelFlags[cancelKey];
     const isCancelled = cancelFlag && (cancelFlag.type === 'cxld' || cancelFlag.type === 'noshow');
 
+    // Check touch-up flag from localStorage or row object
+    const touchupFlags    = JSON.parse(localStorage.getItem('pii_touchup_flags') || '{}');
+    const dismissedFlags  = JSON.parse(localStorage.getItem('pii_touchup_dismissed') || '{}');
+    const isTouchUp       = !!touchupFlags[cancelKey] || !!r._isTouchUp;
+
+    // Touch-up prompt: past appt where cost is $0 OR service name suggests touch-up
+    // Don't block on paid/squarePaid — tips, numbing, merch may still have payments
+    const serviceName = (appt.service || '').toLowerCase();
+    const looksLikeTouchUp = cost === 0 || serviceName.includes('touch') || serviceName.includes('retouch') || serviceName.includes('touch-up');
+    const needsTouchUpPrompt = isPastAppt && !isCancelled && !isTouchUp && !dismissedFlags[cancelKey]
+      && looksLikeTouchUp;
+
     // Payout logic:
-    // - Normal:    cost × pct + addOns × 10% + tips
-    // - Cancelled/No-show: deposit × pct only (no bonus, no tips — nothing was done)
-    const artistAmt = isCancelled ? deposit * pct : cost * pct;
+    // - Normal:            cost × pct + addOns × 10% + tips
+    // - Cancelled/No-show: deposit × pct only (no bonus, no tips)
+    // - Touch-up:          $0 base + addOns × 10% bonus (numbing/merch still sold) + tips
+    const artistAmt = isCancelled ? deposit * pct : isTouchUp ? 0 : cost * pct;
     const bonus     = isCancelled ? 0 : addOns * 0.10;
-    const payout    = isCancelled ? artistAmt : artistAmt + (tipAmt || 0);
+    const payout    = artistAmt + bonus + (isCancelled ? 0 : tipAmt || 0);
 
     const isReconciled    = !isCancelled && isPastAppt && paid !== null && !tipError;
     const isReconcileFlag = !isCancelled && isPastAppt && (tipError || (paid !== null && paid < balance - 0.10) || (paid === null && balance > 0));
@@ -834,19 +851,24 @@ function renderLedger(rows, startStr, endStr, theme) {
 
     let rowStyle  = '';
     let textStyle = '';
-    if (isCancelled)       { rowStyle = 'background:rgba(201,112,112,0.05);'; textStyle = 'opacity:0.75;'; }
-    else if (isReconcileFlag)  { rowStyle = 'background:rgba(232,160,32,0.07);'; textStyle = 'font-weight:500;'; }
-    else if (isReconciled)     { rowStyle = 'background:rgba(90,153,102,0.03)';  textStyle = 'font-weight:600;'; }
-    else if (!isPastAppt)      { rowStyle = 'background:rgba(180,160,170,0.04);';textStyle = 'font-style:italic;color:var(--chrome);'; }
+    if (isCancelled)           { rowStyle = 'background:rgba(201,112,112,0.05);'; textStyle = 'opacity:0.75;'; }
+    else if (isTouchUp)        { rowStyle = 'background:rgba(138,100,185,0.04);'; textStyle = ''; }
+    else if (isReconcileFlag)  { rowStyle = 'background:rgba(232,160,32,0.07);';  textStyle = 'font-weight:500;'; }
+    else if (isReconciled)     { rowStyle = 'background:rgba(90,153,102,0.03)';   textStyle = 'font-weight:600;'; }
+    else if (!isPastAppt)      { rowStyle = 'background:rgba(180,160,170,0.04);'; textStyle = 'font-style:italic;color:var(--chrome);'; }
 
     const statusDot = isCancelled
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#C97070;margin-right:4px;" title="${cancelFlag.type === 'noshow' ? 'No-Show' : 'Cancelled'}"></span>`
+      : isTouchUp
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#8A64B9;margin-right:4px;" title="Touch-Up"></span>`
       : isReconcileFlag
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E8A020;margin-right:4px;" title="Reconcile Flag"></span>`
       : isReconciled
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;" title="Reconciled"></span>`
       : !isPastAppt
       ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--chrome);margin-right:4px;" title="Upcoming"></span>`
+      : needsTouchUpPrompt
+      ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#8A64B9;margin-right:4px;animation:pulse 1.5s infinite;" title="Needs confirmation"></span>`
       : `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#C97070;margin-right:4px;" title="Pending"></span>`;
 
     // Deposit cell
@@ -897,6 +919,14 @@ function renderLedger(rows, startStr, endStr, theme) {
           <div class="td-client" style="${isReconciled?'font-weight:700;':!isPastAppt?'font-style:italic;color:var(--chrome);':''}">${escHtml(appt.clientName)}</div>
           ${appt.canceled === 'TRUE' || appt.canceled === true
             ? '<div style="font-size:9px;background:#FDF0F0;color:#C97070;padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block;">CANCELLED</div>' : ''}
+          ${isTouchUp
+            ? '<div style="font-size:9px;background:#F0EBF8;color:#8A64B9;padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block;">✦ TOUCH-UP</div>' : ''}
+          ${needsTouchUpPrompt ? `
+            <div style="margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+              <span style="font-size:10px;color:#8A64B9;font-style:italic;">Touch-up?</span>
+              <button onclick="markTouchUp(${i}, true)" style="font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid #8A64B9;background:#F0EBF8;color:#8A64B9;cursor:pointer;font-family:'DM Sans',sans-serif;">Yes</button>
+              <button onclick="markTouchUp(${i}, false)" style="font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border);background:var(--white);color:var(--chrome);cursor:pointer;font-family:'DM Sans',sans-serif;">No</button>
+            </div>` : ''}
           <span id="badge-${i}"></span>
         </td>
         <td class="td-money" style="${textStyle}">
@@ -909,17 +939,17 @@ function renderLedger(rows, startStr, endStr, theme) {
         <td class="td-money">${numbingDd}</td>
         <td class="td-money">${aftercareDd}</td>
         <td class="td-money">${merchDd}</td>
-        <td class="td-money" id="total-${i}"   style="${textStyle}">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : totalWithFee > 0 ? fmt(totalWithFee) : '—'}</td>
-        <td class="td-money td-deposit">${depositCell}</td>
+        <td class="td-money" id="total-${i}"   style="${textStyle}">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : isTouchUp && totalWithFee === 0 ? '<span style="color:#8A64B9;font-size:11px;">✦ free</span>' : totalWithFee > 0 ? fmt(totalWithFee) : '—'}</td>
+        <td class="td-money td-deposit">${isTouchUp && !squareDeposit ? '<span style="color:#8A64B9;font-size:11px;">✦ free</span>' : depositCell}</td>
         <td class="td-money" id="balance-${i}" style="color:${isCancelled ? 'var(--chrome)' : balance > 0 ? 'var(--ink-soft)' : 'var(--green)'};${textStyle}">${isCancelled ? '—' : balance > 0 ? fmt(balance) : '✓ Paid'}</td>
         <td class="td-money">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : isPastAppt ? paidCell : '—'}</td>
         <td class="td-money" id="tip-${i}">${isCancelled ? '<span style="color:var(--chrome);">—</span>' : tipCell}</td>
         <td class="td-money td-green" id="artist-${i}" style="${textStyle}">
-          ${fmt(artistAmt)}
+          ${isTouchUp ? '<span style="color:#8A64B9;font-size:11px;">✦ free</span>' : fmt(artistAmt)}
           ${isCancelled ? '<div style="font-size:9px;color:var(--chrome);font-family:\'DM Sans\',sans-serif;">of deposit</div>' : ''}
         </td>
-        <td class="td-money td-gold"  id="bonus-${i}"  style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
-        <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isCancelled ? fmt(payout) : isReconciled ? fmt(payout) : '—'}</td>
+        <td class="td-money td-gold" id="bonus-${i}" style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
+        <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isCancelled ? fmt(payout) : isTouchUp ? (payout > 0 ? fmt(payout) : '<span style="color:#8A64B9;font-size:11px;">✦ free</span>') : isReconciled ? fmt(payout) : '—'}</td>
         <td style="text-align:center;">
           <button onclick="openCancelModal(${i})" title="Mark cancelled / no-show / rescheduled"
             style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--chrome);padding:4px 6px;border-radius:6px;transition:all 0.12s;"
@@ -998,13 +1028,15 @@ function renderSummary(rows, theme) {
   const isAdmin = ['Jackie','Nicole','Mellissa'].includes(currentArtist);
   const now     = new Date();
 
+  const isTouchUpRow   = r => { const k = r.appt.clientName+'|'+(r.appt.appointmentDate||''); return !!touchupFlagsS[k] || !!r._isTouchUp; };
+  const touchupFlagsS  = JSON.parse(localStorage.getItem('pii_touchup_flags') || '{}');
   const cancelFlags    = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
   const isCancelledRow = r => { const k = r.appt.clientName+'|'+(r.appt.appointmentDate||''); const f=cancelFlags[k]; return f && (f.type==='cxld'||f.type==='noshow'); };
 
   const pastRows       = rows.filter(r => r.isPastAppt);
   const upcomingRows   = rows.filter(r => !r.isPastAppt);
   const cancelledRows  = rows.filter(r => isCancelledRow(r));
-  const activeRows     = rows.filter(r => !isCancelledRow(r));
+  const activeRows     = rows.filter(r => !isCancelledRow(r) && !isTouchUpRow(r));
   const reconciledRows = pastRows.filter(r => !isCancelledRow(r) && r.paid !== null && !r.tipError);
 
   let projArtistPct=0, projBonus=0, projShopIncome=0;
@@ -1592,6 +1624,39 @@ function saveWalkin() {
   renderSummary(_ledgerRows, ARTISTS['Mellissa']);
   restoreCancelBadges(_ledgerRows);
   closeWalkinModal();
+}
+
+// ── TOUCH-UP SYSTEM ──────────────────────────────────────
+function markTouchUp(rowIdx, confirmed) {
+  const r = _ledgerRows[rowIdx];
+  if (!r) return;
+  const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+
+  if (confirmed) {
+    // Save touch-up flag
+    try {
+      const flags = JSON.parse(localStorage.getItem('pii_touchup_flags') || '{}');
+      flags[key]  = { savedAt: new Date().toISOString() };
+      localStorage.setItem('pii_touchup_flags', JSON.stringify(flags));
+    } catch(e) {}
+    // Mark on row object so re-render picks it up
+    r._isTouchUp = true;
+  }
+  // Re-render — if confirmed it'll show touch-up badge; if declined it'll stay pending (red dot)
+  // but prompt won't show again this session
+  if (!confirmed) {
+    try {
+      const dismissed = JSON.parse(localStorage.getItem('pii_touchup_dismissed') || '{}');
+      dismissed[key] = true;
+      localStorage.setItem('pii_touchup_dismissed', JSON.stringify(dismissed));
+    } catch(e) {}
+  }
+
+  const val = document.getElementById('period-select').value;
+  const [startStr, endStr] = val.split('|');
+  renderLedger(_ledgerRows, startStr, endStr, ARTISTS[currentArtist]);
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
+  restoreCancelBadges(_ledgerRows);
 }
 
 buildPeriods();

@@ -300,50 +300,65 @@ tbody td:last-child  { padding-right:16px; }
 
 <!-- ── MELLISSA WALK-IN MODAL ── -->
 <div class="modal-overlay" id="walkin-modal" style="display:none;" onclick="if(event.target===this)closeWalkinModal()">
-  <div class="modal-box" style="max-width:500px;">
+  <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto;">
     <div class="modal-title">Add Walk-In</div>
     <div class="modal-sub">Mellissa · Walk-in client</div>
-    <div class="modal-field">
-      <label>Client Name</label>
-      <input type="text" id="wi-name" placeholder="First Last">
+    <div style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label>Client Name</label>
+        <input type="text" id="wi-name" placeholder="First Last">
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label>Date & Time</label>
+        <input type="datetime-local" id="wi-datetime">
+      </div>
     </div>
-    <div class="modal-field">
-      <label>Email (optional — for Square lookup)</label>
-      <input type="email" id="wi-email" placeholder="client@email.com">
+    <div style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label>Email (optional)</label>
+        <input type="email" id="wi-email" placeholder="client@email.com">
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label>Phone (optional)</label>
+        <input type="tel" id="wi-phone" placeholder="(555) 555-5555">
+      </div>
     </div>
-    <div class="modal-field">
-      <label>Phone (optional)</label>
-      <input type="tel" id="wi-phone" placeholder="(555) 555-5555">
-    </div>
-    <div class="modal-field">
-      <label>Piercing Service</label>
-      <select id="wi-piercing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
-        <option value="">Select piercing...</option>
-        <option value="35">Jewelry Change/Removal — $35</option>
-        <option value="85">Dermal — $85</option>
-        <option value="60">Additional Dermal — $60</option>
-        <option value="90">Ear: Industrial — $90</option>
-        <option value="75">Ear: Tragus/Daith/Rook/Helix — $75</option>
-        <option value="150">2 Ear Lobes — $150</option>
-        <option value="75">Surface: Tragus/Bridge/Eyebrow — $75</option>
-        <option value="75">Nostril — $75</option>
-        <option value="65">Septum — $65</option>
-        <option value="75">Lip: Labret/Vertical/Monroe — $75</option>
-        <option value="65">Tongue — $65</option>
-        <option value="65">Tongue: Frenulum/Web — $65</option>
-        <option value="65">Smiley — $65</option>
-        <option value="65">1 Nipple — $65</option>
-        <option value="130">Both Nipples — $130</option>
-        <option value="75">Navel/Belly Button — $75</option>
-        <option value="90">VCH/Hood Piercing — $90</option>
-        <option value="90">Guiche — $90</option>
-        <option value="90">Christina — $90</option>
-        <option value="90">Frenum — $90</option>
-        <option value="90">Hafada/Scrotum — $90</option>
-        <option value="150">Ear Lobe Stretching — $150</option>
-        <option value="75">Mystery Piercing — $75</option>
-        <option value="65">Tongue: Snake Eyes/Venom — $65</option>
-      </select>
+    <div style="display:flex;gap:10px;align-items:flex-end;">
+      <div class="modal-field" style="flex:1;">
+        <label>Piercing Service</label>
+        <select id="wi-piercing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+          <option value="">Select piercing...</option>
+          <option value="35">Jewelry Change/Removal — $35</option>
+          <option value="85">Dermal — $85</option>
+          <option value="60">Additional Dermal — $60</option>
+          <option value="90">Ear: Industrial — $90</option>
+          <option value="75">Ear: Tragus/Daith/Rook/Helix — $75</option>
+          <option value="150">2 Ear Lobes — $150</option>
+          <option value="75">Surface: Tragus/Bridge/Eyebrow — $75</option>
+          <option value="75">Nostril — $75</option>
+          <option value="65">Septum — $65</option>
+          <option value="75">Lip: Labret/Vertical/Monroe — $75</option>
+          <option value="65">Tongue — $65</option>
+          <option value="65">Tongue: Frenulum/Web — $65</option>
+          <option value="65">Smiley — $65</option>
+          <option value="65">1 Nipple — $65</option>
+          <option value="130">Both Nipples — $130</option>
+          <option value="75">Navel/Belly Button — $75</option>
+          <option value="90">VCH/Hood Piercing — $90</option>
+          <option value="90">Guiche — $90</option>
+          <option value="90">Christina — $90</option>
+          <option value="90">Frenum — $90</option>
+          <option value="90">Hafada/Scrotum — $90</option>
+          <option value="150">Ear Lobe Stretching — $150</option>
+          <option value="75">Mystery Piercing — $75</option>
+          <option value="65">Tongue: Snake Eyes/Venom — $65</option>
+        </select>
+      </div>
+      <div class="modal-field" style="width:80px;">
+        <label>Qty</label>
+        <input type="number" id="wi-qty" value="1" min="1" max="10" onchange="calcWalkinTotal()" oninput="calcWalkinTotal()"
+          style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);text-align:center;">
+      </div>
     </div>
     <div style="display:flex;gap:10px;">
       <div class="modal-field" style="flex:1;">
@@ -1402,12 +1417,17 @@ function restoreCancelBadges(rows) {
 
 // ── WALK-IN MODAL (Mellissa) ─────────────────────────────
 function openWalkinModal() {
-  document.getElementById('wi-name').value     = '';
-  document.getElementById('wi-email').value    = '';
-  document.getElementById('wi-phone').value    = '';
-  document.getElementById('wi-piercing').value = '';
-  document.getElementById('wi-aftercare').value= '0';
-  document.getElementById('wi-merch').value    = '0';
+  document.getElementById('wi-name').value      = '';
+  document.getElementById('wi-email').value     = '';
+  document.getElementById('wi-phone').value     = '';
+  document.getElementById('wi-piercing').value  = '';
+  document.getElementById('wi-qty').value       = '1';
+  document.getElementById('wi-aftercare').value = '0';
+  document.getElementById('wi-merch').value     = '0';
+  // Default datetime to now
+  const now = new Date();
+  now.setSeconds(0, 0);
+  document.getElementById('wi-datetime').value = now.toISOString().slice(0, 16);
   document.getElementById('wi-total-line').style.display = 'none';
   document.getElementById('walkin-modal').style.display  = 'flex';
 }
@@ -1417,13 +1437,16 @@ function closeWalkinModal() {
 }
 
 function calcWalkinTotal() {
-  const cost     = parseFloat(document.getElementById('wi-piercing').value) || 0;
+  const unitCost = parseFloat(document.getElementById('wi-piercing').value) || 0;
+  const qty      = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
+  const cost     = unitCost * qty;
   const aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
   const merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
   const total    = (cost + aftercare + merch) * 1.06;
   const line     = document.getElementById('wi-total-line');
-  if (cost > 0) {
-    document.getElementById('wi-total-val').textContent = '$' + total.toFixed(2);
+  if (unitCost > 0) {
+    const breakdown = qty > 1 ? ` (${qty} × $${unitCost})` : '';
+    document.getElementById('wi-total-val').textContent = '$' + total.toFixed(2) + breakdown;
     line.style.display = 'block';
   } else {
     line.style.display = 'none';
@@ -1431,29 +1454,35 @@ function calcWalkinTotal() {
 }
 
 function saveWalkin() {
-  const name     = document.getElementById('wi-name').value.trim();
-  const email    = document.getElementById('wi-email').value.trim();
-  const phone    = document.getElementById('wi-phone').value.trim();
+  const name      = document.getElementById('wi-name').value.trim();
+  const email     = document.getElementById('wi-email').value.trim();
+  const phone     = document.getElementById('wi-phone').value.trim();
+  const datetimeVal = document.getElementById('wi-datetime').value;
   const piercingSel = document.getElementById('wi-piercing');
-  const cost     = parseFloat(piercingSel.value) || 0;
-  const aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
-  const merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
+  const unitCost  = parseFloat(piercingSel.value) || 0;
+  const qty       = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
+  const cost      = unitCost * qty;
+  const aftercare = parseFloat(document.getElementById('wi-aftercare').value) || 0;
+  const merch     = parseFloat(document.getElementById('wi-merch').value) || 0;
 
-  if (!name) { alert('Please enter a client name.'); return; }
-  if (!cost) { alert('Please select a piercing service.'); return; }
+  if (!name)     { alert('Please enter a client name.'); return; }
+  if (!unitCost) { alert('Please select a piercing service.'); return; }
+  if (!datetimeVal) { alert('Please enter a date and time.'); return; }
 
+  const apptD        = new Date(datetimeVal);
   const addOns       = aftercare + merch;
   const totalWithFee = (cost + addOns) * 1.06;
   const piercingLabel= piercingSel.options[piercingSel.selectedIndex].text;
+  const serviceLabel = qty > 1 ? `${qty}× ${piercingLabel}` : piercingLabel;
 
   const walkin = {
     appt: {
       clientName: name, email, phone,
-      appointmentDate: new Date().toISOString(),
-      service: piercingLabel, artist: 'Mellissa', cost, status: 'Walk-In',
+      appointmentDate: apptD.toISOString(),
+      service: serviceLabel, artist: 'Mellissa', cost, status: 'Walk-In',
     },
-    apptD: new Date(), apptDateStr: localDateStr(new Date()),
-    isPastAppt: true, cost, numbing: 0, aftercare, merch,
+    apptD, apptDateStr: localDateStr(apptD),
+    isPastAppt: apptD < new Date(), cost, numbing: 0, aftercare, merch,
     addOns, totalWithFee,
     deposit: 0, balance: totalWithFee,
     squareDeposit: null, squarePaid: null,
@@ -1466,7 +1495,7 @@ function saveWalkin() {
   // Save to localStorage
   try {
     const saved = JSON.parse(localStorage.getItem('pii_walkins') || '[]');
-    saved.push({ name, email, phone, cost, aftercare, merch, totalWithFee, piercingLabel, savedAt: new Date().toISOString() });
+    saved.push({ name, email, phone, datetimeVal, unitCost, qty, cost, aftercare, merch, totalWithFee, serviceLabel, savedAt: new Date().toISOString() });
     localStorage.setItem('pii_walkins', JSON.stringify(saved));
   } catch(e) {}
 

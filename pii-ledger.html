@@ -185,6 +185,61 @@ tbody td:last-child  { padding-right:16px; }
   .summary-bar { grid-template-columns:repeat(2,1fr); }
   .ledger-wrap, .summary-bar, .upsales-row, .controls { padding:0 12px; }
 }
+
+/* ── CANCEL MODAL ─────────────────────────────────── */
+.modal-overlay {
+  position:fixed;inset:0;z-index:8000;background:rgba(28,18,19,0.45);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  backdrop-filter:blur(3px);
+}
+.modal-box {
+  background:var(--white);border-radius:20px;padding:28px 28px 24px;
+  box-shadow:0 16px 64px rgba(100,40,60,0.22);width:100%;max-width:420px;
+  border:1px solid var(--border);
+}
+.modal-title { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:4px; }
+.modal-sub   { font-size:12px;color:var(--chrome);font-weight:300;margin-bottom:20px; }
+.modal-opts  { display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap; }
+.modal-opt   {
+  flex:1;min-width:90px;padding:10px 8px;border-radius:12px;border:1.5px solid var(--border);
+  background:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;
+  color:var(--ink-soft);cursor:pointer;transition:all 0.15s;text-align:center;
+}
+.modal-opt:hover { border-color:var(--pink-mid); }
+.modal-opt.sel-cxld    { background:#FDF0F0;border-color:#C97070;color:#C97070;font-weight:600; }
+.modal-opt.sel-noshow  { background:#FFF8ED;border-color:#E8A020;color:#C47A10;font-weight:600; }
+.modal-opt.sel-reschd  { background:#EFF6FC;border-color:#4A90C4;color:#2A70A4;font-weight:600; }
+.modal-field { margin-bottom:14px; }
+.modal-field label { font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;display:block;margin-bottom:6px; }
+.modal-field input, .modal-field textarea {
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;
+  transition:border-color 0.15s;background:var(--white);resize:vertical;
+}
+.modal-field input:focus, .modal-field textarea:focus { border-color:var(--pink-mid); }
+.modal-btns { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+.modal-btn  { padding:9px 18px;border-radius:100px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s; }
+.modal-btn.cancel { background:var(--cream);color:var(--ink-soft);border:1.5px solid var(--border); }
+.modal-btn.confirm { background:linear-gradient(135deg,var(--pink),var(--pink-dark));color:#fff;box-shadow:0 3px 12px rgba(212,116,143,0.3); }
+.modal-btn.confirm:hover { transform:translateY(-1px); }
+
+/* Status badges in rows */
+.row-badge {
+  display:inline-block;font-size:9px;letter-spacing:0.12em;font-weight:600;
+  padding:2px 7px;border-radius:4px;margin-top:2px;font-family:'DM Sans',sans-serif;
+}
+.badge-cxld   { background:#FDF0F0;color:#C97070; }
+.badge-noshow { background:#FFF8ED;color:#C47A10; }
+.badge-reschd { background:#EFF6FC;color:#2A70A4; }
+
+/* ── WALK-IN MODAL (Mellissa) ─────────────────────── */
+.walkin-btn {
+  padding:8px 16px;border-radius:100px;border:1.5px solid var(--mellissa);
+  background:var(--white);color:var(--mellissa);font-family:'DM Sans',sans-serif;
+  font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;
+}
+.walkin-btn:hover { background:var(--mellissa);color:#fff; }
+
 </style>
 </head>
 <body>
@@ -218,7 +273,107 @@ tbody td:last-child  { padding-right:16px; }
   </div>
 </div>
 
-<div class="nav">
+<!-- ── CANCEL / NO-SHOW / RESCHEDULE MODAL ── -->
+<div class="modal-overlay" id="cancel-modal" style="display:none;" onclick="if(event.target===this)closeCancelModal()">
+  <div class="modal-box">
+    <div class="modal-title">Mark Appointment</div>
+    <div class="modal-sub" id="cancel-client-name">Client name</div>
+    <div class="modal-opts">
+      <button class="modal-opt" id="opt-cxld"   onclick="setCancelType('cxld')">✕ Cancelled</button>
+      <button class="modal-opt" id="opt-noshow" onclick="setCancelType('noshow')">👻 No-Show</button>
+      <button class="modal-opt" id="opt-reschd" onclick="setCancelType('reschd')">📅 Rescheduled</button>
+    </div>
+    <div id="reschedule-field" class="modal-field" style="display:none;">
+      <label>New Date & Time</label>
+      <input type="datetime-local" id="reschedule-dt">
+    </div>
+    <div class="modal-field">
+      <label>Notes (optional)</label>
+      <textarea id="cancel-notes" rows="2" placeholder="Add any notes..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeCancelModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="saveCancelFlag()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MELLISSA WALK-IN MODAL ── -->
+<div class="modal-overlay" id="walkin-modal" style="display:none;" onclick="if(event.target===this)closeWalkinModal()">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title">Add Walk-In</div>
+    <div class="modal-sub">Mellissa · Walk-in client</div>
+    <div class="modal-field">
+      <label>Client Name</label>
+      <input type="text" id="wi-name" placeholder="First Last">
+    </div>
+    <div class="modal-field">
+      <label>Email (optional — for Square lookup)</label>
+      <input type="email" id="wi-email" placeholder="client@email.com">
+    </div>
+    <div class="modal-field">
+      <label>Phone (optional)</label>
+      <input type="tel" id="wi-phone" placeholder="(555) 555-5555">
+    </div>
+    <div class="modal-field">
+      <label>Piercing Service</label>
+      <select id="wi-piercing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+        <option value="">Select piercing...</option>
+        <option value="35">Jewelry Change/Removal — $35</option>
+        <option value="85">Dermal — $85</option>
+        <option value="60">Additional Dermal — $60</option>
+        <option value="90">Ear: Industrial — $90</option>
+        <option value="75">Ear: Tragus/Daith/Rook/Helix — $75</option>
+        <option value="150">2 Ear Lobes — $150</option>
+        <option value="75">Surface: Tragus/Bridge/Eyebrow — $75</option>
+        <option value="75">Nostril — $75</option>
+        <option value="65">Septum — $65</option>
+        <option value="75">Lip: Labret/Vertical/Monroe — $75</option>
+        <option value="65">Tongue — $65</option>
+        <option value="65">Tongue: Frenulum/Web — $65</option>
+        <option value="65">Smiley — $65</option>
+        <option value="65">1 Nipple — $65</option>
+        <option value="130">Both Nipples — $130</option>
+        <option value="75">Navel/Belly Button — $75</option>
+        <option value="90">VCH/Hood Piercing — $90</option>
+        <option value="90">Guiche — $90</option>
+        <option value="90">Christina — $90</option>
+        <option value="90">Frenum — $90</option>
+        <option value="90">Hafada/Scrotum — $90</option>
+        <option value="150">Ear Lobe Stretching — $150</option>
+        <option value="75">Mystery Piercing — $75</option>
+        <option value="65">Tongue: Snake Eyes/Venom — $65</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="modal-field" style="flex:1;">
+        <label>Aftercare</label>
+        <select id="wi-aftercare" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+          <option value="0">None</option>
+          <option value="25">Piercing Kit $25</option>
+        </select>
+      </div>
+      <div class="modal-field" style="flex:1;">
+        <label>Merch</label>
+        <select id="wi-merch" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+          <option value="0">None</option>
+          <option value="25">Shirt $25</option>
+          <option value="10">Sticker $10</option>
+        </select>
+      </div>
+    </div>
+    <div id="wi-total-line" style="display:none;background:var(--cream);border-radius:12px;padding:12px 16px;margin-bottom:4px;font-size:13px;color:var(--ink);font-family:'DM Mono',monospace;">
+      Total: <strong id="wi-total-val" style="color:var(--mellissa);"></strong>
+      <span style="font-size:10px;color:var(--chrome);margin-left:6px;">(includes 6% fee)</span>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeWalkinModal()">Cancel</button>
+      <button class="modal-btn confirm" style="background:var(--mellissa);" onclick="saveWalkin()">Add to Ledger</button>
+    </div>
+  </div>
+</div>
+
+
   <a class="nav-link" href="/">🏠 Home</a>
   <a class="nav-link" href="/pii-appointments">📅 Appointments</a>
   <a class="nav-link" href="/pii-dashboard">💗 Payment Plans</a>
@@ -259,7 +414,7 @@ tbody td:last-child  { padding-right:16px; }
 </div>
 
 <script>
-const SHEET_URL   = "https://script.google.com/macros/s/AKfycbxEDoqpAAp5IbSsEuEJ0YGHfxb7oS5WSQVIACktwC0MrltZUnaVpT4TlaUVBuA4apui/exec";
+const SHEET_URL   = "https://script.google.com/macros/s/AKfycby5Y-U6bAjY5JizIZ63i_oQFqtTDBcTmvmzL0Vqfb1WdBHghNW1dHrVcPEjkrLVp5H8/exec";
 const BACKEND_URL = "https://pii-backend-production.up.railway.app";
 
 // Anchor: Apr 19 2026 (Sunday), bi-weekly
@@ -340,9 +495,11 @@ async function loadLedger() {
 
     const appointments = allAppts.filter(a => {
       if (a.artist !== currentArtist) return false;
-      // Exclude unapproved/failed appointments (no deposit paid, booking incomplete)
-      const status = (a.status || a.appointmentStatus || '').toLowerCase();
-      if (status.includes('unapproved') || status.includes('failednotpaid') || status.includes('failed')) return false;
+      // Exclude unapproved/failed appointments per status field
+      const st = (a.status || '').toLowerCase();
+      if (st.includes('unapproved') || st.includes('failed')) return false;
+      // Also exclude if depositPaid is explicitly false
+      if (a.depositPaid === false || a.depositPaid === 'false' || a.depositPaid === 'FALSE') return false;
       const d = parseDate(a.appointmentDate);
       return d && d >= periodStart && d <= periodEnd;
     }).sort((a,b) => parseDate(a.appointmentDate) - parseDate(b.appointmentDate));
@@ -369,6 +526,7 @@ async function loadLedger() {
     applyAddonOverrides(rows);
     renderLedger(rows, startStr, endStr, theme);
     renderSummary(rows, theme);
+    restoreCancelBadges(rows);
 
   } catch(e) {
     console.error('Ledger load error:', e);
@@ -390,133 +548,84 @@ async function buildRow(appt) {
   const apptDateStr = localDateStr(apptD); // local date string, no UTC shift
   const isPastAppt  = apptD && apptD < new Date();
 
-  // ── 1. DEPOSIT LOOKUP ────────────────────────────────────
-  // Strategy: search Square by email → find most recent VT/any payment BEFORE the appointment
-  let squareDeposit    = null;
-  let emailProfileIds  = [];
+  // ── 1 & 2. PAYMENT LOOKUP via by-email-all ───────────────
+  // Single call fetches ALL payments across ALL profile IDs for this client,
+  // including pre-merge Appointy profiles. Scans booking date to find orphaned IDs.
+  let squareDeposit   = null;
+  let emailProfileIds = [];
+  let allProfileIds   = [];
+  let allClientPmts   = []; // all payments for this client across all profiles
 
+  // Fetch all payments for this client in one call
+  // booking_date tells the backend to scan that date for orphaned pre-merge profile IDs
+  const bookingDateStr = appt.bookingDate ? localDateStr(parseDate(appt.bookingDate)) : '';
   if (appt.email) {
     try {
-      const res      = await fetch(`${BACKEND_URL}/customers/search?email=${encodeURIComponent(appt.email)}`);
-      const profiles = await res.json();
-
-      if (Array.isArray(profiles) && profiles.length > 0) {
-        emailProfileIds = profiles.map(p => p.id).filter(Boolean);
-
-        for (const pid of emailProfileIds) {
-          if (squareDeposit) break;
-
-          const res2 = await fetch(`${BACKEND_URL}/payments/by-customer?customer_id=${pid}`);
-          const pmts = await res2.json();
-          if (!Array.isArray(pmts) || pmts.length === 0) continue;
-
-          // Filter to payments that occurred ON OR BEFORE the appointment date
-          // (deposits are always before the appointment)
-          const beforeAppt = pmts.filter(p => {
-            if (!p.amount || p.amount < 5) return false;
-            if (p.source === 'Afterpay') return false;
-            if (!apptD || isNaN(apptD.getTime())) return true; // no date → include all
-            return new Date(p.date) <= apptD;
-          }).sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
-
-          // Prefer Virtual Terminal (that's how Appointy deposits come through)
-          squareDeposit = beforeAppt.find(p => p.source === 'Virtual Terminal')
-                       || beforeAppt[0]
-                       || null;
-        }
+      let url = `${BACKEND_URL}/payments/by-email-all?email=${encodeURIComponent(appt.email)}&name=${encodeURIComponent(appt.clientName||'')}`;
+      if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
+      console.log(`[PII] ${appt.clientName} — fetching payments:`, url);
+      const res  = await fetch(url);
+      const data = await res.json();
+      console.log(`[PII] ${appt.clientName} — raw response:`, data);
+      if (data && Array.isArray(data.profileIds)) {
+        emailProfileIds = data.profileIds;
+        allProfileIds   = [...data.profileIds];
       }
-    } catch(e) {
-      console.warn('Deposit lookup failed for', appt.clientName, e);
-    }
+      if (data && Array.isArray(data.payments)) {
+        // Square may return customer_id or customerId — normalize both
+        const normalized = data.payments.map(p => ({
+          ...p,
+          customerId: p.customerId || p.customer_id || '',
+          // Normalize date to local YYYY-MM-DD — Square returns UTC ISO strings
+          // e.g. "2026-05-06T14:30:00Z" → need to convert to local date
+          _localDate: localDateStr(parseDate(p.date || p.created_at || p.updated_at || '')),
+        }));
+        // Filter to only payments on known profile IDs — prevents cross-client contamination
+        allClientPmts = normalized.filter(p => allProfileIds.length === 0 || allProfileIds.includes(p.customerId));
+        console.log(`[PII] ${appt.clientName} — profileIds:`, allProfileIds, '| payments after filter:', allClientPmts.length, allClientPmts);
+      }
+    } catch(e) { console.warn('[PII] by-email-all failed for', appt.clientName, e); }
   }
 
-  // Fallback: if email search found nothing, try searching by name for deposit profile
-  if (!squareDeposit && appt.clientName) {
-    try {
-      const res      = await fetch(`${BACKEND_URL}/customers/search?name=${encodeURIComponent(appt.clientName)}`);
-      const profiles = await res.json();
-      if (Array.isArray(profiles)) {
-        for (const profile of profiles) {
-          if (squareDeposit) break;
-          if (emailProfileIds.includes(profile.id)) continue; // already tried
-          const res2 = await fetch(`${BACKEND_URL}/payments/by-customer?customer_id=${profile.id}`);
-          const pmts = await res2.json();
-          if (!Array.isArray(pmts)) continue;
-          const beforeAppt = pmts.filter(p => {
-            if (!p.amount || p.amount < 5) return false;
-            if (p.source === 'Afterpay') return false;
-            if (!apptD || isNaN(apptD.getTime())) return true;
-            return new Date(p.date) <= apptD;
-          }).sort((a,b) => new Date(b.date) - new Date(a.date));
-          squareDeposit = beforeAppt.find(p => p.source === 'Virtual Terminal') || beforeAppt[0] || null;
-        }
-      }
-    } catch(e) {
-      console.warn('Deposit name-fallback failed for', appt.clientName, e);
-    }
+  // Find deposit: most recent VT payment on or before the appointment date
+  // Compare using local date strings to avoid UTC timezone shift issues
+  if (allClientPmts.length > 0 && apptD) {
+    const deposits = allClientPmts.filter(p => {
+      if (p.source !== 'Virtual Terminal') return false;
+      if ((p.amount || 0) < 5) return false;
+      // Use pre-normalized _localDate for comparison to avoid UTC shift
+      const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
+      return pDateStr <= apptDateStr; // string compare works for YYYY-MM-DD
+    }).sort((a,b) => {
+      const da = a._localDate || '';
+      const db = b._localDate || '';
+      return db.localeCompare(da); // newest first
+    });
+    squareDeposit = deposits[0] || null;
+    if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found:`, squareDeposit);
+    else console.log(`[PII] ${appt.clientName} — no deposit found. VT payments:`, allClientPmts.filter(p => p.source === 'Virtual Terminal'));
   }
 
-  const finalDeposit = (squareDeposit && squareDeposit.amount > 0) ? squareDeposit.amount : 0;
+  // finalDeposit: use Square VT amount if found, else fall back to Appointy depositPaid field
+  const depositFromApponty = parseFloat(appt.depositPaid) || 0;
+  const finalDeposit = squareDeposit ? (squareDeposit.amount || 0) : depositFromApponty;
   const balance      = Math.max(0, totalWithFee - finalDeposit);
-
-  // ── 2. BALANCE PAYMENT LOOKUP (past appts only) ──────────
+  // Use allClientPmts already fetched — find POS/VT payment ON the appointment date
+  // that is NOT the deposit (different amount) and >= $5
+  // Use _localDate (pre-normalized) to avoid UTC string comparison issues
   let squarePaid = null;
 
-  if (isPastAppt && apptDateStr) {
-    // Search by name — Waivermaster creates a separate Square profile with the balance payment
-    try {
-      if (appt.clientName) {
-        const res      = await fetch(`${BACKEND_URL}/customers/search?name=${encodeURIComponent(appt.clientName)}`);
-        const profiles = await res.json();
-
-        if (Array.isArray(profiles)) {
-          // Prefer profiles NOT matched by email (those are Appointy/deposit profiles)
-          const nameOnly    = profiles.filter(p => p.id && !emailProfileIds.includes(p.id));
-          const toSearch    = nameOnly.length > 0 ? nameOnly : profiles;
-
-          for (const profile of toSearch) {
-            if (squarePaid) break;
-            const res2 = await fetch(`${BACKEND_URL}/payments/by-customer?customer_id=${profile.id}`);
-            const pmts = await res2.json();
-            if (!Array.isArray(pmts)) continue;
-
-            // Payment on the appointment date (±1 day), different from the deposit amount
-            const candidates = pmts.filter(p => {
-              if (!p.date || !apptD || isNaN(apptD.getTime())) return false;
-              const diffDays = Math.abs(new Date(p.date) - apptD) / 86400000;
-              const notDeposit = Math.abs((p.amount || 0) - finalDeposit) > 1;
-              return diffDays <= 1 && notDeposit && p.amount > 5;
-            });
-
-            squarePaid = candidates.find(p => p.source === 'Point of Sale')
-                      || candidates.find(p => p.source === 'Virtual Terminal')
-                      || candidates[0]
-                      || null;
-          }
-        }
-      }
-    } catch(e) {
-      console.warn('Balance payment lookup failed for', appt.clientName, e);
-    }
-
-    // Fallback: search all payments on appt date by amount range
-    if (!squarePaid && balance > 0) {
-      try {
-        const res = await fetch(`${BACKEND_URL}/payments/by-source?source=ALL&date=${apptDateStr}`);
-        const all = await res.json();
-        if (Array.isArray(all)) {
-          squarePaid = all.find(p =>
-            p.source === 'Point of Sale'
-            && p.amount >= balance - 5
-            && p.amount <= balance * 1.6 + 50
-          ) || all.find(p =>
-            p.source === 'Virtual Terminal'
-            && p.amount >= balance - 5
-            && p.amount <= balance * 1.6 + 50
-          ) || null;
-        }
-      } catch(e) {}
-    }
+  if (isPastAppt && apptDateStr && allClientPmts.length > 0) {
+    const candidates = allClientPmts.filter(p => {
+      const pDateStr   = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
+      const sameDay    = pDateStr === apptDateStr;
+      const notDeposit = Math.abs((p.amount || 0) - finalDeposit) > 1;
+      return sameDay && notDeposit && (p.amount || 0) > 5;
+    });
+    squarePaid = candidates.find(p => p.source === 'Point of Sale')
+              || candidates.find(p => p.source === 'Virtual Terminal')
+              || candidates[0] || null;
+    console.log(`[PII] ${appt.clientName} — balance candidates on ${apptDateStr}:`, candidates, '→ selected:', squarePaid);
   }
 
   // ── 3. TIP CALCULATION ───────────────────────────────────
@@ -547,6 +656,7 @@ async function buildRow(appt) {
 // ── ADD-ON DROPDOWNS ─────────────────────────────────────
 const NUMBING_OPTS   = [{v:0,l:'None'},{v:60,l:'Small $60'},{v:80,l:'Medium $80'},{v:100,l:'Large $100'},{v:120,l:'XL $120'}];
 const AFTERCARE_OPTS = [{v:0,l:'None'},{v:25,l:'Kit $25'},{v:10,l:'Saniderm $10'}];
+const AFTERCARE_PIERCING_OPTS = [{v:0,l:'None'},{v:25,l:'Piercing Kit $25'}];
 const MERCH_OPTS     = [{v:0,l:'None'},{v:25,l:'Shirt $25'},{v:10,l:'Sticker $10'}];
 
 function addonSelect(id, opts, current, rowIdx, field) {
@@ -664,10 +774,13 @@ function renderLedger(rows, startStr, endStr, theme) {
       ? `<div class="deposit-matched"><div class="deposit-dot matched"></div><span style="${textStyle}">${fmt(deposit)}</span>${squareDeposit.last4 ? `<span style="font-size:10px;color:var(--chrome);">···${squareDeposit.last4}</span>` : ''}</div>`
       : `<div class="deposit-matched"><div class="deposit-dot unmatched"></div><span style="${textStyle}">${deposit > 0 ? fmt(deposit) : '—'}</span></div>`;
 
-    // Add-on dropdowns
-    const numbingDd   = addonSelect('numb-'+i,  NUMBING_OPTS,   numbing,   i, 'numbing');
-    const aftercareDd = addonSelect('aftc-'+i,  AFTERCARE_OPTS, aftercare, i, 'aftercare');
-    const merchDd     = addonSelect('merch-'+i, MERCH_OPTS,     merch,     i, 'merch');
+    // Add-on dropdowns — Mellissa is piercer: no numbing, piercing kit only for aftercare
+    const isMellissa = currentArtist === 'Mellissa';
+    const numbingDd   = isMellissa
+      ? `<span style="font-size:11px;color:var(--chrome);font-family:'DM Mono',monospace;">N/A</span>`
+      : addonSelect('numb-'+i, NUMBING_OPTS, numbing, i, 'numbing');
+    const aftercareDd = addonSelect('aftc-'+i, isMellissa ? AFTERCARE_PIERCING_OPTS : AFTERCARE_OPTS, aftercare, i, 'aftercare');
+    const merchDd     = addonSelect('merch-'+i, MERCH_OPTS, merch, i, 'merch');
 
     // Paid cell
     let paidCell = '—';
@@ -704,6 +817,7 @@ function renderLedger(rows, startStr, endStr, theme) {
           <div class="td-client" style="${isReconciled?'font-weight:700;':!isPastAppt?'font-style:italic;color:var(--chrome);':''}">${escHtml(appt.clientName)}</div>
           ${appt.canceled === 'TRUE' || appt.canceled === true
             ? '<div style="font-size:9px;background:#FDF0F0;color:#C97070;padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block;">CANCELLED</div>' : ''}
+          <span id="badge-${i}"></span>
         </td>
         <td class="td-money" style="${textStyle}">${cost > 0 ? fmt(cost) : '—'}</td>
         <td class="td-money">${numbingDd}</td>
@@ -717,6 +831,12 @@ function renderLedger(rows, startStr, endStr, theme) {
         <td class="td-money td-green" id="artist-${i}" style="${textStyle}">${fmt(artistAmt)}</td>
         <td class="td-money td-gold"  id="bonus-${i}"  style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
         <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isReconciled ? fmt(payout) : '—'}</td>
+        <td style="text-align:center;">
+          <button onclick="openCancelModal(${i})" title="Mark cancelled / no-show / rescheduled"
+            style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--chrome);padding:4px 6px;border-radius:6px;transition:all 0.12s;"
+            onmouseover="this.style.background='var(--pink-light)';this.style.color='var(--pink)';"
+            onmouseout="this.style.background='none';this.style.color='var(--chrome)';">✕</button>
+        </td>
       </tr>`;
   }).join('');
 
@@ -735,6 +855,7 @@ function renderLedger(rows, startStr, endStr, theme) {
           <span style="width:7px;height:7px;border-radius:50%;background:#C97070;display:inline-block;margin-left:6px;"></span>Pending
           <span style="width:7px;height:7px;border-radius:50%;background:#E8A020;display:inline-block;margin-left:6px;"></span>Flag
         </div>
+        ${currentArtist === 'Mellissa' ? `<button class="walkin-btn" onclick="openWalkinModal()">+ Add Walk-In</button>` : ''}
         <button id="save-addons-btn" onclick="saveAddonChanges()"
           style="display:none;align-items:center;gap:6px;padding:7px 14px;background:${theme.color};color:#fff;border:none;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;">
           💾 Save Add-on Changes
@@ -758,6 +879,7 @@ function renderLedger(rows, startStr, endStr, theme) {
             <th style="text-align:right;">Artist %</th>
             <th style="text-align:right;">Bonus 10%</th>
             <th style="text-align:right;">Total Payout</th>
+            <th style="text-align:center;">✕</th>
           </tr>
         </thead>
         <tbody>
@@ -774,6 +896,7 @@ function renderLedger(rows, startStr, endStr, theme) {
             <td class="td-money td-green">${fmt(totArtistPct)}</td>
             <td class="td-money td-gold">${fmt(totBonus)}</td>
             <td class="td-money" style="color:${theme.color};font-weight:700;">${fmt(totalPayout)}</td>
+            <td></td>
           </tr>
         </tbody>
       </table>
@@ -856,7 +979,7 @@ function renderSummary(rows, theme) {
 
   const snapshotHTML = `
     <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:${theme.bg};">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:${theme.bg};">
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:${theme.color};">Pay Period Snapshot</div>
         <button onclick="saveLedgerToSheet()" id="save-btn"
           style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:${theme.color};color:#fff;border:none;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;letter-spacing:0.06em;">
@@ -1206,6 +1329,154 @@ document.addEventListener('keydown', e => {
   if (e.key >= '0' && e.key <= '9') pinKey(e.key);
   if (e.key === 'Backspace') pinDelete();
 });
+
+// ── CANCEL / NO-SHOW / RESCHEDULE SYSTEM ─────────────────
+let _cancelRowIdx  = null;
+let _cancelType    = null;
+
+function openCancelModal(rowIdx) {
+  const r = _ledgerRows[rowIdx];
+  if (!r) return;
+  _cancelRowIdx = rowIdx;
+  _cancelType   = null;
+  document.getElementById('cancel-client-name').textContent = r.appt.clientName + (r.apptD ? ' · ' + r.apptD.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '');
+  document.getElementById('cancel-notes').value = '';
+  document.getElementById('reschedule-dt').value = '';
+  document.getElementById('reschedule-field').style.display = 'none';
+  ['opt-cxld','opt-noshow','opt-reschd'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'modal-opt';
+  });
+  document.getElementById('cancel-modal').style.display = 'flex';
+}
+
+function closeCancelModal() {
+  document.getElementById('cancel-modal').style.display = 'none';
+  _cancelRowIdx = null; _cancelType = null;
+}
+
+function setCancelType(type) {
+  _cancelType = type;
+  ['opt-cxld','opt-noshow','opt-reschd'].forEach(id => document.getElementById(id).className = 'modal-opt');
+  const map = { cxld:'opt-cxld', noshow:'opt-noshow', reschd:'opt-reschd' };
+  const cls = { cxld:'sel-cxld', noshow:'sel-noshow', reschd:'sel-reschd' };
+  document.getElementById(map[type]).className = 'modal-opt ' + cls[type];
+  document.getElementById('reschedule-field').style.display = type === 'reschd' ? 'block' : 'none';
+}
+
+function saveCancelFlag() {
+  if (_cancelRowIdx === null || !_cancelType) {
+    alert('Please select Cancelled, No-Show, or Rescheduled.');
+    return;
+  }
+  const r     = _ledgerRows[_cancelRowIdx];
+  const notes = document.getElementById('cancel-notes').value.trim();
+  const reschDt = document.getElementById('reschedule-dt').value;
+
+  const key    = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+  const flags  = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+  flags[key]   = { type: _cancelType, notes, rescheduledTo: reschDt || null, savedAt: new Date().toISOString() };
+  try { localStorage.setItem('pii_cancel_flags', JSON.stringify(flags)); } catch(e) {}
+
+  setBadge(_cancelRowIdx, _cancelType);
+  closeCancelModal();
+}
+
+function setBadge(rowIdx, type) {
+  const el = document.getElementById('badge-' + rowIdx);
+  if (!el) return;
+  const labels = { cxld: 'CXLD', noshow: 'NO-SHOW', reschd: 'RESCHD' };
+  const cls    = { cxld: 'badge-cxld', noshow: 'badge-noshow', reschd: 'badge-reschd' };
+  el.innerHTML = `<span class="row-badge ${cls[type]}">${labels[type]}</span>`;
+}
+
+function restoreCancelBadges(rows) {
+  try {
+    const flags = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+    rows.forEach((r, i) => {
+      const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+      if (flags[key]) setBadge(i, flags[key].type);
+    });
+  } catch(e) {}
+}
+
+// ── WALK-IN MODAL (Mellissa) ─────────────────────────────
+function openWalkinModal() {
+  document.getElementById('wi-name').value     = '';
+  document.getElementById('wi-email').value    = '';
+  document.getElementById('wi-phone').value    = '';
+  document.getElementById('wi-piercing').value = '';
+  document.getElementById('wi-aftercare').value= '0';
+  document.getElementById('wi-merch').value    = '0';
+  document.getElementById('wi-total-line').style.display = 'none';
+  document.getElementById('walkin-modal').style.display  = 'flex';
+}
+
+function closeWalkinModal() {
+  document.getElementById('walkin-modal').style.display = 'none';
+}
+
+function calcWalkinTotal() {
+  const cost     = parseFloat(document.getElementById('wi-piercing').value) || 0;
+  const aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
+  const merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
+  const total    = (cost + aftercare + merch) * 1.06;
+  const line     = document.getElementById('wi-total-line');
+  if (cost > 0) {
+    document.getElementById('wi-total-val').textContent = '$' + total.toFixed(2);
+    line.style.display = 'block';
+  } else {
+    line.style.display = 'none';
+  }
+}
+
+function saveWalkin() {
+  const name     = document.getElementById('wi-name').value.trim();
+  const email    = document.getElementById('wi-email').value.trim();
+  const phone    = document.getElementById('wi-phone').value.trim();
+  const piercingSel = document.getElementById('wi-piercing');
+  const cost     = parseFloat(piercingSel.value) || 0;
+  const aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
+  const merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
+
+  if (!name) { alert('Please enter a client name.'); return; }
+  if (!cost) { alert('Please select a piercing service.'); return; }
+
+  const addOns       = aftercare + merch;
+  const totalWithFee = (cost + addOns) * 1.06;
+  const piercingLabel= piercingSel.options[piercingSel.selectedIndex].text;
+
+  const walkin = {
+    appt: {
+      clientName: name, email, phone,
+      appointmentDate: new Date().toISOString(),
+      service: piercingLabel, artist: 'Mellissa', cost, status: 'Walk-In',
+    },
+    apptD: new Date(), apptDateStr: localDateStr(new Date()),
+    isPastAppt: true, cost, numbing: 0, aftercare, merch,
+    addOns, totalWithFee,
+    deposit: 0, balance: totalWithFee,
+    squareDeposit: null, squarePaid: null,
+    paid: null, tipAmt: null, tipError: false,
+    isWalkin: true,
+  };
+
+  _ledgerRows.push(walkin);
+
+  // Save to localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('pii_walkins') || '[]');
+    saved.push({ name, email, phone, cost, aftercare, merch, totalWithFee, piercingLabel, savedAt: new Date().toISOString() });
+    localStorage.setItem('pii_walkins', JSON.stringify(saved));
+  } catch(e) {}
+
+  const val = document.getElementById('period-select').value;
+  const [startStr, endStr] = val.split('|');
+  renderLedger(_ledgerRows, startStr, endStr, ARTISTS['Mellissa']);
+  renderSummary(_ledgerRows, ARTISTS['Mellissa']);
+  restoreCancelBadges(_ledgerRows);
+  closeWalkinModal();
+}
 
 buildPeriods();
 </script>

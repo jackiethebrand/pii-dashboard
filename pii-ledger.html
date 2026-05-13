@@ -713,24 +713,25 @@ async function buildRow(appt) {
   }
 
   // ── 3. TIP CALCULATION ───────────────────────────────────
-  const paid     = squarePaid ? (squarePaid.total || squarePaid.amount) : null;
+  // Use squarePaid.amount (pre-tip) not .total (post-tip) for balance comparison
+  const paid     = squarePaid ? (squarePaid.amount || 0) : null;
   let tipAmt     = null;
   let tipError   = false;
 
   if (paid !== null) {
     if (squarePaid.tip && squarePaid.tip >= 1.00) {
-      // Square gives us the tip directly — only use if >= $1
+      // Square gives us the tip directly — most reliable, use it
       tipAmt = squarePaid.tip;
     } else {
-      // Derive tip = total paid - balance due
+      // Derive tip = pre-tip amount paid - balance due
+      // Use a generous tolerance since Square rounds to nearest cent
       const derivedTip = paid - balance;
       if (derivedTip < -0.10) {
         tipError = true; // underpaid — flag it
       } else if (derivedTip >= 1.00) {
-        // Only count as a tip if $1 or more (ignore rounding cents like $0.03)
         tipAmt = derivedTip;
       }
-      // derivedTip between -0.10 and 0.99 = rounding, no tip, no error
+      // derivedTip between -0.10 and 0.99 = rounding, no tip
     }
   }
 

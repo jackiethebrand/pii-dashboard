@@ -566,24 +566,32 @@ async function loadLedger() {
       return !hasDuplicate;
     });
 
+    // Pre-load addon overrides so buildRow uses correct totalWithFee/balance
+    // when searching for the balance payment in Square
+    const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+
     // Each row catches its own errors so one bad lookup won't crash the whole ledger
-    const rows = await Promise.all(deduped.map(appt =>
-      buildRow(appt).catch(e => {
+    const rows = await Promise.all(deduped.map(appt => {
+      const key = appt.clientName + '|' + (appt.appointmentDate || '');
+      const ov  = addonOverrides[key] || {};
+      return buildRow(appt, ov).catch(e => {
         console.warn('Row build failed for', appt.clientName, e);
         const apptD = parseDate(appt.appointmentDate);
-        const cost  = parseFloat(appt.cost || appt.balanceDue) || 0;
+        const cost  = parseFloat(ov.cost !== undefined ? ov.cost : (appt.cost || appt.balanceDue)) || 0;
+        const numbing = ov.numbing || 0, aftercare = ov.aftercare || 0, merch = ov.merch || 0;
+        const addOns = numbing + aftercare + merch;
         return {
           appt, apptD,
           apptDateStr: localDateStr(apptD),
           isPastAppt: !!(apptD && apptD < new Date()),
-          cost, numbing: 0, aftercare: 0, merch: 0, addOns: 0,
-          totalWithFee: cost * 1.06,
-          deposit: 0, balance: cost * 1.06,
+          cost, numbing, aftercare, merch, addOns,
+          totalWithFee: (cost + addOns) * 1.06,
+          deposit: 0, balance: (cost + addOns) * 1.06,
           squareDeposit: null, squarePaid: null,
           paid: null, tipAmt: null, tipError: false,
         };
-      })
-    ));
+      });
+    }));
 
     applyAddonOverrides(rows);
     renderLedger(rows, startStr, endStr, theme);
@@ -597,11 +605,12 @@ async function loadLedger() {
 }
 
 // ── BUILD ROW — all Square lookups for one appointment ────
-async function buildRow(appt) {
-  const cost      = parseFloat(appt.cost || appt.balanceDue) || 0;
-  const numbing   = parseFloat(appt.numbing)   || 0;
-  const aftercare = parseFloat(appt.aftercare) || 0;
-  const merch     = parseFloat(appt.tumbler)   || 0;
+async function buildRow(appt, ov) {
+  ov = ov || {};
+  const cost      = ov.cost !== undefined ? ov.cost : (parseFloat(appt.cost || appt.balanceDue) || 0);
+  const numbing   = ov.numbing   !== undefined ? ov.numbing   : (parseFloat(appt.numbing)   || 0);
+  const aftercare = ov.aftercare !== undefined ? ov.aftercare : (parseFloat(appt.aftercare) || 0);
+  const merch     = ov.merch     !== undefined ? ov.merch     : (parseFloat(appt.tumbler)   || 0);
   const addOns       = numbing + aftercare + merch;
   const totalWithFee = (cost + addOns) * 1.06;
 

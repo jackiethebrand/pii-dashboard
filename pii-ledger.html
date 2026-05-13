@@ -540,8 +540,6 @@ async function loadLedger() {
       // Exclude unapproved/failed appointments per status field
       const st = (a.status || '').toLowerCase();
       if (st.includes('unapproved') || st.includes('failed')) return false;
-      // Also exclude if depositPaid is explicitly false
-      if (a.depositPaid === false || a.depositPaid === 'false' || a.depositPaid === 'FALSE') return false;
       const d = parseDate(a.appointmentDate);
       return d && d >= periodStart && d <= periodEnd;
     }).sort((a,b) => parseDate(a.appointmentDate) - parseDate(b.appointmentDate));
@@ -666,25 +664,25 @@ async function buildRow(appt, ov) {
     } catch(e) { console.warn('[PII] by-email-all failed for', appt.clientName, e); }
   }
 
-  // Find deposit: most recent VT/online payment on or before the appointment date
-  // Square source names vary — 'Virtual Terminal', 'Online', 'Ecommerce', 'Card on File' etc.
-  // We treat anything that is NOT 'Point of Sale' and happened before the appt as a potential deposit
+  // Find deposit: most recent non-POS payment on or before the appointment date
+  // If no non-POS deposit found, fall back to earliest POS payment before appt date
+  // (some clients pay deposit in person at the terminal — source = 'Point of Sale')
   if (allClientPmts.length > 0 && apptD) {
-    const depositCandidates = allClientPmts.filter(p => {
+    const nonPOSDeposits = allClientPmts.filter(p => {
       if ((p.amount || 0) < 5) return false;
       const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
-      const beforeAppt = pDateStr <= apptDateStr;
-      // Accept VT, Online, Ecommerce, Card on File, or anything non-POS as a deposit
-      const isNotPOS = p.source !== 'Point of Sale';
-      return beforeAppt && isNotPOS;
-    }).sort((a,b) => {
-      const da = a._localDate || '';
-      const db = b._localDate || '';
-      return db.localeCompare(da); // newest first
-    });
-    squareDeposit = depositCandidates[0] || null;
+      return pDateStr <= apptDateStr && p.source !== 'Point of Sale';
+    }).sort((a,b) => (b._localDate||'').localeCompare(a._localDate||''));
+
+    const posDeposits = allClientPmts.filter(p => {
+      if ((p.amount || 0) < 5) return false;
+      const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
+      return pDateStr < apptDateStr && p.source === 'Point of Sale';
+    }).sort((a,b) => (a._localDate||'').localeCompare(b._localDate||'')); // earliest first
+
+    squareDeposit = nonPOSDeposits[0] || posDeposits[0] || null;
     if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found (source: ${squareDeposit.source}):`, squareDeposit);
-    else console.log(`[PII] ${appt.clientName} — no deposit found. Non-POS payments:`, allClientPmts.filter(p => p.source !== 'Point of Sale'));
+    else console.log(`[PII] ${appt.clientName} — no deposit found.`, allClientPmts);
   }
 
   // finalDeposit: use Square VT amount if found, else fall back to Appointy depositPaid field
@@ -707,14 +705,25 @@ async function buildRow(appt, ov) {
   let squarePaid = null;
 
   if (isPastAppt && apptDateStr && allClientPmts.length > 0) {
+    // Balance payment is on the appointment date
+    // Deposit is on or before the appointment date (usually before)
+    // If deposit and balance have the same amount, distinguish by date:
+    //   - deposit: date < apptDate (strictly before)
+    //   - balance: date == apptDate
+    const depositDate = squareDeposit ? (squareDeposit._localDate || '') : '';
     const candidates = allClientPmts.filter(p => {
-      const pDateStr   = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
-      const sameDay    = pDateStr === apptDateStr;
-      const notDeposit = Math.abs((p.amount || 0) - finalDeposit) > 1;
-      return sameDay && notDeposit && (p.amount || 0) > 5;
+      const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
+      if (pDateStr !== apptDateStr) return false; // must be on appointment date
+      if ((p.amount || 0) < 5) return false;
+      // If deposit was on a different day, exclude by amount match
+      // If deposit was on the same day (rare), exclude only by payment ID
+      if (depositDate && depositDate < apptDateStr) {
+        return true; // any payment on appt date is a candidate
+      }
+      // Deposit was on same day — exclude it by ID
+      return !squareDeposit || p.id !== squareDeposit.id;
     });
-    // Prefer POS payments; within that, prefer the one closest to the expected balance
-    const pos  = candidates.filter(p => p.source === 'Point of Sale');
+    const pos    = candidates.filter(p => p.source === 'Point of Sale');
     const nonPos = candidates.filter(p => p.source !== 'Point of Sale');
     const byClosest = (arr) => arr.sort((a,b) => Math.abs((a.amount||0) - balance) - Math.abs((b.amount||0) - balance));
     squarePaid = byClosest(pos)[0] || byClosest(nonPos)[0] || null;

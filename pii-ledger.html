@@ -282,6 +282,12 @@ tbody td:last-child  { padding-right:16px; }
   <div class="modal-box">
     <div class="modal-title">Mark Appointment</div>
     <div class="modal-sub" id="cancel-client-name">Client name</div>
+    <div id="existing-flag-bar" style="display:none;padding:8px 12px;border-radius:10px;margin-bottom:12px;font-size:11px;display:flex;align-items:center;justify-content:space-between;">
+      <span id="existing-flag-label"></span>
+      <button onclick="clearCancelFlag()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--ink-soft);font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;">
+        ↩ Clear Flag
+      </button>
+    </div>
     <div class="modal-opts">
       <button class="modal-opt" id="opt-cxld"   onclick="setCancelType('cxld')">✕ Cancelled</button>
       <button class="modal-opt" id="opt-noshow" onclick="setCancelType('noshow')">👻 No-Show</button>
@@ -296,13 +302,30 @@ tbody td:last-child  { padding-right:16px; }
       <textarea id="cancel-notes" rows="2" placeholder="Add any notes..."></textarea>
     </div>
     <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeCancelModal()">Cancel</button>
+      <button class="modal-btn cancel" onclick="closeCancelModal()">Close</button>
       <button class="modal-btn confirm" onclick="saveCancelFlag()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- ── MELLISSA WALK-IN MODAL ── -->
+<!-- ── ROW NOTES MODAL ── -->
+<div class="modal-overlay" id="notes-modal" style="display:none;" onclick="if(event.target===this)closeNotesModal()">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-title">Row Note</div>
+    <div class="modal-sub" id="notes-client-name"></div>
+    <div class="modal-field">
+      <label>Note</label>
+      <textarea id="notes-text" rows="3" placeholder="e.g. Booked wrong price — changed to $200 in person, rescheduled from 5/8..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeNotesModal()">Close</button>
+      <button class="modal-btn cancel" onclick="clearNote()" style="color:#C97070;border-color:#C97070;">Clear</button>
+      <button class="modal-btn confirm" onclick="saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="walkin-modal" style="display:none;" onclick="if(event.target===this)closeWalkinModal()">
   <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto;">
     <div class="modal-title">Add Walk-In</div>
@@ -523,8 +546,28 @@ async function loadLedger() {
       return d && d >= periodStart && d <= periodEnd;
     }).sort((a,b) => parseDate(a.appointmentDate) - parseDate(b.appointmentDate));
 
+    // Deduplicate — Appointy sometimes sends the same appointment on consecutive days
+    // (booking date vs appointment date confusion, or rescheduled without removing old)
+    // Rule: if same client appears twice within 3 days with same cost, keep the later one
+    const deduped = appointments.filter((a, idx) => {
+      const aDate = parseDate(a.appointmentDate);
+      const aCost = parseFloat(a.cost || a.balanceDue) || 0;
+      // Check if a later entry for the same client with the same cost exists
+      const hasDuplicate = appointments.some((b, bidx) => {
+        if (bidx <= idx) return false; // only look forward
+        const bDate = parseDate(b.appointmentDate);
+        const bCost = parseFloat(b.cost || b.balanceDue) || 0;
+        const sameName = (a.clientName || '').trim().toLowerCase() === (b.clientName || '').trim().toLowerCase();
+        const sameCost = Math.abs(aCost - bCost) < 1;
+        const withinDays = bDate && aDate && Math.abs(bDate - aDate) <= 3 * 24 * 60 * 60 * 1000;
+        return sameName && sameCost && withinDays;
+      });
+      if (hasDuplicate) console.log(`[PII] Suppressing duplicate entry for ${a.clientName} on ${a.appointmentDate}`);
+      return !hasDuplicate;
+    });
+
     // Each row catches its own errors so one bad lookup won't crash the whole ledger
-    const rows = await Promise.all(appointments.map(appt =>
+    const rows = await Promise.all(deduped.map(appt =>
       buildRow(appt).catch(e => {
         console.warn('Row build failed for', appt.clientName, e);
         const apptD = parseDate(appt.appointmentDate);
@@ -576,12 +619,16 @@ async function buildRow(appt) {
   let allClientPmts   = []; // all payments for this client across all profiles
 
   // Fetch all payments for this client in one call
-  // booking_date tells the backend to scan that date for orphaned pre-merge profile IDs
+  // booking_date = when they booked (deposit was charged around this date)
+  // appointment_date = when they come in (balance payment will be on this date)
+  // We send both so the backend can scan both dates for orphaned profile IDs
   const bookingDateStr = appt.bookingDate ? localDateStr(parseDate(appt.bookingDate)) : '';
+  const apptDateParam  = apptDateStr || '';
   if (appt.email) {
     try {
       let url = `${BACKEND_URL}/payments/by-email-all?email=${encodeURIComponent(appt.email)}&name=${encodeURIComponent(appt.clientName||'')}`;
       if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
+      if (apptDateParam && apptDateParam !== bookingDateStr) url += `&appointment_date=${apptDateParam}`;
       console.log(`[PII] ${appt.clientName} — fetching payments:`, url);
       const res  = await fetch(url);
       const data = await res.json();
@@ -633,7 +680,17 @@ async function buildRow(appt) {
 
   // finalDeposit: use Square VT amount if found, else fall back to Appointy depositPaid field
   const depositFromApponty = parseFloat(appt.depositPaid) || 0;
-  const finalDeposit = squareDeposit ? (squareDeposit.amount || 0) : depositFromApponty;
+
+  // For confirmed touch-ups: cost is $0, no deposit expected, any payment found
+  // at the appointment date is tips/numbing/merch — handle normally below
+  // But if cost is $0 and no numbing/aftercare/merch add-ons, zero everything
+  const touchupFlagsB  = JSON.parse(localStorage.getItem('pii_touchup_flags') || '{}');
+  const cancelKeyB     = appt.clientName + '|' + (appt.appointmentDate || '');
+  const isConfirmedTU  = !!touchupFlagsB[cancelKeyB];
+
+  // If confirmed touch-up: no deposit is expected (don't pull deposit from another appt)
+  // Allow payment lookup normally so tips/numbing on appt date still reconcile
+  const finalDeposit = isConfirmedTU ? 0 : squareDeposit ? (squareDeposit.amount || 0) : depositFromApponty;
   const balance      = Math.max(0, totalWithFee - finalDeposit);
   // Use allClientPmts already fetched — find POS/VT payment ON the appointment date
   // that is NOT the deposit (different amount) and >= $5
@@ -817,10 +874,12 @@ function renderLedger(rows, startStr, endStr, theme) {
     const dismissedFlags  = JSON.parse(localStorage.getItem('pii_touchup_dismissed') || '{}');
     const isTouchUp       = !!touchupFlags[cancelKey] || !!r._isTouchUp;
 
-    // Touch-up prompt: past appt where cost is $0 OR service name suggests touch-up
-    // Don't block on paid/squarePaid — tips, numbing, merch may still have payments
+    // Touch-up prompt: ONLY fire on $0 cost OR service name explicitly says touch-up
+    // Do NOT trigger on low-cost appointments — $60 flash/$25 taper are real paid appts
     const serviceName = (appt.service || '').toLowerCase();
-    const looksLikeTouchUp = cost === 0 || serviceName.includes('touch') || serviceName.includes('retouch') || serviceName.includes('touch-up');
+    const isExplicitTouchUp = serviceName.includes('touch up') || serviceName.includes('touch-up')
+      || serviceName.includes('retouch') || serviceName.includes('t/u');
+    const looksLikeTouchUp = cost === 0 || isExplicitTouchUp;
     const needsTouchUpPrompt = isPastAppt && !isCancelled && !isTouchUp && !dismissedFlags[cancelKey]
       && looksLikeTouchUp;
 
@@ -927,6 +986,7 @@ function renderLedger(rows, startStr, endStr, theme) {
               <button onclick="markTouchUp(${i}, false)" style="font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border);background:var(--white);color:var(--chrome);cursor:pointer;font-family:'DM Sans',sans-serif;">No</button>
             </div>` : ''}
           <span id="badge-${i}"></span>
+          ${(()=>{ const k=appt.clientName+'|'+(appt.appointmentDate||''); const n=JSON.parse(localStorage.getItem('pii_row_notes')||'{}')[k]; return n ? `<div style="font-size:9px;color:var(--chrome);margin-top:3px;font-style:italic;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(n)}">📝 ${escHtml(n)}</div>` : ''; })()}
         </td>
         <td class="td-money" style="${textStyle}">
           <input id="cost-${i}" type="number" value="${cost || ''}" min="0" step="5"
@@ -949,9 +1009,13 @@ function renderLedger(rows, startStr, endStr, theme) {
         </td>
         <td class="td-money td-gold" id="bonus-${i}" style="${textStyle}">${bonus > 0 ? fmt(bonus) : '—'}</td>
         <td class="td-money" id="payout-${i}" style="color:${theme.color};font-weight:600;${textStyle}">${isCancelled ? fmt(payout) : isTouchUp ? (payout > 0 ? fmt(payout) : '<span style="color:#8A64B9;font-size:11px;">✦ free</span>') : isReconciled ? fmt(payout) : '—'}</td>
-        <td style="text-align:center;">
+        <td style="text-align:center;white-space:nowrap;">
+          <button onclick="openNotesModal(${i})" title="Add note"
+            style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--chrome);padding:4px 5px;border-radius:6px;transition:all 0.12s;"
+            onmouseover="this.style.background='var(--cream)';"
+            onmouseout="this.style.background='none';">📝</button>
           <button onclick="openCancelModal(${i})" title="Mark cancelled / no-show / rescheduled"
-            style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--chrome);padding:4px 6px;border-radius:6px;transition:all 0.12s;"
+            style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--chrome);padding:4px 5px;border-radius:6px;transition:all 0.12s;"
             onmouseover="this.style.background='var(--pink-light)';this.style.color='var(--pink)';"
             onmouseout="this.style.background='none';this.style.color='var(--chrome)';">✕</button>
         </td>
@@ -1472,15 +1536,56 @@ function openCancelModal(rowIdx) {
   if (!r) return;
   _cancelRowIdx = rowIdx;
   _cancelType   = null;
-  document.getElementById('cancel-client-name').textContent = r.appt.clientName + (r.apptD ? ' · ' + r.apptD.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '');
+  const clientLabel = r.appt.clientName + (r.apptD ? ' · ' + r.apptD.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '');
+  document.getElementById('cancel-client-name').textContent = clientLabel;
   document.getElementById('cancel-notes').value = '';
   document.getElementById('reschedule-dt').value = '';
   document.getElementById('reschedule-field').style.display = 'none';
   ['opt-cxld','opt-noshow','opt-reschd'].forEach(id => {
-    const el = document.getElementById(id);
-    el.className = 'modal-opt';
+    document.getElementById(id).className = 'modal-opt';
   });
+
+  // Show existing flag if present
+  const key    = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+  const flags  = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+  const bar    = document.getElementById('existing-flag-bar');
+  const lbl    = document.getElementById('existing-flag-label');
+  if (flags[key]) {
+    const typeLabels = { cxld: '✕ Marked Cancelled', noshow: '👻 Marked No-Show', reschd: '📅 Marked Rescheduled' };
+    const typeColors = { cxld: '#FDF0F0', noshow: '#FFF8ED', reschd: '#EFF6FC' };
+    const typeText   = { cxld: '#C97070', noshow: '#C47A10', reschd: '#2A70A4' };
+    const t = flags[key].type;
+    bar.style.display    = 'flex';
+    bar.style.background = typeColors[t] || 'var(--cream)';
+    lbl.style.color      = typeText[t] || 'var(--ink-soft)';
+    lbl.textContent      = typeLabels[t] || 'Flagged';
+    if (flags[key].notes) lbl.textContent += ' · ' + flags[key].notes;
+    // Pre-select existing type
+    setCancelType(t);
+    if (flags[key].rescheduledTo) document.getElementById('reschedule-dt').value = flags[key].rescheduledTo;
+    if (flags[key].notes) document.getElementById('cancel-notes').value = flags[key].notes;
+  } else {
+    bar.style.display = 'none';
+  }
+
   document.getElementById('cancel-modal').style.display = 'flex';
+}
+
+function clearCancelFlag() {
+  if (_cancelRowIdx === null) return;
+  const r   = _ledgerRows[_cancelRowIdx];
+  const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+  try {
+    const flags = JSON.parse(localStorage.getItem('pii_cancel_flags') || '{}');
+    delete flags[key];
+    localStorage.setItem('pii_cancel_flags', JSON.stringify(flags));
+  } catch(e) {}
+  closeCancelModal();
+  const val = document.getElementById('period-select').value;
+  const [startStr, endStr] = val.split('|');
+  renderLedger(_ledgerRows, startStr, endStr, ARTISTS[currentArtist]);
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
+  restoreCancelBadges(_ledgerRows);
 }
 
 function closeCancelModal() {
@@ -1656,6 +1761,48 @@ function markTouchUp(rowIdx, confirmed) {
   renderLedger(_ledgerRows, startStr, endStr, ARTISTS[currentArtist]);
   renderSummary(_ledgerRows, ARTISTS[currentArtist]);
   restoreCancelBadges(_ledgerRows);
+}
+
+// ── ROW NOTES SYSTEM ─────────────────────────────────────
+let _notesRowIdx = null;
+
+function openNotesModal(rowIdx) {
+  const r = _ledgerRows[rowIdx];
+  if (!r) return;
+  _notesRowIdx = rowIdx;
+  const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+  const notes = JSON.parse(localStorage.getItem('pii_row_notes') || '{}');
+  document.getElementById('notes-client-name').textContent = r.appt.clientName + (r.apptD ? ' · ' + r.apptD.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '');
+  document.getElementById('notes-text').value = notes[key] || '';
+  document.getElementById('notes-modal').style.display = 'flex';
+}
+
+function closeNotesModal() {
+  document.getElementById('notes-modal').style.display = 'none';
+  _notesRowIdx = null;
+}
+
+function saveNote() {
+  if (_notesRowIdx === null) return;
+  const r   = _ledgerRows[_notesRowIdx];
+  const key = r.appt.clientName + '|' + (r.appt.appointmentDate || '');
+  const txt = document.getElementById('notes-text').value.trim();
+  try {
+    const notes = JSON.parse(localStorage.getItem('pii_row_notes') || '{}');
+    if (txt) notes[key] = txt; else delete notes[key];
+    localStorage.setItem('pii_row_notes', JSON.stringify(notes));
+  } catch(e) {}
+  closeNotesModal();
+  const val = document.getElementById('period-select').value;
+  const [startStr, endStr] = val.split('|');
+  renderLedger(_ledgerRows, startStr, endStr, ARTISTS[currentArtist]);
+  renderSummary(_ledgerRows, ARTISTS[currentArtist]);
+  restoreCancelBadges(_ledgerRows);
+}
+
+function clearNote() {
+  document.getElementById('notes-text').value = '';
+  saveNote();
 }
 
 buildPeriods();

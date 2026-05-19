@@ -828,6 +828,7 @@ async function buildRow(appt, ov) {
       if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
       if (apptDateParam && apptDateParam !== bookingDateStr) url += `&appointment_date=${apptDateParam}`;
       if (cost > 0) url += `&cost=${cost}`;
+      if (totalWithFee > 0) url += `&total=${totalWithFee.toFixed(2)}`;
       console.log(`[PII] ${appt.clientName} — fetching payments:`, url);
       const res  = await fetch(url, { cache: 'no-store' });
       const data = await res.json();

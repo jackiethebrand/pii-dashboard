@@ -637,7 +637,7 @@ async function buildRow(appt, ov) {
       if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
       if (apptDateParam && apptDateParam !== bookingDateStr) url += `&appointment_date=${apptDateParam}`;
       console.log(`[PII] ${appt.clientName} — fetching payments:`, url);
-      const res  = await fetch(url);
+      const res  = await fetch(url, { cache: 'no-store' });
       const data = await res.json();
       console.log(`[PII] ${appt.clientName} — raw response:`, data);
       if (data && Array.isArray(data.profileIds)) {

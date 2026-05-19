@@ -858,23 +858,35 @@ async function buildRow(appt, ov) {
   }
 
   // Find deposit: most recent non-POS payment on or before the appointment date
-  // If no non-POS deposit found, fall back to earliest POS payment before appt date
-  // (some clients pay deposit in person at the terminal — source = 'Point of Sale')
+  // Priority: 1) VT/online on client's own profile, 2) VT/online on any profile, 3) POS before appt
+  // Never use payments with no customerId (cash/anonymous transactions)
   if (allClientPmts.length > 0 && apptD) {
-    const nonPOSDeposits = allClientPmts.filter(p => {
+    const ownedProfiles  = new Set(allProfileIds);
+
+    const isValidDeposit = (p, requireBeforeAppt) => {
+      if (!p.customerId) return false; // skip anonymous/cash payments
       if ((p.amount || 0) < 5) return false;
       const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
-      return pDateStr <= apptDateStr && p.source !== 'Point of Sale';
-    }).sort((a,b) => (b._localDate||'').localeCompare(a._localDate||''));
+      return requireBeforeAppt ? pDateStr < apptDateStr : pDateStr <= apptDateStr;
+    };
 
-    const posDeposits = allClientPmts.filter(p => {
-      if ((p.amount || 0) < 5) return false;
-      const pDateStr = p._localDate || localDateStr(parseDate(p.date || p.created_at || ''));
-      return pDateStr < apptDateStr && p.source === 'Point of Sale';
-    }).sort((a,b) => (a._localDate||'').localeCompare(b._localDate||'')); // earliest first
+    // Tier 1: non-POS on client's own profile (most trustworthy)
+    const ownNonPOS = allClientPmts.filter(p =>
+      isValidDeposit(p, false) && p.source !== 'Point of Sale' && ownedProfiles.has(p.customerId)
+    ).sort((a,b) => (b._localDate||'').localeCompare(a._localDate||''));
 
-    squareDeposit = nonPOSDeposits[0] || posDeposits[0] || null;
-    if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found (source: ${squareDeposit.source}):`, squareDeposit);
+    // Tier 2: non-POS on any profile (ghost profile deposits)
+    const anyNonPOS = allClientPmts.filter(p =>
+      isValidDeposit(p, false) && p.source !== 'Point of Sale'
+    ).sort((a,b) => (b._localDate||'').localeCompare(a._localDate||''));
+
+    // Tier 3: POS strictly before appointment (in-person deposit)
+    const posBefore = allClientPmts.filter(p =>
+      isValidDeposit(p, true) && p.source === 'Point of Sale' && ownedProfiles.has(p.customerId)
+    ).sort((a,b) => (a._localDate||'').localeCompare(b._localDate||'')); // earliest first
+
+    squareDeposit = ownNonPOS[0] || anyNonPOS[0] || posBefore[0] || null;
+    if (squareDeposit) console.log(`[PII] ${appt.clientName} — deposit found (source: ${squareDeposit.source}, owned: ${ownedProfiles.has(squareDeposit.customerId)}):`, squareDeposit);
     else console.log(`[PII] ${appt.clientName} — no deposit found.`, allClientPmts);
   }
 

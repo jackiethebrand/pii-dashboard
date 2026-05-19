@@ -273,7 +273,24 @@ tbody td:last-child  { padding-right:16px; }
 .badge-noshow { background:#FFF8ED;color:#C47A10; }
 .badge-reschd { background:#EFF6FC;color:#2A70A4; }
 
-/* ── WALK-IN MODAL (Mellissa) ─────────────────────── */
+/* ── MERCH MULTI-SELECT ──────────────────────────────── */
+.merch-wrap { position:relative;display:inline-block; }
+.merch-btn  {
+  font-size:11px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);
+  border-radius:6px;padding:3px 8px;background:var(--white);color:var(--ink);
+  cursor:pointer;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.merch-btn:hover { border-color:var(--pink-mid); }
+.merch-popup {
+  display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:999;
+  background:var(--white);border:1.5px solid var(--border);border-radius:10px;
+  padding:8px 10px;box-shadow:0 8px 24px rgba(100,40,60,0.12);min-width:160px;
+}
+.merch-popup.open { display:block; }
+.merch-cb-row { display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap; }
+.merch-cb-row input[type=checkbox] { cursor:pointer;accent-color:var(--pink); }
+
+
 .walkin-btn {
   padding:8px 16px;border-radius:100px;border:1.5px solid var(--mellissa);
   background:var(--white);color:var(--mellissa);font-family:'DM Sans',sans-serif;
@@ -668,14 +685,21 @@ function showSetupScreen(appts, theme, periodVal) {
       NUMBING_OPTS.map(o => `<option value="${o.v}" ${(ov.numbing||0)==o.v?'selected':''}>${o.l}</option>`).join('');
     const aftercareOpts = (isMel ? AFTERCARE_PIERCING_OPTS : AFTERCARE_OPTS)
       .map(o => `<option value="${o.v}" ${(ov.aftercare||0)==o.v?'selected':''}>${o.l}</option>`).join('');
-    const merchOpts = MERCH_OPTS.map(o => `<option value="${o.v}" ${(ov.merch||0)==o.v?'selected':''}>${o.l}</option>`).join('');
+    const merchOpts = MERCH_OPTS.filter(o=>o.v>0).map(o =>
+      `<label style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" value="${o.v}" data-key="${escHtml(key)}" data-field="merch"
+          ${getMerchSelection(ov.merch||0).some(s=>Math.abs(s.v-o.v)<0.01)?'checked':''}
+          style="accent-color:var(--pink);cursor:pointer;">
+        ${o.l.split(' ')[0]}
+      </label>`
+    ).join('');
 
     return `<tr>
       <td><strong>${escHtml(appt.clientName)}</strong><br><span style="font-size:10px;color:var(--chrome);">${dateStr}</span></td>
       <td>$${cost.toFixed(0)}</td>
       <td>${isMel ? '<span style="color:var(--chrome);font-size:11px;">N/A</span>' : `<select class="setup-select" data-key="${escHtml(key)}" data-field="numbing">${numbingOpts}</select>`}</td>
       <td><select class="setup-select" data-key="${escHtml(key)}" data-field="aftercare">${aftercareOpts}</select></td>
-      <td><select class="setup-select" data-key="${escHtml(key)}" data-field="merch">${merchOpts}</select></td>
+      <td><div style="display:flex;flex-direction:column;gap:2px;">${merchOpts}</div></td>
     </tr>`;
   }).join('');
 
@@ -685,12 +709,26 @@ function showSetupScreen(appts, theme, periodVal) {
 function confirmSetup() {
   // Save all add-on selections from the setup table
   const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+
+  // Handle regular selects (numbing, aftercare)
   document.querySelectorAll('#setup-tbody .setup-select').forEach(sel => {
     const key   = sel.dataset.key;
     const field = sel.dataset.field;
     const val   = parseFloat(sel.value) || 0;
     if (!addonOverrides[key]) addonOverrides[key] = {};
     addonOverrides[key][field] = val;
+  });
+
+  // Handle merch checkboxes — sum all checked values per key
+  const merchTotals = {};
+  document.querySelectorAll('#setup-tbody input[type=checkbox][data-field=merch]').forEach(cb => {
+    const key = cb.dataset.key;
+    if (!merchTotals[key]) merchTotals[key] = 0;
+    if (cb.checked) merchTotals[key] += parseFloat(cb.value) || 0;
+  });
+  Object.entries(merchTotals).forEach(([key, total]) => {
+    if (!addonOverrides[key]) addonOverrides[key] = {};
+    addonOverrides[key].merch = total;
   });
   try { localStorage.setItem('pii_addon_overrides', JSON.stringify(addonOverrides)); } catch(e) {}
 
@@ -914,7 +952,7 @@ async function buildRow(appt, ov) {
 const NUMBING_OPTS   = [{v:0,l:'None'},{v:60,l:'Small $60'},{v:80,l:'Medium $80'},{v:100,l:'Large $100'},{v:120,l:'XL $120'}];
 const AFTERCARE_OPTS = [{v:0,l:'None'},{v:25,l:'Kit $25'},{v:10,l:'Saniderm $10'}];
 const AFTERCARE_PIERCING_OPTS = [{v:0,l:'None'},{v:25,l:'Piercing Kit $25'}];
-const MERCH_OPTS     = [{v:0,l:'None'},{v:25,l:'Shirt $25'},{v:10,l:'Sticker $10'}];
+const MERCH_OPTS     = [{v:0,l:'None'},{v:25,l:'Shirt $25'},{v:10,l:'Sticker $10'},{v:18.95,l:'Studded Tumbler $18.95'}];
 
 function addonSelect(id, opts, current, rowIdx, field) {
   const selOpts = opts.map(o =>
@@ -925,6 +963,76 @@ function addonSelect(id, opts, current, rowIdx, field) {
     ${selOpts}
   </select>`;
 }
+
+// Merch multi-select — stores total value, renders as checkbox popup
+function merchMultiSelect(rowIdx, currentTotal) {
+  // Reverse-engineer which items are selected from the total
+  // Try to match combinations of merch items to the stored total
+  const items    = MERCH_OPTS.filter(o => o.v > 0);
+  const selected = getMerchSelection(currentTotal);
+  const label    = selected.length === 0 ? 'None' : selected.map(o => o.l.split(' ')[0]).join(', ');
+
+  const checkboxes = items.map(o =>
+    `<label class="merch-cb-row">
+      <input type="checkbox" value="${o.v}" ${selected.some(s=>s.v===o.v)?'checked':''}
+        onchange="onMerchChange(${rowIdx}, this.closest('.merch-popup'))">
+      ${o.l}
+    </label>`
+  ).join('');
+
+  return `<div class="merch-wrap" id="merch-wrap-${rowIdx}">
+    <button class="merch-btn" id="merch-btn-${rowIdx}" onclick="toggleMerchPopup(${rowIdx}, event)" type="button">${escHtml(label)}</button>
+    <div class="merch-popup" id="merch-popup-${rowIdx}">
+      ${checkboxes}
+    </div>
+  </div>`;
+}
+
+function getMerchSelection(total) {
+  if (!total || total === 0) return [];
+  const items = MERCH_OPTS.filter(o => o.v > 0);
+  // Find which combination of items sums to total (within $0.01)
+  const matches = [];
+  for (let mask = 1; mask < (1 << items.length); mask++) {
+    let sum = 0;
+    const combo = [];
+    items.forEach((item, i) => { if (mask & (1 << i)) { sum += item.v; combo.push(item); } });
+    if (Math.abs(sum - total) < 0.01) { matches.push(combo); }
+  }
+  return matches.length > 0 ? matches[0] : [];
+}
+
+function toggleMerchPopup(rowIdx, e) {
+  e.stopPropagation();
+  const popup = document.getElementById('merch-popup-' + rowIdx);
+  if (!popup) return;
+  // Close all other popups first
+  document.querySelectorAll('.merch-popup.open').forEach(p => {
+    if (p !== popup) p.classList.remove('open');
+  });
+  popup.classList.toggle('open');
+}
+
+function onMerchChange(rowIdx, popup) {
+  const checkboxes = popup.querySelectorAll('input[type=checkbox]');
+  let total = 0;
+  checkboxes.forEach(cb => { if (cb.checked) total += parseFloat(cb.value) || 0; });
+  // Update button label
+  const btn = document.getElementById('merch-btn-' + rowIdx);
+  if (btn) {
+    const sel = Array.from(checkboxes).filter(cb => cb.checked).map(cb => {
+      const opt = MERCH_OPTS.find(o => Math.abs(o.v - parseFloat(cb.value)) < 0.01);
+      return opt ? opt.l.split(' ')[0] : '';
+    }).filter(Boolean);
+    btn.textContent = sel.length === 0 ? 'None' : sel.join(', ');
+  }
+  onAddonChange(rowIdx, 'merch', total);
+}
+
+// Close merch popups when clicking outside
+document.addEventListener('click', () => {
+  document.querySelectorAll('.merch-popup.open').forEach(p => p.classList.remove('open'));
+});
 
 function onCostChange(rowIdx, val) {
   const r = _ledgerRows[rowIdx];
@@ -1113,7 +1221,7 @@ function renderLedger(rows, startStr, endStr, theme) {
       ? `<span style="font-size:11px;color:var(--chrome);font-family:'DM Mono',monospace;">N/A</span>`
       : addonSelect('numb-'+i, NUMBING_OPTS, numbing, i, 'numbing');
     const aftercareDd = addonSelect('aftc-'+i, isMellissa ? AFTERCARE_PIERCING_OPTS : AFTERCARE_OPTS, aftercare, i, 'aftercare');
-    const merchDd     = addonSelect('merch-'+i, MERCH_OPTS, merch, i, 'merch');
+    const merchDd     = merchMultiSelect(i, merch);
 
     // Paid cell
     let paidCell = '—';

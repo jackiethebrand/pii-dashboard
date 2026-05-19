@@ -190,6 +190,43 @@ tbody td:last-child  { padding-right:16px; }
   .ledger-wrap, .summary-bar, .upsales-row, .controls { padding:0 12px; }
 }
 
+/* ── ADD-ON SETUP SCREEN ─────────────────────────────── */
+.setup-overlay {
+  position:fixed;inset:0;z-index:7000;background:rgba(28,18,19,0.5);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  backdrop-filter:blur(4px);
+}
+.setup-box {
+  background:var(--white);border-radius:24px;padding:32px 28px 24px;
+  box-shadow:0 20px 80px rgba(100,40,60,0.25);width:100%;max-width:720px;
+  max-height:85vh;overflow-y:auto;border:1px solid var(--border);
+}
+.setup-title { font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;margin-bottom:4px; }
+.setup-sub   { font-size:12px;color:var(--chrome);font-weight:300;margin-bottom:24px;line-height:1.5; }
+.setup-table { width:100%;border-collapse:collapse;margin-bottom:20px; }
+.setup-table th {
+  font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--chrome);
+  font-weight:500;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);
+}
+.setup-table td { padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle; }
+.setup-table td:first-child { font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500; }
+.setup-table td:nth-child(2) { font-size:11px;color:var(--chrome);font-family:'DM Mono',monospace; }
+.setup-select {
+  padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:11px;color:var(--ink);
+  outline:none;background:var(--white);cursor:pointer;
+}
+.setup-select:focus { border-color:var(--pink-mid); }
+.setup-confirm-btn {
+  width:100%;padding:14px;border-radius:100px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.02em;
+}
+.setup-skip {
+  text-align:center;margin-top:10px;font-size:11px;color:var(--chrome);cursor:pointer;
+  text-decoration:underline;
+}
+
 /* ── CANCEL MODAL ─────────────────────────────────── */
 .modal-overlay {
   position:fixed;inset:0;z-index:8000;background:rgba(28,18,19,0.45);
@@ -277,7 +314,31 @@ tbody td:last-child  { padding-right:16px; }
   </div>
 </div>
 
-<!-- ── CANCEL / NO-SHOW / RESCHEDULE MODAL ── -->
+<!-- ── ADD-ON SETUP SCREEN ── -->
+<div class="setup-overlay" id="setup-overlay" style="display:none;">
+  <div class="setup-box">
+    <div class="setup-title">Before We Load Your Ledger ✦</div>
+    <div class="setup-sub" id="setup-sub-text">Confirm add-ons for this pay period so payment lookups use the correct totals. You can always adjust in the ledger after.</div>
+    <table class="setup-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Quote</th>
+          <th>Numbing</th>
+          <th>Aftercare</th>
+          <th>Merch</th>
+        </tr>
+      </thead>
+      <tbody id="setup-tbody"></tbody>
+    </table>
+    <button class="setup-confirm-btn" id="setup-confirm-btn" onclick="confirmSetup()">
+      ✦ Load Ledger
+    </button>
+    <div class="setup-skip" onclick="skipSetup()">Skip — load without add-ons</div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="cancel-modal" style="display:none;" onclick="if(event.target===this)closeCancelModal()">
   <div class="modal-box">
     <div class="modal-title">Mark Appointment</div>
@@ -518,11 +579,17 @@ function selectArtist(name) {
 }
 
 // ── LOAD LEDGER ───────────────────────────────────────────
+let _pendingAppointments = []; // holds deduped appointments during setup
+
 async function loadLedger() {
   const val = document.getElementById('period-select').value;
   if (!val) return;
   const [startStr, endStr] = val.split('|');
   const theme = ARTISTS[currentArtist];
+
+  // Check if setup has been done for this period+artist combo
+  const setupKey  = 'pii_setup_done|' + currentArtist + '|' + val;
+  const setupDone = localStorage.getItem(setupKey);
 
   setLedgerLoading();
   document.getElementById('summary-bar').style.display = 'none';
@@ -537,22 +604,17 @@ async function loadLedger() {
 
     const appointments = allAppts.filter(a => {
       if (a.artist !== currentArtist) return false;
-      // Exclude unapproved/failed appointments per status field
       const st = (a.status || '').toLowerCase();
       if (st.includes('unapproved') || st.includes('failed')) return false;
       const d = parseDate(a.appointmentDate);
       return d && d >= periodStart && d <= periodEnd;
     }).sort((a,b) => parseDate(a.appointmentDate) - parseDate(b.appointmentDate));
 
-    // Deduplicate — Appointy sometimes sends the same appointment on consecutive days
-    // (booking date vs appointment date confusion, or rescheduled without removing old)
-    // Rule: if same client appears twice within 3 days with same cost, keep the later one
     const deduped = appointments.filter((a, idx) => {
       const aDate = parseDate(a.appointmentDate);
       const aCost = parseFloat(a.cost || a.balanceDue) || 0;
-      // Check if a later entry for the same client with the same cost exists
       const hasDuplicate = appointments.some((b, bidx) => {
-        if (bidx <= idx) return false; // only look forward
+        if (bidx <= idx) return false;
         const bDate = parseDate(b.appointmentDate);
         const bCost = parseFloat(b.cost || b.balanceDue) || 0;
         const sameName = (a.clientName || '').trim().toLowerCase() === (b.clientName || '').trim().toLowerCase();
@@ -564,11 +626,103 @@ async function loadLedger() {
       return !hasDuplicate;
     });
 
-    // Pre-load addon overrides so buildRow uses correct totalWithFee/balance
-    // when searching for the balance payment in Square
+    // If setup not done for this period, show setup screen first
+    if (!setupDone) {
+      _pendingAppointments = deduped;
+      showSetupScreen(deduped, theme, val);
+      return;
+    }
+
+    // Setup done — proceed with payment lookups
+    await runPaymentLookups(deduped, startStr, endStr, theme);
+
+  } catch(e) {
+    console.error('Ledger load error:', e);
+    setLedgerError();
+  }
+}
+
+// ── SETUP SCREEN ──────────────────────────────────────────
+const ISMELLISSA = () => currentArtist === 'Mellissa';
+
+function showSetupScreen(appts, theme, periodVal) {
+  const isMel = ISMELLISSA();
+  document.getElementById('setup-sub-text').textContent =
+    `Confirm add-ons for ${currentArtist}'s ${appts.length} appointments this period so payment lookups use the correct totals.`;
+
+  const btn = document.getElementById('setup-confirm-btn');
+  btn.style.background = `linear-gradient(135deg, ${theme.color}, ${theme.dark || theme.color})`;
+  btn.style.color = '#fff';
+
+  const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+
+  const tbody = document.getElementById('setup-tbody');
+  tbody.innerHTML = appts.map((appt, i) => {
+    const key      = appt.clientName + '|' + (appt.appointmentDate || '');
+    const ov       = addonOverrides[key] || {};
+    const cost     = parseFloat(appt.cost || appt.balanceDue) || 0;
+    const apptD    = parseDate(appt.appointmentDate);
+    const dateStr  = apptD ? apptD.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
+
+    const numbingOpts = isMel ? '<option value="0">N/A</option>' :
+      NUMBING_OPTS.map(o => `<option value="${o.v}" ${(ov.numbing||0)==o.v?'selected':''}>${o.l}</option>`).join('');
+    const aftercareOpts = (isMel ? AFTERCARE_PIERCING_OPTS : AFTERCARE_OPTS)
+      .map(o => `<option value="${o.v}" ${(ov.aftercare||0)==o.v?'selected':''}>${o.l}</option>`).join('');
+    const merchOpts = MERCH_OPTS.map(o => `<option value="${o.v}" ${(ov.merch||0)==o.v?'selected':''}>${o.l}</option>`).join('');
+
+    return `<tr>
+      <td><strong>${escHtml(appt.clientName)}</strong><br><span style="font-size:10px;color:var(--chrome);">${dateStr}</span></td>
+      <td>$${cost.toFixed(0)}</td>
+      <td>${isMel ? '<span style="color:var(--chrome);font-size:11px;">N/A</span>' : `<select class="setup-select" data-key="${escHtml(key)}" data-field="numbing">${numbingOpts}</select>`}</td>
+      <td><select class="setup-select" data-key="${escHtml(key)}" data-field="aftercare">${aftercareOpts}</select></td>
+      <td><select class="setup-select" data-key="${escHtml(key)}" data-field="merch">${merchOpts}</select></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('setup-overlay').style.display = 'flex';
+}
+
+function confirmSetup() {
+  // Save all add-on selections from the setup table
+  const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+  document.querySelectorAll('#setup-tbody .setup-select').forEach(sel => {
+    const key   = sel.dataset.key;
+    const field = sel.dataset.field;
+    const val   = parseFloat(sel.value) || 0;
+    if (!addonOverrides[key]) addonOverrides[key] = {};
+    addonOverrides[key][field] = val;
+  });
+  try { localStorage.setItem('pii_addon_overrides', JSON.stringify(addonOverrides)); } catch(e) {}
+
+  // Mark setup as done for this period+artist
+  const periodVal = document.getElementById('period-select').value;
+  const setupKey  = 'pii_setup_done|' + currentArtist + '|' + periodVal;
+  try { localStorage.setItem(setupKey, '1'); } catch(e) {}
+
+  document.getElementById('setup-overlay').style.display = 'none';
+
+  // Now run payment lookups
+  const [startStr, endStr] = periodVal.split('|');
+  const theme = ARTISTS[currentArtist];
+  runPaymentLookups(_pendingAppointments, startStr, endStr, theme);
+}
+
+function skipSetup() {
+  // Mark setup as done without saving add-ons
+  const periodVal = document.getElementById('period-select').value;
+  const setupKey  = 'pii_setup_done|' + currentArtist + '|' + periodVal;
+  try { localStorage.setItem(setupKey, '1'); } catch(e) {}
+  document.getElementById('setup-overlay').style.display = 'none';
+  const [startStr, endStr] = periodVal.split('|');
+  runPaymentLookups(_pendingAppointments, startStr, endStr, ARTISTS[currentArtist]);
+}
+
+// ── RUN PAYMENT LOOKUPS ───────────────────────────────────
+async function runPaymentLookups(deduped, startStr, endStr, theme) {
+  setLedgerLoading();
+  try {
     const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
 
-    // Each row catches its own errors so one bad lookup won't crash the whole ledger
     const rows = await Promise.all(deduped.map(appt => {
       const key = appt.clientName + '|' + (appt.appointmentDate || '');
       const ov  = addonOverrides[key] || {};
@@ -595,14 +749,13 @@ async function loadLedger() {
     renderLedger(rows, startStr, endStr, theme);
     renderSummary(rows, theme);
     restoreCancelBadges(rows);
-
   } catch(e) {
-    console.error('Ledger load error:', e);
+    console.error('Payment lookup error:', e);
     setLedgerError();
   }
 }
 
-// ── BUILD ROW — all Square lookups for one appointment ────
+
 async function buildRow(appt, ov) {
   ov = ov || {};
   const cost      = ov.cost !== undefined ? ov.cost : (parseFloat(appt.cost || appt.balanceDue) || 0);
@@ -636,6 +789,7 @@ async function buildRow(appt, ov) {
       let url = `${BACKEND_URL}/payments/by-email-all?email=${encodeURIComponent(appt.email)}&name=${encodeURIComponent(appt.clientName||'')}`;
       if (bookingDateStr) url += `&booking_date=${bookingDateStr}`;
       if (apptDateParam && apptDateParam !== bookingDateStr) url += `&appointment_date=${apptDateParam}`;
+      if (cost > 0) url += `&cost=${cost}`;
       console.log(`[PII] ${appt.clientName} — fetching payments:`, url);
       const res  = await fetch(url, { cache: 'no-store' });
       const data = await res.json();

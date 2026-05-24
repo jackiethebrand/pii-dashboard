@@ -407,7 +407,7 @@ tbody td:last-child  { padding-right:16px; }
 <div class="modal-overlay" id="walkin-modal" style="display:none;" onclick="if(event.target===this)closeWalkinModal()">
   <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto;">
     <div class="modal-title">Add Walk-In</div>
-    <div class="modal-sub">Mellissa · Walk-in client</div>
+    <div class="modal-sub" id="wi-artist-sub"></div>
     <div style="display:flex;gap:10px;">
       <div class="modal-field" style="flex:1;">
         <label>Client Name</label>
@@ -428,62 +428,111 @@ tbody td:last-child  { padding-right:16px; }
         <input type="tel" id="wi-phone" placeholder="(555) 555-5555">
       </div>
     </div>
-    <div style="display:flex;gap:10px;align-items:flex-end;">
-      <div class="modal-field" style="flex:1;">
-        <label>Piercing Service</label>
-        <select id="wi-piercing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
-          <option value="">Select piercing...</option>
-          <option value="35">Jewelry Change/Removal — $35</option>
-          <option value="85">Dermal — $85</option>
-          <option value="60">Additional Dermal — $60</option>
-          <option value="90">Ear: Industrial — $90</option>
-          <option value="75">Ear: Tragus/Daith/Rook/Helix — $75</option>
-          <option value="150">2 Ear Lobes — $150</option>
-          <option value="75">Surface: Tragus/Bridge/Eyebrow — $75</option>
-          <option value="75">Nostril — $75</option>
-          <option value="65">Septum — $65</option>
-          <option value="75">Lip: Labret/Vertical/Monroe — $75</option>
-          <option value="65">Tongue — $65</option>
-          <option value="65">Tongue: Frenulum/Web — $65</option>
-          <option value="65">Smiley — $65</option>
-          <option value="65">1 Nipple — $65</option>
-          <option value="130">Both Nipples — $130</option>
-          <option value="75">Navel/Belly Button — $75</option>
-          <option value="90">VCH/Hood Piercing — $90</option>
-          <option value="90">Guiche — $90</option>
-          <option value="90">Christina — $90</option>
-          <option value="90">Frenum — $90</option>
-          <option value="90">Hafada/Scrotum — $90</option>
-          <option value="150">Ear Lobe Stretching — $150</option>
-          <option value="75">Mystery Piercing — $75</option>
-          <option value="65">Tongue: Snake Eyes/Venom — $65</option>
-        </select>
+
+    <!-- Tattoo artist fields -->
+    <div id="wi-tattoo-fields">
+      <div style="display:flex;gap:10px;">
+        <div class="modal-field" style="flex:1;">
+          <label>Service / Description</label>
+          <input type="text" id="wi-service" placeholder="e.g. Fine line floral sleeve">
+        </div>
+        <div class="modal-field" style="width:110px;">
+          <label>Quote ($)</label>
+          <input type="number" id="wi-cost" min="0" step="5" onchange="calcWalkinTotal()" oninput="calcWalkinTotal()"
+            style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+        </div>
       </div>
-      <div class="modal-field" style="width:80px;">
-        <label>Qty</label>
-        <input type="number" id="wi-qty" value="1" min="1" max="10" onchange="calcWalkinTotal()" oninput="calcWalkinTotal()"
-          style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);text-align:center;">
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <div class="modal-field" style="flex:1;">
-        <label>Aftercare</label>
-        <select id="wi-aftercare" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
-          <option value="0">None</option>
-          <option value="25">Piercing Kit $25</option>
-        </select>
-      </div>
-      <div class="modal-field" style="flex:1;">
-        <label>Merch</label>
-        <select id="wi-merch" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
-          <option value="0">None</option>
-          <option value="25">Shirt $25</option>
-          <option value="10">Sticker $10</option>
-        </select>
+      <div style="display:flex;gap:10px;">
+        <div class="modal-field" style="flex:1;">
+          <label>Numbing</label>
+          <select id="wi-numbing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="0">None</option>
+            <option value="60">Small $60</option>
+            <option value="80">Medium $80</option>
+            <option value="100">Large $100</option>
+            <option value="120">XL $120</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex:1;">
+          <label>Aftercare</label>
+          <select id="wi-aftercare-tattoo" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="0">None</option>
+            <option value="25">Kit $25</option>
+            <option value="10">Saniderm $10</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex:1;">
+          <label>Merch</label>
+          <select id="wi-merch-tattoo" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="0">None</option>
+            <option value="25">Shirt $25</option>
+            <option value="10">Sticker $10</option>
+            <option value="18.95">Studded Tumbler $18.95</option>
+          </select>
+        </div>
       </div>
     </div>
+
+    <!-- Mellissa piercing fields -->
+    <div id="wi-piercing-fields" style="display:none;">
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div class="modal-field" style="flex:1;">
+          <label>Piercing Service</label>
+          <select id="wi-piercing" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="">Select piercing...</option>
+            <option value="35">Jewelry Change/Removal — $35</option>
+            <option value="85">Dermal — $85</option>
+            <option value="60">Additional Dermal — $60</option>
+            <option value="90">Ear: Industrial — $90</option>
+            <option value="75">Ear: Tragus/Daith/Rook/Helix — $75</option>
+            <option value="150">2 Ear Lobes — $150</option>
+            <option value="75">Surface: Tragus/Bridge/Eyebrow — $75</option>
+            <option value="75">Nostril — $75</option>
+            <option value="65">Septum — $65</option>
+            <option value="75">Lip: Labret/Vertical/Monroe — $75</option>
+            <option value="65">Tongue — $65</option>
+            <option value="65">Tongue: Frenulum/Web — $65</option>
+            <option value="65">Smiley — $65</option>
+            <option value="65">1 Nipple — $65</option>
+            <option value="130">Both Nipples — $130</option>
+            <option value="75">Navel/Belly Button — $75</option>
+            <option value="90">VCH/Hood Piercing — $90</option>
+            <option value="90">Guiche — $90</option>
+            <option value="90">Christina — $90</option>
+            <option value="90">Frenum — $90</option>
+            <option value="90">Hafada/Scrotum — $90</option>
+            <option value="150">Ear Lobe Stretching — $150</option>
+            <option value="75">Mystery Piercing — $75</option>
+            <option value="65">Tongue: Snake Eyes/Venom — $65</option>
+          </select>
+        </div>
+        <div class="modal-field" style="width:80px;">
+          <label>Qty</label>
+          <input type="number" id="wi-qty" value="1" min="1" max="10" onchange="calcWalkinTotal()" oninput="calcWalkinTotal()"
+            style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);text-align:center;">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="modal-field" style="flex:1;">
+          <label>Aftercare</label>
+          <select id="wi-aftercare" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="0">None</option>
+            <option value="25">Piercing Kit $25</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex:1;">
+          <label>Merch</label>
+          <select id="wi-merch" onchange="calcWalkinTotal()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;background:var(--white);">
+            <option value="0">None</option>
+            <option value="25">Shirt $25</option>
+            <option value="10">Sticker $10</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div id="wi-total-line" style="display:none;background:var(--cream);border-radius:12px;padding:12px 16px;margin-bottom:4px;font-size:13px;color:var(--ink);font-family:'DM Mono',monospace;">
-      Total: <strong id="wi-total-val" style="color:var(--mellissa);"></strong>
+      Total: <strong id="wi-total-val"></strong>
       <span style="font-size:10px;color:var(--chrome);margin-left:6px;">(includes 6% fee)</span>
     </div>
     <div class="modal-btns">
@@ -1331,7 +1380,7 @@ function renderLedger(rows, startStr, endStr, theme) {
           <span style="width:7px;height:7px;border-radius:50%;background:#C97070;display:inline-block;margin-left:6px;"></span>Pending
           <span style="width:7px;height:7px;border-radius:50%;background:#E8A020;display:inline-block;margin-left:6px;"></span>Flag
         </div>
-        ${currentArtist === 'Mellissa' ? `<button class="walkin-btn" onclick="openWalkinModal()">+ Add Walk-In</button>` : ''}
+        ${`<button class="walkin-btn" onclick="openWalkinModal()" style="border-color:${theme.color};color:${theme.color};" onmouseover="this.style.background='${theme.color}';this.style.color='#fff';" onmouseout="this.style.background='var(--white)';this.style.color='${theme.color}';">+ Add Walk-In</button>`}
         <button id="save-addons-btn" onclick="saveAddonChanges()"
           style="display:none;align-items:center;gap:6px;padding:7px 14px;background:${theme.color};color:#fff;border:none;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;">
           💾 Save Add-on Changes
@@ -1934,19 +1983,40 @@ function restoreCancelBadges(rows) {
 
 // ── WALK-IN MODAL (Mellissa) ─────────────────────────────
 function openWalkinModal() {
-  document.getElementById('wi-name').value      = '';
-  document.getElementById('wi-email').value     = '';
-  document.getElementById('wi-phone').value     = '';
-  document.getElementById('wi-piercing').value  = '';
-  document.getElementById('wi-qty').value       = '1';
-  document.getElementById('wi-aftercare').value = '0';
-  document.getElementById('wi-merch').value     = '0';
-  // Default datetime to now
-  const now = new Date();
-  now.setSeconds(0, 0);
-  document.getElementById('wi-datetime').value = now.toISOString().slice(0, 16);
+  const isMel = currentArtist === 'Mellissa';
+  const theme = ARTISTS[currentArtist];
+
+  document.getElementById('wi-artist-sub').textContent = currentArtist + ' · Walk-in client';
+  document.getElementById('wi-tattoo-fields').style.display  = isMel ? 'none' : 'block';
+  document.getElementById('wi-piercing-fields').style.display = isMel ? 'block' : 'none';
+
+  // Reset all fields
+  document.getElementById('wi-name').value     = '';
+  document.getElementById('wi-email').value    = '';
+  document.getElementById('wi-phone').value    = '';
   document.getElementById('wi-total-line').style.display = 'none';
-  document.getElementById('walkin-modal').style.display  = 'flex';
+
+  const now = new Date(); now.setSeconds(0, 0);
+  document.getElementById('wi-datetime').value = now.toISOString().slice(0, 16);
+
+  if (isMel) {
+    document.getElementById('wi-piercing').value  = '';
+    document.getElementById('wi-qty').value       = '1';
+    document.getElementById('wi-aftercare').value = '0';
+    document.getElementById('wi-merch').value     = '0';
+  } else {
+    document.getElementById('wi-service').value         = '';
+    document.getElementById('wi-cost').value            = '';
+    document.getElementById('wi-numbing').value         = '0';
+    document.getElementById('wi-aftercare-tattoo').value= '0';
+    document.getElementById('wi-merch-tattoo').value    = '0';
+  }
+
+  // Style confirm button with artist theme color
+  const confirmBtn = document.querySelector('#walkin-modal .modal-btn.confirm');
+  if (confirmBtn) confirmBtn.style.background = theme.color;
+
+  document.getElementById('walkin-modal').style.display = 'flex';
 }
 
 function closeWalkinModal() {
@@ -1954,16 +2024,32 @@ function closeWalkinModal() {
 }
 
 function calcWalkinTotal() {
-  const unitCost = parseFloat(document.getElementById('wi-piercing').value) || 0;
-  const qty      = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
-  const cost     = unitCost * qty;
-  const aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
-  const merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
-  const total    = (cost + aftercare + merch) * 1.06;
-  const line     = document.getElementById('wi-total-line');
-  if (unitCost > 0) {
-    const breakdown = qty > 1 ? ` (${qty} × $${unitCost})` : '';
-    document.getElementById('wi-total-val').textContent = '$' + total.toFixed(2) + breakdown;
+  const isMel = currentArtist === 'Mellissa';
+  let cost = 0, aftercare = 0, merch = 0, numbing = 0, label = '';
+
+  if (isMel) {
+    const unitCost = parseFloat(document.getElementById('wi-piercing').value) || 0;
+    const qty      = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
+    cost     = unitCost * qty;
+    aftercare= parseFloat(document.getElementById('wi-aftercare').value) || 0;
+    merch    = parseFloat(document.getElementById('wi-merch').value) || 0;
+    const sel = document.getElementById('wi-piercing');
+    label = unitCost > 0 ? (qty > 1 ? `${qty}× ${sel.options[sel.selectedIndex]?.text}` : sel.options[sel.selectedIndex]?.text) : '';
+  } else {
+    cost     = parseFloat(document.getElementById('wi-cost').value) || 0;
+    numbing  = parseFloat(document.getElementById('wi-numbing').value) || 0;
+    aftercare= parseFloat(document.getElementById('wi-aftercare-tattoo').value) || 0;
+    merch    = parseFloat(document.getElementById('wi-merch-tattoo').value) || 0;
+    label = document.getElementById('wi-service').value.trim() || 'Walk-in tattoo';
+  }
+
+  const total = (cost + numbing + aftercare + merch) * 1.06;
+  const line  = document.getElementById('wi-total-line');
+  const theme = ARTISTS[currentArtist];
+
+  if (cost > 0) {
+    document.getElementById('wi-total-val').textContent = '$' + total.toFixed(2);
+    document.getElementById('wi-total-val').style.color = theme.color;
     line.style.display = 'block';
   } else {
     line.style.display = 'none';
@@ -1971,36 +2057,48 @@ function calcWalkinTotal() {
 }
 
 function saveWalkin() {
-  const name      = document.getElementById('wi-name').value.trim();
-  const email     = document.getElementById('wi-email').value.trim();
-  const phone     = document.getElementById('wi-phone').value.trim();
+  const isMel = currentArtist === 'Mellissa';
+  const name     = document.getElementById('wi-name').value.trim();
+  const email    = document.getElementById('wi-email').value.trim();
+  const phone    = document.getElementById('wi-phone').value.trim();
   const datetimeVal = document.getElementById('wi-datetime').value;
-  const piercingSel = document.getElementById('wi-piercing');
-  const unitCost  = parseFloat(piercingSel.value) || 0;
-  const qty       = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
-  const cost      = unitCost * qty;
-  const aftercare = parseFloat(document.getElementById('wi-aftercare').value) || 0;
-  const merch     = parseFloat(document.getElementById('wi-merch').value) || 0;
 
-  if (!name)     { alert('Please enter a client name.'); return; }
-  if (!unitCost) { alert('Please select a piercing service.'); return; }
+  if (!name)      { alert('Please enter a client name.'); return; }
   if (!datetimeVal) { alert('Please enter a date and time.'); return; }
 
+  let cost = 0, numbing = 0, aftercare = 0, merch = 0, serviceLabel = '';
+
+  if (isMel) {
+    const piercingSel = document.getElementById('wi-piercing');
+    const unitCost    = parseFloat(piercingSel.value) || 0;
+    const qty         = Math.max(1, parseInt(document.getElementById('wi-qty').value) || 1);
+    if (!unitCost) { alert('Please select a piercing service.'); return; }
+    cost         = unitCost * qty;
+    aftercare    = parseFloat(document.getElementById('wi-aftercare').value) || 0;
+    merch        = parseFloat(document.getElementById('wi-merch').value) || 0;
+    serviceLabel = qty > 1 ? `${qty}× ${piercingSel.options[piercingSel.selectedIndex].text}` : piercingSel.options[piercingSel.selectedIndex].text;
+  } else {
+    cost         = parseFloat(document.getElementById('wi-cost').value) || 0;
+    numbing      = parseFloat(document.getElementById('wi-numbing').value) || 0;
+    aftercare    = parseFloat(document.getElementById('wi-aftercare-tattoo').value) || 0;
+    merch        = parseFloat(document.getElementById('wi-merch-tattoo').value) || 0;
+    serviceLabel = document.getElementById('wi-service').value.trim() || 'Walk-in tattoo';
+    if (!cost) { alert('Please enter a quote amount.'); return; }
+  }
+
   const apptD        = new Date(datetimeVal);
-  const addOns       = aftercare + merch;
+  const addOns       = numbing + aftercare + merch;
   const totalWithFee = (cost + addOns) * 1.06;
-  const piercingLabel= piercingSel.options[piercingSel.selectedIndex].text;
-  const serviceLabel = qty > 1 ? `${qty}× ${piercingLabel}` : piercingLabel;
 
   const walkin = {
     appt: {
       clientName: name, email, phone,
       appointmentDate: apptD.toISOString(),
-      service: serviceLabel, artist: 'Mellissa', cost, status: 'Walk-In',
+      service: serviceLabel, artist: currentArtist, cost, status: 'Walk-In',
     },
     apptD, apptDateStr: localDateStr(apptD),
-    isPastAppt: apptD < new Date(), cost, numbing: 0, aftercare, merch,
-    addOns, totalWithFee,
+    isPastAppt: apptD < new Date(),
+    cost, numbing, aftercare, merch, addOns, totalWithFee,
     deposit: 0, balance: totalWithFee,
     squareDeposit: null, squarePaid: null,
     paid: null, tipAmt: null, tipError: false,
@@ -2009,17 +2107,17 @@ function saveWalkin() {
 
   _ledgerRows.push(walkin);
 
-  // Save to localStorage
   try {
     const saved = JSON.parse(localStorage.getItem('pii_walkins') || '[]');
-    saved.push({ name, email, phone, datetimeVal, unitCost, qty, cost, aftercare, merch, totalWithFee, serviceLabel, savedAt: new Date().toISOString() });
+    saved.push({ name, email, phone, datetimeVal, cost, numbing, aftercare, merch, totalWithFee, serviceLabel, artist: currentArtist, savedAt: new Date().toISOString() });
     localStorage.setItem('pii_walkins', JSON.stringify(saved));
   } catch(e) {}
 
   const val = document.getElementById('period-select').value;
   const [startStr, endStr] = val.split('|');
-  renderLedger(_ledgerRows, startStr, endStr, ARTISTS['Mellissa']);
-  renderSummary(_ledgerRows, ARTISTS['Mellissa']);
+  const theme = ARTISTS[currentArtist];
+  renderLedger(_ledgerRows, startStr, endStr, theme);
+  renderSummary(_ledgerRows, theme);
   restoreCancelBadges(_ledgerRows);
   closeWalkinModal();
 }

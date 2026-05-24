@@ -420,8 +420,9 @@ tbody td:last-child  { padding-right:16px; }
     </div>
     <div style="display:flex;gap:10px;">
       <div class="modal-field" style="flex:1;">
-        <label>Email (optional)</label>
+        <label>Email — links to Square profile</label>
         <input type="email" id="wi-email" placeholder="client@email.com">
+        <div style="font-size:10px;color:var(--chrome);margin-top:3px;">Add email to auto-find deposit & balance in Square</div>
       </div>
       <div class="modal-field" style="flex:1;">
         <label>Phone (optional)</label>
@@ -2090,12 +2091,15 @@ function saveWalkin() {
   const addOns       = numbing + aftercare + merch;
   const totalWithFee = (cost + addOns) * 1.06;
 
+  const walkinAppt = {
+    clientName: name, email, phone,
+    appointmentDate: apptD.toISOString(),
+    bookingDate: apptD.toISOString(), // same day — booking date = appointment date
+    service: serviceLabel, artist: currentArtist, cost, status: 'Walk-In',
+  };
+
   const walkin = {
-    appt: {
-      clientName: name, email, phone,
-      appointmentDate: apptD.toISOString(),
-      service: serviceLabel, artist: currentArtist, cost, status: 'Walk-In',
-    },
+    appt: walkinAppt,
     apptD, apptDateStr: localDateStr(apptD),
     isPastAppt: apptD < new Date(),
     cost, numbing, aftercare, merch, addOns, totalWithFee,
@@ -2105,8 +2109,7 @@ function saveWalkin() {
     isWalkin: true,
   };
 
-  _ledgerRows.push(walkin);
-
+  // Save to localStorage
   try {
     const saved = JSON.parse(localStorage.getItem('pii_walkins') || '[]');
     saved.push({ name, email, phone, datetimeVal, cost, numbing, aftercare, merch, totalWithFee, serviceLabel, artist: currentArtist, savedAt: new Date().toISOString() });
@@ -2116,10 +2119,34 @@ function saveWalkin() {
   const val = document.getElementById('period-select').value;
   const [startStr, endStr] = val.split('|');
   const theme = ARTISTS[currentArtist];
-  renderLedger(_ledgerRows, startStr, endStr, theme);
-  renderSummary(_ledgerRows, theme);
-  restoreCancelBadges(_ledgerRows);
-  closeWalkinModal();
+
+  // If email provided, run full Square lookup — finds same-day deposit and balance
+  // Same as Appointy appointments. Requires client to have a Square profile.
+  if (email) {
+    closeWalkinModal();
+    const addonOverrides = JSON.parse(localStorage.getItem('pii_addon_overrides') || '{}');
+    const ov = { cost, numbing, aftercare, merch };
+    buildRow(walkinAppt, ov).then(fullRow => {
+      fullRow.isWalkin = true;
+      _ledgerRows.push(fullRow);
+      renderLedger(_ledgerRows, startStr, endStr, theme);
+      renderSummary(_ledgerRows, theme);
+      restoreCancelBadges(_ledgerRows);
+    }).catch(() => {
+      // Fallback — add static row if Square lookup fails
+      _ledgerRows.push(walkin);
+      renderLedger(_ledgerRows, startStr, endStr, theme);
+      renderSummary(_ledgerRows, theme);
+      restoreCancelBadges(_ledgerRows);
+    });
+  } else {
+    // No email — add static row, manual deposit entry available in ledger
+    _ledgerRows.push(walkin);
+    renderLedger(_ledgerRows, startStr, endStr, theme);
+    renderSummary(_ledgerRows, theme);
+    restoreCancelBadges(_ledgerRows);
+    closeWalkinModal();
+  }
 }
 
 // ── TOUCH-UP SYSTEM ──────────────────────────────────────

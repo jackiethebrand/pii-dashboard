@@ -10,33 +10,76 @@
 :root{
   --cream:#FDF7F5;--white:#FFFFFF;--ink:#1C1213;--ink-soft:#5C4449;--chrome:#B8A8AC;
   --pink:#D4748F;--pink-dark:#A84F68;--pink-light:#F5E0E6;--pink-mid:#EAB8C5;
-  --green:#3D9970;--green-dark:#2A7A56;--green-light:#E8F5EF;
+  --green:#3D9970;--green-light:#E8F5EF;
   --gold:#C4952A;--gold-light:#FDF8ED;
   --purple:#8B6BB5;--orange:#D4853A;--blue:#4A90C4;
+  --red:#C97070;--red-light:#FDF0F0;
   --shadow-sm:0 3px 16px rgba(100,40,60,0.08);
   --shadow-md:0 8px 32px rgba(100,40,60,0.16);
   --border:rgba(180,140,150,0.14);
 }
 html,body{min-height:100vh;font-family:'DM Sans',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
-body{
-  display:flex;flex-direction:column;align-items:center;
-  min-height:100vh;padding:40px 20px 80px;
-  background:
-    radial-gradient(ellipse at 85% 5%,rgba(212,116,143,0.13) 0%,transparent 50%),
-    radial-gradient(ellipse at 5% 85%,rgba(61,153,112,0.07) 0%,transparent 45%),
-    var(--cream);
-}
-.brand{text-align:center;margin-bottom:32px;width:100%;max-width:520px;}
-.brand-mark{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:0.24em;color:var(--pink);text-transform:uppercase;margin-bottom:8px;}
-.brand-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(42px,9vw,68px);color:var(--ink);line-height:1;}
-.brand-logo em{font-style:italic;color:var(--pink);}
-.brand-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;font-weight:300;color:var(--chrome);margin-top:6px;}
-.femmepire{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;}
-.femme-dot{width:10px;height:10px;border-radius:50%;opacity:0.85;}
-.divider{width:100%;max-width:520px;height:1px;background:linear-gradient(90deg,transparent,var(--pink-mid),transparent);margin:4px 0 28px;}
-.hub-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:20px;}
 
-/* ── SECTION ── */
+/* ── PIN OVERLAY ── */
+.pin-overlay{position:fixed;inset:0;z-index:9999;background:var(--cream);display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 85% 5%,rgba(212,116,143,0.13) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(61,153,112,0.07) 0%,transparent 45%),var(--cream);}
+.pin-box{background:var(--white);border-radius:24px;padding:36px 32px;box-shadow:0 12px 48px rgba(100,40,60,0.16);text-align:center;width:320px;border:1px solid var(--border);}
+.pin-logo{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--ink);margin-bottom:4px;}
+.pin-logo em{font-style:italic;color:var(--pink);}
+.pin-sub{font-size:12px;color:var(--chrome);margin-bottom:24px;font-weight:300;}
+.pin-label{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:10px;}
+.pin-dots{display:flex;justify-content:center;gap:10px;margin-bottom:20px;}
+.pin-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--pink-mid);background:transparent;transition:all 0.15s;}
+.pin-dot.filled{background:var(--pink);border-color:var(--pink);}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.pin-key{padding:14px;border-radius:14px;border:1.5px solid var(--border);background:var(--white);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--ink);cursor:pointer;transition:all 0.12s;user-select:none;}
+.pin-key:hover{background:var(--pink-light);border-color:var(--pink-mid);}
+.pin-key:active{transform:scale(0.94);}
+.pin-key.delete{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--chrome);}
+.pin-error{font-size:12px;color:#C97070;min-height:18px;margin-top:4px;}
+
+/* ── MAIN BODY ── */
+body{
+  background:radial-gradient(ellipse at 85% 5%,rgba(212,116,143,0.13) 0%,transparent 50%),
+    radial-gradient(ellipse at 5% 85%,rgba(61,153,112,0.07) 0%,transparent 45%),var(--cream);
+  padding:0 0 80px;
+}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:28px 24px 12px;}
+.brand-mark{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;letter-spacing:0.24em;color:var(--pink);text-transform:uppercase;margin-bottom:6px;}
+.brand-logo{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(36px,8vw,56px);color:var(--ink);line-height:1;}
+.brand-logo em{font-style:italic;color:var(--pink);}
+.brand-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--chrome);margin-top:4px;}
+.artist-greeting{font-size:12px;color:var(--ink-soft);margin-top:8px;font-weight:400;}
+.artist-greeting span{color:var(--pink);font-weight:600;}
+.divider{width:100%;max-width:520px;margin:10px auto 0;height:1px;background:linear-gradient(90deg,transparent,var(--pink-mid),transparent);}
+
+/* ── TAB BAR ── */
+.tab-bar{display:flex;justify-content:center;gap:8px;padding:16px 20px 0;max-width:520px;margin:0 auto;}
+.tab-btn{
+  position:relative;flex:1;padding:10px 16px;border-radius:100px;
+  border:1.5px solid var(--border);background:var(--white);
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  color:var(--ink-soft);cursor:pointer;transition:all 0.18s;
+}
+.tab-btn.active{background:var(--pink);border-color:var(--pink);color:var(--white);}
+.tab-btn:hover:not(.active){border-color:var(--pink-mid);color:var(--pink);}
+.inbox-badge{
+  position:absolute;top:-6px;right:-6px;
+  min-width:18px;height:18px;border-radius:100px;
+  background:#C97070;color:#fff;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid var(--cream);
+}
+
+/* ── TAB PANELS ── */
+.tab-panel{display:none;padding:20px 20px 0;max-width:520px;margin:0 auto;}
+.tab-panel.active{display:flex;flex-direction:column;gap:20px;}
+
+/* ── HUB SECTION ── */
 .hub-section{background:var(--white);border-radius:24px;overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
 .hub-section-header{padding:18px 22px 14px;}
 .hub-eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;font-weight:500;margin-bottom:4px;}
@@ -45,7 +88,6 @@ body{
 .hub-desc{font-size:12px;color:var(--chrome);font-weight:300;margin-top:3px;}
 .hub-body{padding:0 14px 14px;}
 
-/* ── SINGLE CARD ── */
 .hub-card{
   display:flex;flex-direction:column;text-decoration:none;
   background:var(--cream);border-radius:16px;padding:18px 16px;
@@ -57,20 +99,10 @@ body{
 .hub-card:hover{transform:translateY(-2px) scale(1.01);box-shadow:var(--shadow-md);}
 .hub-card:active{transform:scale(0.98);}
 
-/* ── DUAL CARDS ── */
 .hub-dual{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-/* ── EXPANDABLE CARD ── */
-.hub-expand-card{
-  background:var(--cream);border-radius:16px;
-  border:1.5px solid var(--border);overflow:hidden;
-  transition:all 0.2s ease;
-}
-.hub-expand-trigger{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px;cursor:pointer;text-decoration:none;
-  transition:background 0.15s;
-}
+.hub-expand-card{background:var(--cream);border-radius:16px;border:1.5px solid var(--border);overflow:hidden;transition:all 0.2s ease;}
+.hub-expand-trigger{display:flex;align-items:center;justify-content:space-between;padding:16px;cursor:pointer;text-decoration:none;transition:background 0.15s;}
 .hub-expand-trigger:hover{background:rgba(212,116,143,0.05);}
 .hub-expand-trigger-left{display:flex;align-items:center;gap:12px;}
 .hub-expand-icon{font-size:22px;}
@@ -78,25 +110,13 @@ body{
 .hub-expand-name em{font-style:italic;}
 .hub-expand-chevron{font-size:14px;color:var(--chrome);transition:transform 0.2s;}
 .hub-expand-chevron.open{transform:rotate(180deg);}
-.hub-expand-menu{
-  max-height:0;overflow:hidden;
-  transition:max-height 0.3s ease;
-  border-top:0px solid var(--border);
-}
+.hub-expand-menu{max-height:0;overflow:hidden;transition:max-height 0.3s ease;border-top:0px solid var(--border);}
 .hub-expand-menu.open{max-height:200px;border-top-width:1px;}
-.hub-expand-item{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px 12px 24px;
-  text-decoration:none;color:var(--ink-soft);
-  font-size:13px;font-weight:400;
-  border-bottom:1px solid var(--border);
-  transition:background 0.12s;
-}
+.hub-expand-item{display:flex;align-items:center;gap:10px;padding:12px 16px 12px 24px;text-decoration:none;color:var(--ink-soft);font-size:13px;font-weight:400;border-bottom:1px solid var(--border);transition:background 0.12s;}
 .hub-expand-item:last-child{border-bottom:none;}
 .hub-expand-item:hover{background:rgba(212,116,143,0.06);}
 .hub-expand-item-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
-/* card content */
 .card-icon{font-size:22px;margin-bottom:8px;}
 .card-label{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:3px;}
 .card-label em{font-style:italic;}
@@ -104,16 +124,96 @@ body{
 .card-arrow{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:8px;transition:letter-spacing 0.18s;}
 .hub-card:hover .card-arrow{letter-spacing:0.16em;}
 
-/* section accent colors */
 .hub-section.appts .hub-eyebrow{color:var(--purple);}
 .hub-section.ledger .hub-eyebrow{color:var(--gold);}
 .hub-section.payments .hub-eyebrow{color:var(--pink);}
+.hub-section.sops .hub-eyebrow{color:var(--blue);}
 .hub-card.appts-card::before{background:linear-gradient(90deg,#D4748F,#8B6BB5,#D4853A,#5A9E6F,#4A90C4);}
 .hub-card.appts-card .card-arrow{color:var(--purple);}
 .hub-card.ledger-card::before{background:linear-gradient(90deg,var(--gold),#F5D4B0);}
 .hub-card.ledger-card .card-arrow{color:var(--gold);}
+.hub-card.sop-card::before{background:linear-gradient(90deg,var(--blue),#B8D8F0);}
+.hub-card.sop-card .card-arrow{color:var(--blue);}
 .hub-expand-card.layaway .hub-expand-trigger{border-left:3px solid var(--pink);}
-.hub-expand-card.afterpay .hub-expand-trigger{border-left:3px solid var(--green-dark);}
+.hub-expand-card.afterpay .hub-expand-trigger{border-left:3px solid var(--green);}
+
+/* ── INBOX ── */
+.inbox-section{display:flex;flex-direction:column;gap:12px;}
+.inbox-section-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--chrome);font-weight:500;padding:0 4px;}
+
+.update-card{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;transition:all 0.15s;}
+.update-card.unread{border-color:var(--pink-mid);border-left:4px solid var(--pink);}
+.update-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;}
+.update-title-wrap{display:flex;align-items:center;gap:10px;}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0;}
+.update-title{font-size:14px;font-weight:500;color:var(--ink);}
+.update-meta{font-size:11px;color:var(--chrome);margin-top:2px;}
+.update-chevron{font-size:12px;color:var(--chrome);transition:transform 0.2s;flex-shrink:0;}
+.update-chevron.open{transform:rotate(180deg);}
+.update-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+.update-body.open{max-height:300px;}
+.update-body-inner{padding:0 16px 14px;font-size:13px;color:var(--ink-soft);line-height:1.7;border-top:1px solid var(--border);padding-top:12px;}
+.mark-read-btn{margin-top:10px;padding:6px 14px;border-radius:100px;border:1.5px solid var(--pink-mid);background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--pink);cursor:pointer;transition:all 0.15s;}
+.mark-read-btn:hover{background:var(--pink-light);}
+
+.task-card{background:var(--white);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;cursor:pointer;transition:all 0.15s;}
+.task-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.task-card.new{border-left:4px solid var(--pink);}
+.task-card.in-progress{border-left:4px solid var(--gold);}
+.task-card.pending{border-left:4px solid var(--blue);}
+.task-card.completed{border-left:4px solid var(--green);opacity:0.7;}
+
+.task-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.task-left{display:flex;flex-direction:column;gap:4px;flex:1;}
+.task-title{font-size:14px;font-weight:600;color:var(--ink);}
+.task-assignee{font-size:11px;color:var(--chrome);}
+.task-pills{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.urgency-pill{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:100px;}
+.urgency-High{background:#FDF0F0;color:#C97070;}
+.urgency-Medium{background:var(--gold-light);color:var(--gold);}
+.urgency-Low{background:var(--green-light);color:var(--green);}
+.status-pill{font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:100px;}
+.status-New{background:var(--pink-light);color:var(--pink-dark);}
+.status-In-Progress{background:var(--gold-light);color:var(--gold);}
+.status-Pending-Review{background:#EFF6FC;color:var(--blue);}
+.status-Completed{background:var(--green-light);color:var(--green);}
+
+/* ── TASK MODAL ── */
+.task-modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(28,18,19,0.5);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.task-modal{background:var(--white);border-radius:24px;padding:28px 24px;max-width:500px;width:100%;box-shadow:0 16px 64px rgba(100,40,60,0.2);margin:auto;max-height:90vh;overflow-y:auto;}
+.task-modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--ink);margin-bottom:4px;}
+.task-modal-title em{font-style:italic;color:var(--pink);}
+.task-modal-meta{font-size:12px;color:var(--chrome);margin-bottom:16px;}
+.task-desc{font-size:13px;color:var(--ink-soft);line-height:1.7;background:var(--cream);border-radius:12px;padding:14px 16px;margin-bottom:16px;border:1px solid var(--border);}
+.task-tool-link{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--pink-light);border-radius:12px;text-decoration:none;color:var(--pink-dark);font-size:13px;font-weight:500;margin-bottom:16px;border:1px solid var(--pink-mid);transition:all 0.15s;}
+.task-tool-link:hover{background:var(--pink-mid);}
+.task-notes-history{margin-bottom:14px;}
+.task-notes-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:8px;}
+.task-note-item{background:var(--cream);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--ink-soft);line-height:1.6;margin-bottom:6px;border:1px solid var(--border);white-space:pre-wrap;}
+.task-note-textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;resize:none;margin-bottom:12px;transition:border-color 0.15s;}
+.task-note-textarea:focus{border-color:var(--pink);}
+.task-actions{display:flex;gap:10px;}
+.task-btn{flex:1;padding:12px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.task-btn.note{background:var(--cream);border:1.5px solid var(--border);color:var(--ink-soft);}
+.task-btn.note:hover{border-color:var(--pink);color:var(--pink);}
+.task-btn.complete{background:var(--green);color:#fff;}
+.task-btn.complete:hover{background:var(--green-dark,#2A7A56);}
+.task-btn.review{background:var(--blue);color:#fff;}
+.task-btn.close-btn{background:var(--cream);border:1.5px solid var(--border);color:var(--chrome);}
+
+/* ── ADMIN COMPOSE ── */
+.compose-card{background:var(--white);border-radius:16px;border:1.5px dashed var(--pink-mid);padding:16px;box-shadow:var(--shadow-sm);}
+.compose-title{font-size:12px;font-weight:500;color:var(--pink);margin-bottom:10px;letter-spacing:0.06em;}
+.compose-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;margin-bottom:8px;}
+.compose-input:focus{border-color:var(--pink);}
+.compose-select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;margin-bottom:8px;appearance:none;}
+.compose-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.compose-btn{width:100%;padding:11px;border-radius:10px;border:none;background:var(--pink);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.compose-btn:hover{background:var(--pink-dark);}
+
+.empty-inbox{text-align:center;padding:40px 20px;color:var(--chrome);}
+.empty-icon{font-size:32px;margin-bottom:8px;}
+.empty-msg{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ink);margin-bottom:4px;}
 
 .hub-footer{margin-top:20px;text-align:center;font-size:11px;color:var(--chrome);letter-spacing:0.1em;font-weight:300;}
 .hub-footer em{font-style:italic;color:var(--pink);font-family:'Cormorant Garamond',serif;font-size:13px;}
@@ -121,136 +221,565 @@ body{
 </head>
 <body>
 
-<div class="brand">
-  <div class="brand-mark">Internal Tools</div>
-  <div class="brand-logo">Pretty <em>in Ink</em></div>
-  <div class="brand-sub">The Femmepire · Bowie, MD</div>
-  <div class="femmepire">
-    <div class="femme-dot" style="background:#D4748F;"></div>
-    <div class="femme-dot" style="background:#8B6BB5;"></div>
-    <div class="femme-dot" style="background:#D4853A;"></div>
-    <div class="femme-dot" style="background:#5A9E6F;"></div>
-    <div class="femme-dot" style="background:#4A90C4;"></div>
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-box">
+    <div class="pin-logo">Pretty <em>in Ink</em></div>
+    <div class="pin-sub">The Femmepire · Enter your PIN</div>
+    <div class="pin-label">PIN</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <div></div>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key delete" onclick="pinDelete()">⌫</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
   </div>
 </div>
 
-<div class="divider"></div>
+<!-- MAIN DASHBOARD -->
+<div id="dashboard" style="display:none;">
 
-<div class="hub-wrap">
+  <div class="header">
+    <div class="brand-mark">Internal Tools</div>
+    <div class="brand-logo">Pretty <em>in Ink</em></div>
+    <div class="brand-sub">The Femmepire · Bowie, MD</div>
+    <div class="artist-greeting" id="artist-greeting"></div>
+  </div>
+  <div class="divider"></div>
 
-  <!-- 1. UPCOMING APPOINTMENTS -->
-  <div class="hub-section appts">
-    <div class="hub-section-header">
-      <div class="hub-eyebrow">📅 Scheduling</div>
-      <div class="hub-title">Upcoming <em>Appointments</em></div>
-      <div class="hub-desc">Next 5 days per artist — sketch reminders, waiver checks</div>
-    </div>
-    <div class="hub-body">
-      <a href="pii-appointments.html" class="hub-card appts-card">
-        <span class="card-icon">🗓</span>
-        <div class="card-label">Appointments <em>Dashboard</em></div>
-        <div class="card-desc">Color-coded by artist · 72hr sketch alerts · waiver status per client</div>
-        <div class="card-arrow">Open →</div>
-      </a>
-    </div>
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-home-btn" onclick="switchTab('home')">🏠 Home</button>
+    <button class="tab-btn" id="tab-inbox-btn" onclick="switchTab('inbox')">
+      📬 Inbox
+      <span class="inbox-badge" id="inbox-badge" style="display:none;">0</span>
+    </button>
   </div>
 
-  <!-- 2. ARTIST LEDGER -->
-  <div class="hub-section ledger">
-    <div class="hub-section-header">
-      <div class="hub-eyebrow">📒 Payroll</div>
-      <div class="hub-title">Artist <em>Ledger</em></div>
-      <div class="hub-desc">Bi-weekly pay periods · auto-filled from Appointy + Square</div>
-    </div>
-    <div class="hub-body">
-      <a href="pii-ledger.html" class="hub-card ledger-card">
-        <span class="card-icon">💰</span>
-        <div class="card-label">Pay Period <em>Ledger</em></div>
-        <div class="card-desc">Artist payout · tips · incentive bonus · projection vs running total</div>
-        <div class="card-arrow">Open →</div>
-      </a>
-    </div>
-  </div>
+  <!-- HOME TAB -->
+  <div class="tab-panel active" id="tab-home">
 
-  <!-- 3. TATTOO LAYAWAY -->
-  <div class="hub-section payments">
-    <div class="hub-section-header">
-      <div class="hub-eyebrow">💗 Payments</div>
-      <div class="hub-title">Tattoo <em>Layaway</em></div>
-      <div class="hub-desc">Payment plans and Afterpay invoices</div>
+    <!-- APPOINTMENTS -->
+    <div class="hub-section appts" id="section-appts">
+      <div class="hub-section-header">
+        <div class="hub-eyebrow">📅 Scheduling</div>
+        <div class="hub-title">Upcoming <em>Appointments</em></div>
+        <div class="hub-desc">Next 5 days · sketch reminders · waiver checks</div>
+      </div>
+      <div class="hub-body">
+        <a class="hub-card appts-card" href="/pii-appointments">
+          <span class="card-icon">🗓</span>
+          <div class="card-label">Appointments <em>Dashboard</em></div>
+          <div class="card-desc">Color-coded by artist · 72hr sketch alerts · waiver status per client</div>
+          <div class="card-arrow">Open →</div>
+        </a>
+      </div>
     </div>
-    <div class="hub-body">
-      <div class="hub-dual">
 
-        <!-- Payment Plans expandable -->
-        <div class="hub-expand-card layaway">
-          <div class="hub-expand-trigger" onclick="toggleExpand('layaway')">
-            <div class="hub-expand-trigger-left">
-              <span class="hub-expand-icon">💗</span>
-              <div>
-                <div class="hub-expand-name">Payment <em>Plans</em></div>
-                <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Layaway tracking</div>
+    <!-- LEDGER — hidden for Tressa & Rosa (they use their own ledger directly) -->
+    <div class="hub-section ledger" id="section-ledger">
+      <div class="hub-section-header">
+        <div class="hub-eyebrow">📒 Payroll</div>
+        <div class="hub-title">Artist <em>Ledger</em></div>
+        <div class="hub-desc">Bi-weekly pay periods · auto-filled from Appointy + Square</div>
+      </div>
+      <div class="hub-body">
+        <a class="hub-card ledger-card" href="/pii-ledger">
+          <span class="card-icon">💰</span>
+          <div class="card-label">Pay Period <em>Ledger</em></div>
+          <div class="card-desc">Artist payout · tips · incentive bonus · projection vs running total</div>
+          <div class="card-arrow">Open →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="hub-section payments" id="section-payments">
+      <div class="hub-section-header">
+        <div class="hub-eyebrow">💗 Payments</div>
+        <div class="hub-title">Tattoo <em>Layaway</em></div>
+        <div class="hub-desc">Payment plans and Afterpay invoices</div>
+      </div>
+      <div class="hub-body">
+        <div class="hub-dual">
+          <div class="hub-expand-card layaway">
+            <div class="hub-expand-trigger" onclick="toggleExpand('layaway')">
+              <div class="hub-expand-trigger-left">
+                <span class="hub-expand-icon">💗</span>
+                <div>
+                  <div class="hub-expand-name">Payment <em>Plans</em></div>
+                  <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Layaway tracking</div>
+                </div>
               </div>
+              <span class="hub-expand-chevron" id="chevron-layaway">▼</span>
             </div>
-            <span class="hub-expand-chevron" id="chevron-layaway">▼</span>
+            <div class="hub-expand-menu" id="menu-layaway">
+              <a class="hub-expand-item" href="/pii-payment-calculator">
+                <div class="hub-expand-item-dot" style="background:var(--pink);"></div>
+                <span>New Payment Plan</span>
+              </a>
+              <a class="hub-expand-item" href="/pii-dashboard">
+                <div class="hub-expand-item-dot" style="background:var(--pink-mid);"></div>
+                <span>Open Plans</span>
+              </a>
+            </div>
           </div>
-          <div class="hub-expand-menu" id="menu-layaway">
-            <a href="pii-payment-calculator.html" class="hub-expand-item">
-              <div class="hub-expand-item-dot" style="background:var(--pink);"></div>
-              <span>New Payment Plan</span>
-            </a>
-            <a href="pii-dashboard.html" class="hub-expand-item">
-              <div class="hub-expand-item-dot" style="background:var(--pink-mid);"></div>
-              <span>Open Plans</span>
-            </a>
+          <div class="hub-expand-card afterpay">
+            <div class="hub-expand-trigger" onclick="toggleExpand('afterpay')">
+              <div class="hub-expand-trigger-left">
+                <span class="hub-expand-icon">🟢</span>
+                <div>
+                  <div class="hub-expand-name">Afterpay <em>Plans</em></div>
+                  <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Invoice tracking</div>
+                </div>
+              </div>
+              <span class="hub-expand-chevron" id="chevron-afterpay">▼</span>
+            </div>
+            <div class="hub-expand-menu" id="menu-afterpay">
+              <a class="hub-expand-item" href="/pii-afterpay-calculator">
+                <div class="hub-expand-item-dot" style="background:var(--green);"></div>
+                <span>New Afterpay Plan</span>
+              </a>
+              <a class="hub-expand-item" href="/pii-afterpay-dashboard">
+                <div class="hub-expand-item-dot" style="background:var(--green);"></div>
+                <span>Open Afterpay Plans</span>
+              </a>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Afterpay expandable -->
-        <div class="hub-expand-card afterpay">
-          <div class="hub-expand-trigger" onclick="toggleExpand('afterpay')">
-            <div class="hub-expand-trigger-left">
-              <span class="hub-expand-icon">🟢</span>
-              <div>
-                <div class="hub-expand-name">Afterpay <em>Plans</em></div>
-                <div style="font-size:10px;color:var(--chrome);margin-top:1px;">Invoice tracking</div>
-              </div>
-            </div>
-            <span class="hub-expand-chevron" id="chevron-afterpay">▼</span>
-          </div>
-          <div class="hub-expand-menu" id="menu-afterpay">
-            <a href="pii-afterpay-calculator.html" class="hub-expand-item">
-              <div class="hub-expand-item-dot" style="background:var(--green-dark);"></div>
-              <span>New Afterpay Plan</span>
-            </a>
-            <a href="pii-afterpay-dashboard.html" class="hub-expand-item">
-              <div class="hub-expand-item-dot" style="background:var(--green);"></div>
-              <span>Open Afterpay Plans</span>
-            </a>
-          </div>
-        </div>
+    <!-- SOPs -->
+    <div class="hub-section sops">
+      <div class="hub-section-header">
+        <div class="hub-eyebrow">📋 Knowledge Base</div>
+        <div class="hub-title">Femmepire <em>SOPs</em></div>
+        <div class="hub-desc">How-tos, quick references, and team guides</div>
+      </div>
+      <div class="hub-body">
+        <a class="hub-card sop-card" href="/pii-sop-hub">
+          <span class="card-icon">📖</span>
+          <div class="card-label">SOP <em>Hub</em></div>
+          <div class="card-desc">Searchable SOPs · checkout guide · payment plans · social · ledger</div>
+          <div class="card-arrow">Open →</div>
+        </a>
+      </div>
+    </div>
 
+  </div><!-- /tab-home -->
+
+  <!-- INBOX TAB -->
+  <div class="tab-panel" id="tab-inbox">
+    <div class="inbox-section" id="inbox-content">
+      <div class="empty-inbox">
+        <div class="empty-icon">⟳</div>
+        <div class="empty-msg">Loading inbox...</div>
       </div>
     </div>
   </div>
 
+  <div class="hub-footer"><em>Less Grunge, More Glitter</em> · For team use only</div>
+
+</div><!-- /dashboard -->
+
+<!-- TASK MODAL -->
+<div class="task-modal-overlay" id="task-modal-overlay" style="display:none;" onclick="closeTaskModal(event)">
+  <div class="task-modal" id="task-modal-content"></div>
 </div>
 
-<div class="hub-footer"><em>Less Grunge, More Glitter</em> · For team use only</div>
-
 <script>
+const SHEET_URL  = "https://script.google.com/macros/s/AKfycby5Y-U6bAjY5JizIZ63i_oQFqtTDBcTmvmzL0Vqfb1WdBHghNW1dHrVcPEjkrLVp5H8/exec";
+const ADMIN_ARTISTS = ['Jackie','Nicole','Mellissa'];
+
+const PINS = { '1111':'Jackie','2222':'Nicole','3333':'Tressa','4444':'Rosa','5555':'Mellissa' };
+let currentArtist = '';
+let pinBuffer     = '';
+let _updates      = [];
+let _tasks        = [];
+
+// ── PIN ───────────────────────────────────────────────────
+function pinKey(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(verifyPin, 150);
+}
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+}
+function updatePinDots() {
+  for (let i=0;i<4;i++) document.getElementById('dot-'+i).classList.toggle('filled', i < pinBuffer.length);
+}
+function verifyPin() {
+  const artist = PINS[pinBuffer];
+  if (artist) {
+    currentArtist = artist;
+    document.getElementById('pin-overlay').style.display = 'none';
+    document.getElementById('dashboard').style.display   = 'block';
+    initDashboard();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+    pinBuffer = '';
+    updatePinDots();
+    const box = document.querySelector('.pin-box');
+    let n = 0;
+    const shake = setInterval(() => {
+      box.style.transform = n%2===0 ? 'translateX(-8px)' : 'translateX(8px)';
+      if (++n >= 6) { clearInterval(shake); box.style.transform=''; }
+    }, 50);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pin-overlay').style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') pinKey(e.key);
+  if (e.key === 'Backspace') pinDelete();
+});
+
+// ── INIT ──────────────────────────────────────────────────
+function initDashboard() {
+  // Greeting
+  const greetings = { Jackie:'Welcome back, Jackie 💗', Nicole:'Hey Nicole 💜', Tressa:'Hey Tressa 🧡', Rosa:'Hey Rosa 💚', Mellissa:'Hey Mellissa 💙' };
+  document.getElementById('artist-greeting').innerHTML = `<span>${greetings[currentArtist] || currentArtist}</span>`;
+
+  // Hide sections non-admins shouldn't see
+  // All artists can see all sections for now — customize here if needed
+  // e.g. if (currentArtist === 'Mellissa') document.getElementById('section-payments').style.display='none';
+
+  // Load inbox data
+  loadInbox();
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab + '-btn').classList.add('active');
+}
+
+// ── JSONP ─────────────────────────────────────────────────
+let _cbId = 0;
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb     = 'cb_' + (++_cbId);
+    const script = document.createElement('script');
+    script.src   = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
+    window[cb]   = data => { cleanup(); clearTimeout(timer); resolve(data); };
+    script.onerror = () => { cleanup(); clearTimeout(timer); reject(new Error('error')); };
+    function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+    document.head.appendChild(script);
+  });
+}
+
+// ── LOAD INBOX ────────────────────────────────────────────
+async function loadInbox() {
+  try {
+    const [updatesRes, tasksRes] = await Promise.all([
+      jsonp(`${SHEET_URL}?action=getUpdates`),
+      jsonp(`${SHEET_URL}?action=getTasks&artist=${encodeURIComponent(currentArtist)}`),
+    ]);
+
+    _updates = updatesRes.updates || [];
+    _tasks   = tasksRes.tasks    || [];
+
+    renderInbox();
+    updateBadge();
+  } catch(e) {
+    document.getElementById('inbox-content').innerHTML = `
+      <div class="empty-inbox">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-msg">Couldn't load inbox</div>
+        <div style="font-size:12px;color:var(--chrome);">Check connection and refresh</div>
+      </div>`;
+  }
+}
+
+function updateBadge() {
+  const unreadUpdates = _updates.filter(u => !u.readBy.includes(currentArtist)).length;
+  const newTasks      = _tasks.filter(t => t.status === 'New' || t.status === 'In Progress').length;
+  const total         = unreadUpdates + newTasks;
+  const badge         = document.getElementById('inbox-badge');
+  badge.textContent   = total;
+  badge.style.display = total > 0 ? 'flex' : 'none';
+}
+
+// ── RENDER INBOX ──────────────────────────────────────────
+function renderInbox() {
+  const isAdmin = ADMIN_ARTISTS.includes(currentArtist);
+  const el      = document.getElementById('inbox-content');
+  let html      = '';
+
+  // ── ADMIN COMPOSE SECTION ──
+  if (isAdmin) {
+    html += `
+      <div class="inbox-section-label">📣 Post Update or Assign Task</div>
+      <div class="compose-card">
+        <div class="compose-title">NEW ANNOUNCEMENT</div>
+        <input class="compose-input" id="upd-title" placeholder="Title (e.g. Booking notifications updated)">
+        <textarea class="compose-input" id="upd-body" rows="3" placeholder="Message body..." style="resize:none;"></textarea>
+        <button class="compose-btn" onclick="postUpdate()">Post to All Artists</button>
+      </div>
+      <div class="compose-card" style="margin-top:-4px;">
+        <div class="compose-title">NEW TASK</div>
+        <input class="compose-input" id="task-title" placeholder="Task title">
+        <textarea class="compose-input" id="task-desc" rows="3" placeholder="Describe what needs to be done..." style="resize:none;"></textarea>
+        <div class="compose-row">
+          <select class="compose-select" id="task-assignee">
+            <option value="">Assign to...</option>
+            <option>Jackie</option><option>Nicole</option><option>Tressa</option>
+            <option>Rosa</option><option>Mellissa</option>
+          </select>
+          <select class="compose-select" id="task-urgency">
+            <option value="High">🔴 High</option>
+            <option value="Medium" selected>🟡 Medium</option>
+            <option value="Low">🟢 Low</option>
+          </select>
+        </div>
+        <input class="compose-input" id="task-tool" placeholder="Tool link (optional)">
+        <button class="compose-btn" onclick="submitNewTask()">Assign Task</button>
+      </div>`;
+  }
+
+  // ── MY TASKS ──
+  const myTasks = _tasks.filter(t => t.assignedTo === currentArtist || isAdmin);
+  if (myTasks.length > 0) {
+    html += `<div class="inbox-section-label">✅ ${isAdmin ? 'All Tasks' : 'My Tasks'}</div>`;
+    myTasks.forEach(task => {
+      const statusClass = 'status-' + task.status.replace(' ', '-');
+      const cardClass   = task.status === 'New' ? 'new' : task.status === 'In Progress' ? 'in-progress' : task.status === 'Pending Review' ? 'pending' : 'completed';
+      html += `
+        <div class="task-card ${cardClass}" onclick="openTaskModal('${task.id}')">
+          <div class="task-header">
+            <div class="task-left">
+              <div class="task-title">${escHtml(task.title)}</div>
+              <div class="task-assignee">${isAdmin ? `Assigned to ${task.assignedTo} · by ${task.assignedBy}` : `Assigned by ${task.assignedBy}`}</div>
+            </div>
+            <div class="task-pills">
+              <span class="urgency-pill urgency-${task.urgency}">${task.urgency}</span>
+              <span class="status-pill ${statusClass}">${task.status}</span>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  // ── UPDATES / ANNOUNCEMENTS ──
+  if (_updates.length > 0) {
+    html += `<div class="inbox-section-label">📣 Announcements</div>`;
+    _updates.slice().reverse().forEach((update, idx) => {
+      const isUnread = !update.readBy.includes(currentArtist);
+      const realIdx  = _updates.length - 1 - idx;
+      html += `
+        <div class="update-card ${isUnread ? 'unread' : ''}" id="update-card-${update.id}">
+          <div class="update-header" onclick="toggleUpdate('${update.id}')">
+            <div class="update-title-wrap">
+              ${isUnread ? '<div class="unread-dot"></div>' : ''}
+              <div>
+                <div class="update-title">${escHtml(update.title)}</div>
+                <div class="update-meta">Posted by ${update.postedBy} · ${fmtDate(update.postedAt)}</div>
+              </div>
+            </div>
+            <span class="update-chevron" id="update-chevron-${update.id}">▼</span>
+          </div>
+          <div class="update-body" id="update-body-${update.id}">
+            <div class="update-body-inner">
+              ${escHtml(update.body)}
+              ${isUnread ? `<br><button class="mark-read-btn" onclick="markRead('${update.id}', event)">✓ Mark as read</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  if (!myTasks.length && !_updates.length) {
+    html = `<div class="empty-inbox"><div class="empty-icon">✨</div><div class="empty-msg">All caught up!</div><div style="font-size:12px;color:var(--chrome);">No new tasks or announcements</div></div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ── TOGGLE UPDATE ─────────────────────────────────────────
+function toggleUpdate(id) {
+  const body    = document.getElementById('update-body-' + id);
+  const chevron = document.getElementById('update-chevron-' + id);
+  const isOpen  = body.classList.contains('open');
+  document.querySelectorAll('.update-body.open').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.update-chevron.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) { body.classList.add('open'); chevron.classList.add('open'); }
+}
+
+// ── MARK READ ─────────────────────────────────────────────
+async function markRead(updateId, e) {
+  e.stopPropagation();
+  try {
+    await jsonp(`${SHEET_URL}?action=markUpdateRead&updateId=${encodeURIComponent(updateId)}&artist=${encodeURIComponent(currentArtist)}`);
+    const u = _updates.find(u => u.id === updateId);
+    if (u && !u.readBy.includes(currentArtist)) u.readBy.push(currentArtist);
+    renderInbox();
+    updateBadge();
+  } catch(e) {}
+}
+
+// ── OPEN TASK MODAL ───────────────────────────────────────
+function openTaskModal(taskId) {
+  const task    = _tasks.find(t => t.id === taskId);
+  if (!task) return;
+  const isAdmin = ADMIN_ARTISTS.includes(currentArtist);
+  const isOwner = task.assignedTo === currentArtist;
+
+  const notesHtml = task.notes ? task.notes.split('\n\n').map(n =>
+    `<div class="task-note-item">${escHtml(n)}</div>`
+  ).join('') : '';
+
+  const statusClass = 'status-' + task.status.replace(' ', '-');
+
+  document.getElementById('task-modal-content').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div class="task-modal-title">${escHtml(task.title)}</div>
+        <div class="task-modal-meta">
+          Assigned to <strong>${task.assignedTo}</strong> by ${task.assignedBy} ·
+          <span class="urgency-pill urgency-${task.urgency}" style="display:inline-block;">${task.urgency}</span>
+          <span class="status-pill ${statusClass}" style="display:inline-block;margin-left:4px;">${task.status}</span>
+        </div>
+      </div>
+      <button onclick="closeTaskModal()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:var(--cream);font-size:14px;color:var(--chrome);cursor:pointer;flex-shrink:0;">✕</button>
+    </div>
+
+    <div class="task-desc">${escHtml(task.description)}</div>
+
+    ${task.toolLink ? `<a class="task-tool-link" href="${task.toolLink}" target="_blank">🔗 Open Tool → ${task.toolLink.replace('https://','')}</a>` : ''}
+
+    ${notesHtml ? `<div class="task-notes-history"><div class="task-notes-label">Notes & Updates</div>${notesHtml}</div>` : ''}
+
+    ${task.status !== 'Completed' ? `
+      <div class="task-notes-label">Add a Note or Question</div>
+      <textarea class="task-note-textarea" id="task-note-input" rows="3" placeholder="Ask a question, add an update, or note a complication..."></textarea>
+      <div class="task-actions">
+        ${isOwner || isAdmin ? `
+          <button class="task-btn note" onclick="submitTaskNote('${taskId}')">💬 Submit Note</button>
+          ${task.status !== 'Pending Review' ? `<button class="task-btn complete" onclick="completeTask('${taskId}')">✓ Mark Complete</button>` : ''}
+        ` : ''}
+        ${isAdmin && task.status === 'Pending Review' ? `<button class="task-btn review" onclick="approveTask('${taskId}')">✓ Approve & Close</button>` : ''}
+      </div>
+    ` : `<div style="text-align:center;padding:16px;background:var(--green-light);border-radius:12px;color:var(--green);font-weight:500;font-size:13px;">✅ Task Completed</div>`}
+  `;
+
+  document.getElementById('task-modal-overlay').style.display = 'flex';
+}
+
+function closeTaskModal(e) {
+  if (!e || e.target === document.getElementById('task-modal-overlay')) {
+    document.getElementById('task-modal-overlay').style.display = 'none';
+  }
+}
+
+// ── TASK ACTIONS ──────────────────────────────────────────
+async function submitTaskNote(taskId) {
+  const note = document.getElementById('task-note-input')?.value?.trim();
+  if (!note) return;
+  try {
+    await jsonp(`${SHEET_URL}?action=addTaskNote&taskId=${encodeURIComponent(taskId)}&artist=${encodeURIComponent(currentArtist)}&note=${encodeURIComponent(note)}&status=In Progress`);
+    const task = _tasks.find(t => t.id === taskId);
+    if (task) {
+      const ts = new Date().toLocaleString('en-US',{timeZone:'America/New_York'});
+      task.notes  = (task.notes ? task.notes + '\n\n' : '') + `[${currentArtist} · ${ts}]\n${note}`;
+      task.status = 'In Progress';
+    }
+    closeTaskModal();
+    renderInbox();
+    updateBadge();
+  } catch(e) { alert('Failed to save note — try again'); }
+}
+
+async function completeTask(taskId) {
+  try {
+    await jsonp(`${SHEET_URL}?action=updateTask&taskId=${encodeURIComponent(taskId)}&status=Pending Review`);
+    const task = _tasks.find(t => t.id === taskId);
+    if (task) task.status = 'Pending Review';
+    closeTaskModal();
+    renderInbox();
+    updateBadge();
+  } catch(e) { alert('Failed to update task — try again'); }
+}
+
+async function approveTask(taskId) {
+  try {
+    await jsonp(`${SHEET_URL}?action=updateTask&taskId=${encodeURIComponent(taskId)}&status=Completed`);
+    const task = _tasks.find(t => t.id === taskId);
+    if (task) task.status = 'Completed';
+    closeTaskModal();
+    renderInbox();
+    updateBadge();
+  } catch(e) { alert('Failed to approve task — try again'); }
+}
+
+// ── ADMIN: POST UPDATE ────────────────────────────────────
+async function postUpdate() {
+  const title = document.getElementById('upd-title')?.value?.trim();
+  const body  = document.getElementById('upd-body')?.value?.trim();
+  if (!title || !body) { alert('Please fill in both title and message'); return; }
+  try {
+    const res = await jsonp(`${SHEET_URL}?action=postUpdate&title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&postedBy=${encodeURIComponent(currentArtist)}`);
+    document.getElementById('upd-title').value = '';
+    document.getElementById('upd-body').value  = '';
+    await loadInbox();
+  } catch(e) { alert('Failed to post update — try again'); }
+}
+
+// ── ADMIN: ASSIGN TASK ────────────────────────────────────
+async function submitNewTask() {
+  const title    = document.getElementById('task-title')?.value?.trim();
+  const desc     = document.getElementById('task-desc')?.value?.trim();
+  const assignee = document.getElementById('task-assignee')?.value;
+  const urgency  = document.getElementById('task-urgency')?.value;
+  const toolLink = document.getElementById('task-tool')?.value?.trim();
+  if (!title || !desc || !assignee) { alert('Please fill in title, description, and assignee'); return; }
+  try {
+    await jsonp(`${SHEET_URL}?action=addTask&title=${encodeURIComponent(title)}&description=${encodeURIComponent(desc)}&assignedTo=${encodeURIComponent(assignee)}&assignedBy=${encodeURIComponent(currentArtist)}&urgency=${encodeURIComponent(urgency)}&toolLink=${encodeURIComponent(toolLink||'')}`);
+    document.getElementById('task-title').value    = '';
+    document.getElementById('task-desc').value     = '';
+    document.getElementById('task-assignee').value = '';
+    document.getElementById('task-tool').value     = '';
+    await loadInbox();
+  } catch(e) { alert('Failed to assign task — try again'); }
+}
+
+// ── EXPAND/COLLAPSE PAYMENT DROPDOWNS ────────────────────
 function toggleExpand(id) {
   const menu    = document.getElementById('menu-' + id);
   const chevron = document.getElementById('chevron-' + id);
   const isOpen  = menu.classList.contains('open');
-  // Close all
   document.querySelectorAll('.hub-expand-menu').forEach(m => m.classList.remove('open'));
   document.querySelectorAll('.hub-expand-chevron').forEach(c => c.classList.remove('open'));
-  // Open this one if it was closed
-  if (!isOpen) {
-    menu.classList.add('open');
-    chevron.classList.add('open');
-  }
+  if (!isOpen) { menu.classList.add('open'); chevron.classList.add('open'); }
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(iso) {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  catch(e) { return iso; }
 }
 </script>
 </body>

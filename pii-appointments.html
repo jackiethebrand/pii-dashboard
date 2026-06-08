@@ -374,6 +374,34 @@ body {
   .appt-grid { grid-template-columns: 1fr; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── WAIVER MODAL ── */
+.waiver-badge {
+  display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;
+  font-size:10px;font-weight:600;cursor:pointer;transition:all 0.15s;border:none;
+  font-family:'DM Sans',sans-serif;letter-spacing:0.06em;
+}
+.waiver-badge:hover{transform:scale(1.05);}
+.waiver-ok    {background:#E8F5EF;color:#3A7850;border:1px solid #BCE0C8;}
+.waiver-warn  {background:#FDF4ED;color:#D4853A;border:1px solid #F5D4B0;}
+.waiver-miss  {background:#FDF0F0;color:#C97070;border:1px solid #F0C8C8;}
+.waiver-load  {background:var(--cream);color:var(--chrome);border:1px solid var(--border);}
+
+.waiver-overlay{position:fixed;inset:0;z-index:9999;background:rgba(28,18,19,0.55);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.waiver-modal{background:var(--white);border-radius:24px;padding:28px 24px;max-width:480px;width:100%;box-shadow:0 20px 80px rgba(100,40,60,0.25);margin:auto;max-height:90vh;overflow-y:auto;}
+.waiver-modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.waiver-modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--ink);}
+.waiver-modal-title em{font-style:italic;color:var(--jackie);}
+.waiver-modal-close{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:var(--cream);font-size:14px;color:var(--chrome);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.waiver-field{margin-bottom:12px;}
+.waiver-field-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--chrome);font-weight:500;margin-bottom:4px;}
+.waiver-field-value{font-size:14px;color:var(--ink);line-height:1.5;}
+.waiver-flag{display:flex;align-items:flex-start;gap:8px;background:#FDF4ED;border:1px solid #F5D4B0;border-left:4px solid #D4853A;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.waiver-flag.red{background:#FDF0F0;border-color:#F0C8C8;border-left-color:#C97070;}
+.waiver-ok-row{display:flex;align-items:center;gap:8px;background:#E8F5EF;border:1px solid #BCE0C8;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:#3A7850;font-weight:500;}
+.waiver-divider{height:1px;background:var(--border);margin:16px 0;}
+.waiver-link{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--cream);border-radius:10px;text-decoration:none;color:var(--ink-soft);font-size:12px;font-weight:500;border:1px solid var(--border);transition:all 0.15s;margin-top:12px;}
+.waiver-link:hover{border-color:var(--jackie-mid);color:var(--jackie);}
 </style>
 </head>
 <body>
@@ -626,7 +654,7 @@ function buildApptCard(a, theme, idx) {
         <div class="appt-client">${escHtml(a.clientName)}</div>
         <div class="appt-service">${escHtml(service)}</div>
         <div id="waiver-${a.clientName.replace(/\s+/g,'-').replace(/[^a-z0-9-]/gi,'')}-${dateStr.replace(/\s/g,'')}" style="margin-bottom:6px;">
-          <span style="font-size:10px;color:var(--chrome);">⟳ checking waiver...</span>
+          <button class="waiver-badge waiver-load" onclick="checkWaiverFor(this,'${escHtml(a.clientName).replace(/'/g,"\\'")}','${escHtml(a.email||'').replace(/'/g,"\\'")}')">⟳ Check Waiver</button>
         </div>
         <div class="appt-meta">
           <div class="appt-date-block">
@@ -717,6 +745,135 @@ function jsonp(url) {
     function cleanup() { if(script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
     document.head.appendChild(script);
   });
+}
+
+
+// ── WAIVER CHECK ──────────────────────────────────────
+const _waiverCache = {};
+
+async function checkWaiverFor(btn, clientName, email) {
+  const cacheKey = (email || clientName).toLowerCase();
+
+  // If already cached, show modal directly
+  if (_waiverCache[cacheKey]) {
+    showWaiverModal(_waiverCache[cacheKey], clientName);
+    return;
+  }
+
+  btn.textContent = '⟳ Loading...';
+  btn.disabled = true;
+
+  try {
+    const result = await jsonp(SHEET_URL + '?action=checkWaiver&name=' + encodeURIComponent(clientName) + '&email=' + encodeURIComponent(email || ''));
+    _waiverCache[cacheKey] = result;
+
+    if (result.found) {
+      const hasFlags = result.flags && result.flags.length > 0;
+      btn.className  = hasFlags ? 'waiver-badge waiver-warn' : 'waiver-badge waiver-ok';
+      btn.textContent = hasFlags ? '⚠️ Waiver — Flags' : '✅ Waiver OK';
+      btn.onclick    = () => showWaiverModal(result, clientName);
+    } else {
+      btn.className  = 'waiver-badge waiver-miss';
+      btn.textContent = '❌ No Waiver';
+      btn.disabled   = false;
+    }
+  } catch(e) {
+    btn.className  = 'waiver-badge waiver-load';
+    btn.textContent = '⚠️ Check failed';
+    btn.disabled   = false;
+  }
+}
+
+function showWaiverModal(data, clientName) {
+  const overlay = document.createElement('div');
+  overlay.className = 'waiver-overlay';
+
+  const hasFlags = data.flags && data.flags.length > 0;
+  const flagsHtml = (data.flags || []).map(f => {
+    const isRed = f.includes('UNDER 18') || f.includes('NO ID');
+    return `<div class="waiver-flag ${isRed ? 'red' : ''}">${escHtml(f)}</div>`;
+  }).join('');
+
+  const okItems = [];
+  if (data.over18)      okItems.push('✓ Over 18 — Age ' + data.age);
+  if (data.idUploaded)  okItems.push('✓ ID on file' + (data.idNumber ? ' · ' + data.idNumber : ''));
+  if (data.photoConsent) okItems.push('✓ Photo consent granted');
+  const okHtml = okItems.map(o => `<div class="waiver-ok-row">${escHtml(o)}</div>`).join('');
+
+  overlay.innerHTML = `
+    <div class="waiver-modal">
+      <div class="waiver-modal-header">
+        <div>
+          <div class="waiver-modal-title">${escHtml(clientName)}</div>
+          <div style="font-size:12px;color:var(--chrome);margin-top:2px;">${data.waiverType || ''} Waiver · ${data.fileName ? data.fileName.split(' - ')[2]?.split('T')[0] || '' : ''}</div>
+        </div>
+        <button class="waiver-modal-close" onclick="this.closest('.waiver-overlay').remove()">✕</button>
+      </div>
+
+      ${hasFlags ? `<div style="margin-bottom:14px;">${flagsHtml}</div>` : ''}
+      ${okHtml}
+
+      <div class="waiver-divider"></div>
+
+      ${data.artistOnWaiver ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Artist on Waiver</div>
+          <div class="waiver-field-value">${escHtml(data.artistOnWaiver)}</div>
+        </div>` : ''}
+
+      ${data.placement ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Placement</div>
+          <div class="waiver-field-value">${escHtml(data.placement)}</div>
+        </div>` : ''}
+
+      ${data.instagram ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Instagram</div>
+          <div class="waiver-field-value" style="color:var(--jackie);">${escHtml(data.instagram)}</div>
+        </div>` : ''}
+
+      ${data.allergies ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Allergies</div>
+          <div class="waiver-field-value">${escHtml(data.allergies)}</div>
+        </div>` : ''}
+
+      ${data.medications ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Medications</div>
+          <div class="waiver-field-value">${escHtml(data.medications)}</div>
+        </div>` : ''}
+
+      ${data.medicalConditions ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Medical Conditions</div>
+          <div class="waiver-field-value">${escHtml(data.medicalConditions)}</div>
+        </div>` : ''}
+
+      ${data.conditionsChecked ? `
+        <div class="waiver-field">
+          <div class="waiver-field-label">Conditions Checked</div>
+          <div class="waiver-field-value">${escHtml(data.conditionsChecked)}</div>
+        </div>` : ''}
+
+      ${data.fileUrl ? `<a class="waiver-link" href="${data.fileUrl}" target="_blank">📄 View Original Waiver PDF →</a>` : ''}
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function markSketchSent(cb, key) {
+  if (cb.checked) sessionStorage.setItem(key, '1');
+  else sessionStorage.removeItem(key);
+  const badge = cb.closest('[style*="FFF3CD"]');
+  if (badge && cb.checked) {
+    badge.style.background = '#E8F5EF';
+    badge.style.borderColor = '#BCE0C8';
+    badge.style.color = '#3A7850';
+    badge.innerHTML = '✓ Sketch sent';
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────

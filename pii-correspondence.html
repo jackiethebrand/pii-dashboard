@@ -1,254 +1,499 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pretty in Ink — Correspondence Log</title>
-  <style>
-    /* ── Base ── */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --pink:      #d4547a;
-      --pink-lt:   #f5dce5;
-      --ink:       #1a1a2e;
-      --gray:      #6b7280;
-      --gray-lt:   #f3f4f6;
-      --border:    #e5e7eb;
-      --white:     #ffffff;
-      --inbound:   #d1fae5;
-      --outbound:  #dbeafe;
-      --open:      #fef3c7;
-      --sent:      #dbeafe;
-      --responded: #d1fae5;
-      --radius:    8px;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--gray-lt);
-      color: var(--ink);
-      min-height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Correspondence — Pretty in Ink</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Header ── */
-    .header {
-      background: var(--ink);
-      color: var(--white);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
-    .header nav a {
-      color: rgba(255,255,255,0.65);
-      text-decoration: none;
-      font-size: 13px;
-      margin-left: 20px;
-    }
-    .header nav a:hover { color: var(--white); }
+:root {
+  --cream:     #FDF7F5;
+  --white:     #FFFFFF;
+  --ink:       #1C1213;
+  --ink-soft:  #5C4449;
+  --chrome:    #B8A8AC;
+  --border:    rgba(180,140,150,0.14);
+  --shadow-sm: 0 2px 12px rgba(100,40,60,0.07);
+  --shadow-md: 0 6px 32px rgba(100,40,60,0.13);
+  --jackie:    #D4748F;
+  --jackie-bg: #FDF0F3;
+  --jackie-mid:#F2C8D4;
+  --jackie-dark:#A84F68;
+}
 
-    /* ── Layout ── */
-    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+html, body {
+  min-height: 100vh;
+  background: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
 
-    /* ── Toolbar ── */
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar input[type="text"] {
-      flex: 1;
-      min-width: 200px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      background: var(--white);
-    }
-    .toolbar input[type="text"]:focus { outline: none; border-color: var(--pink); }
-    .btn {
-      padding: 9px 18px;
-      border-radius: var(--radius);
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary   { background: var(--pink); color: var(--white); }
-    .btn-secondary { background: var(--white); color: var(--ink); border: 1px solid var(--border); }
-    .btn-sm { padding: 6px 12px; font-size: 13px; }
+body {
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(212,116,143,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 5% 90%, rgba(139,107,181,0.07) 0%, transparent 45%),
+    var(--cream);
+  padding-bottom: 80px;
+}
 
-    /* ── Cards ── */
-    .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .card-header:hover { background: var(--gray-lt); }
+/* ── NAV ── */
+.nav {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 16px 16px 0;
+}
 
-    /* direction badge */
-    .badge {
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      flex-shrink: 0;
-    }
-    .badge-inbound  { background: var(--inbound);  color: #065f46; }
-    .badge-outbound { background: var(--outbound); color: #1e40af; }
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--jackie-mid);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: all 0.18s;
+}
+.nav-link:hover        { border-color: var(--jackie); color: var(--jackie); }
+.nav-link.active       { background: var(--jackie); border-color: var(--jackie); color: var(--white); }
 
-    /* channel icon */
-    .channel-icon { font-size: 16px; flex-shrink: 0; }
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding: 32px 24px 24px;
+}
 
-    .card-meta { flex: 1; min-width: 0; }
-    .card-subject { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.header-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--jackie);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .status-open      { background: #f59e0b; }
-    .status-sent      { background: #93c5fd; }
-    .status-responded { background: #34d399; }
-    .status-closed    { background: #d1d5db; }
+.header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(28px, 5vw, 44px);
+  color: var(--ink);
+  line-height: 1;
+}
+.header h1 em { font-style: italic; color: var(--jackie); }
 
-    .card-body {
-      display: none;
-      padding: 14px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .card-body.open { display: block; }
+.header-meta {
+  font-size: 12px;
+  color: var(--chrome);
+  margin-top: 8px;
+  font-weight: 300;
+}
 
-    .body-text {
-      color: #374151;
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: var(--gray-lt);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-    .body-meta { color: var(--gray); font-size: 12px; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
+.header::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jackie-mid), var(--jackie));
+  margin: 16px auto 0;
+  border-radius: 2px;
+}
 
-    /* ── Empty / Loading ── */
-    .empty {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--gray);
-    }
-    .empty .icon { font-size: 40px; margin-bottom: 10px; }
-    .spinner {
-      display: inline-block;
-      width: 22px; height: 22px;
-      border: 3px solid var(--border);
-      border-top-color: var(--pink);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+/* ── TOOLBAR ── */
+.toolbar {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-    /* ── Modal ── */
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white);
-      border-radius: 12px;
-      width: min(480px, 95vw);
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-size: 18px; margin-bottom: 20px; }
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--gray); }
-    .field input, .field select, .field textarea {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-family: inherit;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      outline: none;
-      border-color: var(--pink);
-    }
-    .field textarea { resize: vertical; min-height: 90px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-    .error-msg { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
-    .success-msg { color: #059669; font-size: 13px; margin-top: 8px; display: none; }
+.action-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-    /* ── Filters ── */
-    .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .filter-btn {
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--white);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--jackie-mid);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.refresh-btn:hover { border-color: var(--jackie); color: var(--jackie); }
 
-    /* ── Count ── */
-    .result-count { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
-  </style>
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: var(--jackie);
+  border: 1.5px solid var(--jackie);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.primary-btn:hover { background: var(--jackie-dark); border-color: var(--jackie-dark); }
+
+/* ── SEARCH ── */
+.search-wrap {
+  max-width: 900px;
+  margin: 0 auto 16px;
+  padding: 0 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 11px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.18s;
+}
+.search-input:focus { outline: none; border-color: var(--jackie-mid); }
+
+/* ── FILTERS ── */
+.filter-row {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-btn:hover  { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); font-weight: 600; }
+.filter-btn[data-filter="inbound"].active  { background: #3A7850; border-color: #3A7850; }
+.filter-btn[data-filter="outbound"].active { background: #2A6A9A; border-color: #2A6A9A; }
+.filter-btn[data-filter="open"].active     { background: #A86028; border-color: #A86028; }
+
+/* ── RESULT COUNT ── */
+.result-count {
+  max-width: 900px;
+  margin: 0 auto 10px;
+  padding: 0 20px;
+  font-size: 11px;
+  color: var(--chrome);
+  letter-spacing: 0.06em;
+}
+
+/* ── CORR LIST ── */
+.corr-list {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── CORR CARD ── */
+.corr-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: fadeUp 0.25s ease both;
+}
+.corr-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+.corr-card-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+
+.corr-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  position: relative;
+  padding-left: 22px;
+}
+.corr-card-header:hover { background: rgba(212,116,143,0.03); }
+
+.channel-icon { font-size: 18px; flex-shrink: 0; }
+
+.dir-badge {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+.dir-inbound  { background: #E8F5EF; color: #3A7850; border: 1px solid #BCE0C8; }
+.dir-outbound { background: #EFF6FC; color: #2A6A9A; border: 1px solid #B8D8F0; }
+
+.corr-meta { flex: 1; min-width: 0; }
+.corr-subject {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.corr-sub {
+  font-size: 11px;
+  color: var(--chrome);
+  margin-top: 3px;
+  font-weight: 300;
+}
+
+.status-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pip-open      { background: #D4853A; }
+.pip-sent      { background: #4A90C4; }
+.pip-responded { background: #5A9E6F; }
+.pip-closed    { background: var(--chrome); }
+
+.corr-card-body {
+  display: none;
+  padding: 14px 18px 18px 22px;
+  border-top: 1px solid var(--border);
+}
+.corr-card-body.open { display: block; }
+
+.corr-body-text {
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 12px 14px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  font-weight: 300;
+}
+
+.corr-body-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--chrome);
+}
+.corr-body-meta strong { color: var(--ink-soft); font-weight: 500; }
+
+/* ── STATE BOXES ── */
+.state-box { text-align: center; padding: 60px 20px; color: var(--chrome); }
+.state-box .icon { font-size: 36px; margin-bottom: 12px; }
+.state-box .msg  { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--ink); margin-bottom: 6px; }
+.state-box .sub  { font-size: 12px; font-weight: 300; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(28,18,19,0.55);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: 24px;
+  width: min(480px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 28px 24px;
+  box-shadow: 0 20px 80px rgba(100,40,60,0.25);
+  margin: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 300;
+  color: var(--ink);
+}
+.modal-title em { font-style: italic; color: var(--jackie); }
+
+.modal-close {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--cream);
+  font-size: 14px;
+  color: var(--chrome);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.modal-close:hover { border-color: var(--jackie-mid); color: var(--jackie); }
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--cream);
+  transition: border-color 0.18s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--jackie-mid);
+  background: var(--white);
+}
+.field textarea { resize: vertical; min-height: 70px; }
+.field .hint { font-size: 11px; color: var(--chrome); margin-top: 4px; font-weight: 300; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-btn {
+  padding: 10px 22px;
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: 1.5px solid;
+}
+.modal-btn-secondary { background: var(--white); color: var(--ink-soft); border-color: var(--border); }
+.modal-btn-secondary:hover { border-color: var(--jackie-mid); }
+.modal-btn-primary { background: var(--jackie); color: var(--white); border-color: var(--jackie); }
+.modal-btn-primary:hover { background: var(--jackie-dark); border-color: var(--jackie-dark); }
+.modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.msg-error   { color: #C97070; font-size: 12px; margin-top: 8px; display: none; padding: 8px 12px; background: #FDF0F0; border-radius: 8px; border: 1px solid #F0C8C8; }
+.msg-success { color: #3A7850; font-size: 12px; margin-top: 8px; display: none; padding: 8px 12px; background: #E8F5EF; border-radius: 8px; border: 1px solid #BCE0C8; }
+
+/* ── SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2.5px solid var(--jackie-mid);
+  border-top-color: var(--jackie);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  .toolbar, .search-wrap, .filter-row, .result-count, .corr-list { padding: 0 12px; }
+}
+</style>
 </head>
 <body>
 
-<div class="header">
-  <h1>✉️ Correspondence Log</h1>
-  <nav>
-    <a href="pii-appointments.html">Appointments</a>
-    <a href="pii-duplicate-finder.html">Duplicates</a>
-    <a href="pii-correspondence.html">Correspondence</a>
-  </nav>
+<div class="nav">
+  <a href="index.html" class="nav-link">🏠 Home</a>
+  <a href="pii-appointments.html" class="nav-link">📅 Appointments</a>
+  <a href="pii-correspondence.html" class="nav-link active">✉️ Correspondence</a>
 </div>
 
-<div class="container">
+<div class="header">
+  <div class="header-eyebrow">Pretty in Ink · The Femmepire</div>
+  <h1>Correspondence <em>Log</em></h1>
+  <div class="header-meta" id="header-meta">Loading…</div>
+</div>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <input type="text" id="searchBox" placeholder="Search by client ID, subject, or notes…" oninput="filterCards()">
-    <button class="btn btn-secondary" onclick="loadCorrespondence()">↻ Refresh</button>
-    <button class="btn btn-primary" onclick="openLogModal()">+ Log Interaction</button>
-    <button class="btn btn-primary" onclick="openEmailModal()">✉ Send Email</button>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters">
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="action-group">
+    <span class="filter-label">Filter:</span>
     <button class="filter-btn active" data-filter="all"       onclick="setFilter(this)">All</button>
     <button class="filter-btn"        data-filter="inbound"   onclick="setFilter(this)">Inbound</button>
     <button class="filter-btn"        data-filter="outbound"  onclick="setFilter(this)">Outbound</button>
@@ -258,20 +503,31 @@
     <button class="filter-btn"        data-filter="dm"        onclick="setFilter(this)">DM</button>
     <button class="filter-btn"        data-filter="in-person" onclick="setFilter(this)">In-person</button>
   </div>
-
-  <div class="result-count" id="resultCount"></div>
-
-  <!-- Correspondence list -->
-  <div id="corrList">
-    <div class="empty"><div class="spinner"></div><p style="margin-top:12px">Loading…</p></div>
+  <div class="action-group">
+    <button class="refresh-btn" onclick="loadCorrespondence()">↻ Refresh</button>
+    <button class="primary-btn" onclick="openModal('logModal')">+ Log Interaction</button>
+    <button class="primary-btn" onclick="openModal('emailModal')">✉ Send Email</button>
   </div>
-
 </div>
+
+<!-- Search -->
+<div class="search-wrap">
+  <input class="search-input" type="text" id="searchBox" placeholder="Search by client ID, notes, or channel…" oninput="filterCards()">
+</div>
+
+<div class="result-count" id="resultCount"></div>
+<div class="corr-list" id="corrList">
+  <div class="state-box"><div class="spinner"></div> Loading…</div>
+</div>
+
 
 <!-- Log Interaction Modal -->
 <div class="modal-overlay" id="logModal">
   <div class="modal">
-    <h2>Log Interaction</h2>
+    <div class="modal-header">
+      <div class="modal-title">Log <em>Interaction</em></div>
+      <button class="modal-close" onclick="closeModal('logModal')">✕</button>
+    </div>
 
     <div class="field">
       <label>Client ID</label>
@@ -300,337 +556,36 @@
     </div>
     <div class="field">
       <label>Notes / summary</label>
-      <textarea id="log_summary" placeholder="Brief description of what was discussed…"></textarea>
+      <textarea id="log_summary" placeholder="What was discussed?"></textarea>
     </div>
     <div class="field">
-      <label>Linked Inquiry ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <label>Linked Inquiry ID <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
       <input type="text" id="log_inquiryId" placeholder="INQ_001">
     </div>
     <div class="field">
-      <label>Linked Appointment ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <label>Linked Appointment ID <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
       <input type="text" id="log_apptId" placeholder="APPT_001">
     </div>
 
-    <div class="error-msg"   id="logError"></div>
-    <div class="success-msg" id="logSuccess"></div>
+    <div class="msg-error"   id="logError"></div>
+    <div class="msg-success" id="logSuccess"></div>
 
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('logModal')">Cancel</button>
-      <button class="btn btn-primary"   onclick="submitLog()" id="logSubmitBtn">Save</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal('logModal')">Cancel</button>
+      <button class="modal-btn modal-btn-primary"   onclick="submitLog()" id="logSubmitBtn">Save</button>
     </div>
   </div>
 </div>
+
 
 <!-- Send Email Modal -->
 <div class="modal-overlay" id="emailModal">
   <div class="modal">
-    <h2>Send CRM Email</h2>
-
-    <div class="field">
-      <label>Client ID</label>
-      <input type="text" id="em_clientId" placeholder="e.g. C_001">
+    <div class="modal-header">
+      <div class="modal-title">Send <em>Email</em></div>
+      <button class="modal-close" onclick="closeModal('emailModal')">✕</button>
     </div>
-    <div class="field">
-      <label>To (email address)</label>
-      <input type="email" id="em_toEmail" placeholder="client@email.com">
-    </div>
-    <div class="field">
-      <label>Your name</label>
-      <input type="text" id="em_staffName" placeholder="Jackie, Nicole, Tressa…<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pretty in Ink — Correspondence Log</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --pink:      #d4547a;
-      --pink-lt:   #f5dce5;
-      --ink:       #1a1a2e;
-      --gray:      #6b7280;
-      --gray-lt:   #f3f4f6;
-      --border:    #e5e7eb;
-      --white:     #ffffff;
-      --inbound:   #d1fae5;
-      --outbound:  #dbeafe;
-      --radius:    8px;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--gray-lt);
-      color: var(--ink);
-      min-height: 100vh;
-    }
 
-    .header {
-      background: var(--ink);
-      color: var(--white);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
-    .header nav a {
-      color: rgba(255,255,255,0.65);
-      text-decoration: none;
-      font-size: 13px;
-      margin-left: 20px;
-    }
-    .header nav a:hover { color: var(--white); }
-
-    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar input[type="text"] {
-      flex: 1;
-      min-width: 200px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      background: var(--white);
-    }
-    .toolbar input[type="text"]:focus { outline: none; border-color: var(--pink); }
-    .btn {
-      padding: 9px 18px;
-      border-radius: var(--radius);
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary   { background: var(--pink); color: var(--white); }
-    .btn-secondary { background: var(--white); color: var(--ink); border: 1px solid var(--border); }
-
-    .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .card-header:hover { background: var(--gray-lt); }
-
-    .badge {
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      flex-shrink: 0;
-    }
-    .badge-inbound  { background: var(--inbound);  color: #065f46; }
-    .badge-outbound { background: var(--outbound); color: #1e40af; }
-
-    .channel-icon { font-size: 16px; flex-shrink: 0; }
-
-    .card-meta { flex: 1; min-width: 0; }
-    .card-subject { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
-
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .status-open      { background: #f59e0b; }
-    .status-sent      { background: #93c5fd; }
-    .status-responded { background: #34d399; }
-    .status-closed    { background: #d1d5db; }
-
-    .card-body {
-      display: none;
-      padding: 14px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .card-body.open { display: block; }
-
-    .body-text {
-      color: #374151;
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: var(--gray-lt);
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-    .body-meta { color: var(--gray); font-size: 12px; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
-
-    .empty { text-align: center; padding: 48px 24px; color: var(--gray); }
-    .empty .icon { font-size: 40px; margin-bottom: 10px; }
-    .spinner {
-      display: inline-block;
-      width: 22px; height: 22px;
-      border: 3px solid var(--border);
-      border-top-color: var(--pink);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white);
-      border-radius: 12px;
-      width: min(480px, 95vw);
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-size: 18px; margin-bottom: 20px; }
-    .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--gray); }
-    .field input, .field select, .field textarea {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-family: inherit;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      outline: none; border-color: var(--pink);
-    }
-    .field textarea { resize: vertical; min-height: 90px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-    .error-msg   { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
-    .success-msg { color: #059669; font-size: 13px; margin-top: 8px; display: none; }
-
-    .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-    .filter-btn {
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--white);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
-
-    .result-count { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
-  </style>
-</head>
-<body>
-
-<div class="header">
-  <h1>✉️ Correspondence Log</h1>
-  <nav>
-    <a href="pii-appointments.html">Appointments</a>
-    <a href="pii-duplicate-finder.html">Duplicates</a>
-    <a href="pii-correspondence.html">Correspondence</a>
-  </nav>
-</div>
-
-<div class="container">
-
-  <div class="toolbar">
-    <input type="text" id="searchBox" placeholder="Search by client ID, subject, or notes…" oninput="filterCards()">
-    <button class="btn btn-secondary" onclick="loadCorrespondence()">↻ Refresh</button>
-    <button class="btn btn-primary" onclick="openLogModal()">+ Log Interaction</button>
-    <button class="btn btn-primary" onclick="openEmailModal()">✉ Send Email</button>
-  </div>
-
-  <div class="filters">
-    <button class="filter-btn active" data-filter="all"       onclick="setFilter(this)">All</button>
-    <button class="filter-btn"        data-filter="inbound"   onclick="setFilter(this)">Inbound</button>
-    <button class="filter-btn"        data-filter="outbound"  onclick="setFilter(this)">Outbound</button>
-    <button class="filter-btn"        data-filter="open"      onclick="setFilter(this)">⚠ Needs Reply</button>
-    <button class="filter-btn"        data-filter="email"     onclick="setFilter(this)">Email</button>
-    <button class="filter-btn"        data-filter="phone"     onclick="setFilter(this)">Phone</button>
-    <button class="filter-btn"        data-filter="dm"        onclick="setFilter(this)">DM</button>
-    <button class="filter-btn"        data-filter="in-person" onclick="setFilter(this)">In-person</button>
-  </div>
-
-  <div class="result-count" id="resultCount"></div>
-  <div id="corrList">
-    <div class="empty"><div class="spinner"></div><p style="margin-top:12px">Loading…</p></div>
-  </div>
-
-</div>
-
-<!-- Log Interaction Modal -->
-<div class="modal-overlay" id="logModal">
-  <div class="modal">
-    <h2>Log Interaction</h2>
-    <div class="field">
-      <label>Client ID</label>
-      <input type="text" id="log_clientId" placeholder="e.g. C_001">
-    </div>
-    <div class="field">
-      <label>Channel</label>
-      <select id="log_channel">
-        <option value="phone">Phone call</option>
-        <option value="sms">SMS / text</option>
-        <option value="dm">DM (Instagram / Facebook)</option>
-        <option value="in-person">In-person</option>
-        <option value="email">Email (manual)</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Direction</label>
-      <select id="log_direction">
-        <option value="inbound">Inbound — client contacted us</option>
-        <option value="outbound">Outbound — we contacted client</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Your name</label>
-      <input type="text" id="log_staffName" placeholder="Jackie, Nicole, Tressa…">
-    </div>
-    <div class="field">
-      <label>Notes / summary</label>
-      <textarea id="log_summary" placeholder="Brief description of what was discussed…"></textarea>
-    </div>
-    <div class="field">
-      <label>Linked Inquiry ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
-      <input type="text" id="log_inquiryId" placeholder="INQ_001">
-    </div>
-    <div class="field">
-      <label>Linked Appointment ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
-      <input type="text" id="log_apptId" placeholder="APPT_001">
-    </div>
-    <div class="error-msg"   id="logError"></div>
-    <div class="success-msg" id="logSuccess"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('logModal')">Cancel</button>
-      <button class="btn btn-primary"   onclick="submitLog()" id="logSubmitBtn">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Send Email Modal -->
-<div class="modal-overlay" id="emailModal">
-  <div class="modal">
-    <h2>Send CRM Email</h2>
     <div class="field">
       <label>Client ID</label>
       <input type="text" id="em_clientId" placeholder="e.g. C_001">
@@ -648,243 +603,262 @@
       <input type="text" id="em_subject" placeholder="e.g. Your appointment on June 3rd">
     </div>
     <div class="field">
-      <label>Body</label>
+      <label>Message</label>
       <textarea id="em_body" placeholder="Write your message here…"></textarea>
     </div>
     <div class="field">
-      <label>Linked Appointment ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <label>Linked Appointment ID <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
       <input type="text" id="em_apptId" placeholder="APPT_001">
     </div>
-    <div class="error-msg"   id="emailError"></div>
-    <div class="success-msg" id="emailSuccess"></div>
+
+    <div class="msg-error"   id="emailError"></div>
+    <div class="msg-success" id="emailSuccess"></div>
+
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('emailModal')">Cancel</button>
-      <button class="btn btn-primary"   onclick="submitEmail()" id="emailSubmitBtn">Send + Log</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal('emailModal')">Cancel</button>
+      <button class="modal-btn modal-btn-primary"   onclick="submitEmail()" id="emailSubmitBtn">Send + Log</button>
     </div>
   </div>
 </div>
 
+
 <script>
-  const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
+const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
 
-  let allRows      = [];
-  let activeFilter = 'all';
+let allRows      = [];
+let activeFilter = 'all';
+let cbId         = 0;
 
-  const CHANNEL_ICONS = {
-    email: '✉️', phone: '📞', sms: '💬', dm: '📱', 'in-person': '🤝'
-  };
-  const CHANNEL_LABELS = {
-    email: 'Email', phone: 'Phone', sms: 'SMS', dm: 'DM', 'in-person': 'In-person'
-  };
+const CHANNEL_ICONS  = { email:'✉️', phone:'📞', sms:'💬', dm:'📱', 'in-person':'🤝' };
+const CHANNEL_LABELS = { email:'Email', phone:'Phone', sms:'SMS', dm:'DM', 'in-person':'In-person' };
 
-  async function loadCorrespondence() {
-    const list = document.getElementById('corrList');
-    list.innerHTML = '<div class="empty"><div class="spinner"></div><p style="margin-top:12px">Loading…</p></div>';
-    try {
-      const res  = await fetch(`${EXEC_URL}?action=getCorrespondence`);
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Unknown error');
-      allRows = data.correspondence || [];
-      renderCards(allRows);
-    } catch (e) {
-      list.innerHTML = `<div class="empty"><p>⚠️ Failed to load: ${e.message}</p></div>`;
-    }
+// ── JSONP (matches existing dashboard pattern) ─────────
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb     = 'corrDash_' + (++cbId);
+    const sep    = url.includes('?') ? '&' : '?';
+    const script = document.createElement('script');
+    script.src   = url + sep + 'callback=' + cb;
+    const timer  = setTimeout(() => { cleanup(); reject(new Error('Timed out')); }, 15000);
+    window[cb]   = data => { cleanup(); clearTimeout(timer); resolve(data); };
+    script.onerror = () => { cleanup(); clearTimeout(timer); reject(new Error('Network error')); };
+    function cleanup() { if (script.parentNode) script.parentNode.removeChild(script); delete window[cb]; }
+    document.head.appendChild(script);
+  });
+}
+
+// ── LOAD ──────────────────────────────────────────────
+async function loadCorrespondence() {
+  document.getElementById('corrList').innerHTML =
+    '<div class="state-box"><div class="spinner"></div> Loading…</div>';
+  try {
+    const data = await jsonp(EXEC_URL + '?action=getCorrespondence');
+    if (!data.success) throw new Error(data.error || 'Bad response');
+    allRows = data.correspondence || [];
+    render(allRows);
+    document.getElementById('header-meta').textContent =
+      allRows.length + ' entr' + (allRows.length === 1 ? 'y' : 'ies') +
+      ' · Updated ' + new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  } catch (e) {
+    document.getElementById('corrList').innerHTML =
+      `<div class="state-box"><div class="icon">✕</div><div class="msg">Couldn't connect</div><div class="sub">${e.message}</div></div>`;
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────
+function render(rows) {
+  const list = document.getElementById('corrList');
+  document.getElementById('resultCount').textContent =
+    rows.length === 0 ? '' : rows.length + ' entr' + (rows.length === 1 ? 'y' : 'ies');
+
+  if (rows.length === 0) {
+    list.innerHTML = '<div class="state-box"><div class="icon">✉️</div><div class="msg">No correspondence yet</div><div class="sub">Log a phone call or send an email above</div></div>';
+    return;
   }
 
-  function renderCards(rows) {
-    const list = document.getElementById('corrList');
-    document.getElementById('resultCount').textContent =
-      rows.length === 0 ? '' : `${rows.length} entr${rows.length === 1 ? 'y' : 'ies'}`;
+  list.innerHTML = rows.map((row, i) => {
+    const icon    = CHANNEL_ICONS[row.channel]  || '💬';
+    const chanLbl = CHANNEL_LABELS[row.channel] || row.channel;
+    const msgDate = row.messageAt ? new Date(row.messageAt) : null;
+    const dateStr = msgDate
+      ? msgDate.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' })
+      : '—';
+    const timeStr = msgDate
+      ? msgDate.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' })
+      : '';
+    const staff   = row.staffName ? ' · ' + row.staffName : '';
+    const status  = row.status || 'sent';
+    const barColor = row.direction === 'inbound' ? '#5A9E6F' : '#4A90C4';
+    const pipClass = 'pip-' + status;
 
-    if (rows.length === 0) {
-      list.innerHTML = '<div class="empty"><div class="icon">✉️</div><p>No correspondence found.</p></div>';
-      return;
-    }
-
-    list.innerHTML = rows.map((row, i) => {
-      const icon    = CHANNEL_ICONS[row.channel]  || '💬';
-      const chanLbl = CHANNEL_LABELS[row.channel] || row.channel;
-      const msgDate = row.messageAt ? new Date(row.messageAt) : null;
-      const dateStr = msgDate ? msgDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
-      const timeStr = msgDate ? msgDate.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }) : '';
-      const staff   = row.staffName ? ` · ${row.staffName}` : '';
-      const status  = row.status || 'sent';
-
-      return `
-        <div class="card"
-             data-direction="${row.direction}"
-             data-channel="${row.channel}"
-             data-status="${status}"
-             data-text="${escHtml((row.subject + ' ' + row.clientId + ' ' + row.bodyPreview).toLowerCase())}">
-          <div class="card-header" onclick="toggleCard(this)">
-            <span class="channel-icon">${icon}</span>
-            <span class="badge badge-${row.direction}">${row.direction}</span>
-            <div class="card-meta">
-              <div class="card-subject">${escHtml(row.subject || '(no subject)')}</div>
-              <div class="card-sub">${row.clientId} · ${chanLbl} · ${dateStr} ${timeStr}${staff}</div>
-            </div>
-            <span class="status-dot status-${status}" title="${status}"></span>
+    return `
+      <div class="corr-card"
+           data-direction="${row.direction}"
+           data-channel="${row.channel}"
+           data-status="${status}"
+           data-text="${esc((row.body||'') + ' ' + row.clientId + ' ' + (row.staffName||'')).toLowerCase()}"
+           style="animation-delay:${i * 0.03}s">
+        <div class="corr-card-header" onclick="toggleCard(this)">
+          <div class="corr-card-bar" style="background:${barColor};"></div>
+          <span class="channel-icon">${icon}</span>
+          <span class="dir-badge dir-${row.direction}">${row.direction}</span>
+          <div class="corr-meta">
+            <div class="corr-subject">${esc(row.body ? row.body.split('\n')[0].substring(0,80) : '(no notes)')}</div>
+            <div class="corr-sub">${row.clientId} · ${chanLbl} · ${dateStr} ${timeStr}${staff}</div>
           </div>
-          <div class="card-body" id="body_${i}">
-            ${row.bodyPreview
-              ? `<div class="body-text">${escHtml(row.bodyPreview)}</div>`
-              : '<em style="color:var(--gray);font-size:13px">No preview available.</em>'}
-            <div class="body-meta">
-              <span>Status: <strong>${status}</strong></span>
-              ${row.inquiryId ? `<span>Inquiry: ${row.inquiryId}</span>` : ''}
-              ${row.apptId    ? `<span>Appt: ${row.apptId}</span>`       : ''}
-              ${row.respondedAt ? `<span>Responded: ${new Date(row.respondedAt).toLocaleDateString()}</span>` : ''}
-              <span>Logged: ${row.loggedAt ? new Date(row.loggedAt).toLocaleDateString() : '—'}</span>
-            </div>
+          <span class="status-pip ${pipClass}" title="${status}"></span>
+        </div>
+        <div class="corr-card-body">
+          ${row.body ? `<div class="corr-body-text">${esc(row.body)}</div>` : ''}
+          <div class="corr-body-meta">
+            <span>Status: <strong>${status}</strong></span>
+            ${row.inquiryId ? `<span>Inquiry: <strong>${row.inquiryId}</strong></span>` : ''}
+            ${row.apptId    ? `<span>Appt: <strong>${row.apptId}</strong></span>`       : ''}
+            ${row.respondedAt ? `<span>Responded: <strong>${new Date(row.respondedAt).toLocaleDateString()}</strong></span>` : ''}
+            <span>ID: ${row.corrId}</span>
           </div>
-        </div>`;
-    }).join('');
-  }
+        </div>
+      </div>`;
+  }).join('');
+}
 
-  function toggleCard(header) {
-    header.nextElementSibling.classList.toggle('open');
-  }
+function toggleCard(header) {
+  header.nextElementSibling.classList.toggle('open');
+}
 
-  function setFilter(btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter = btn.dataset.filter;
-    filterCards();
-  }
+// ── FILTER ────────────────────────────────────────────
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.filter;
+  filterCards();
+}
 
-  function filterCards() {
-    const query = document.getElementById('searchBox').value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
-    let visible = 0;
-    cards.forEach(card => {
-      const dir    = card.dataset.direction;
-      const chan   = card.dataset.channel;
-      const status = card.dataset.status;
-      const text   = card.dataset.text;
-      let show = true;
-      if (activeFilter !== 'all') {
-        if      (activeFilter === 'open')     show = status === 'open';
-        else if (activeFilter === 'inbound')  show = dir === 'inbound';
-        else if (activeFilter === 'outbound') show = dir === 'outbound';
-        else show = chan === activeFilter;
-      }
-      if (show && query) show = text.includes(query);
-      card.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    document.getElementById('resultCount').textContent =
-      visible === 0 ? 'No results' : `${visible} entr${visible === 1 ? 'y' : 'ies'}`;
-  }
+function filterCards() {
+  const query = document.getElementById('searchBox').value.toLowerCase();
+  const cards = document.querySelectorAll('.corr-card');
+  let visible = 0;
 
-  function openLogModal()   { document.getElementById('logModal').classList.add('open'); }
-  function openEmailModal() { document.getElementById('emailModal').classList.add('open'); }
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('open');
-    document.getElementById(id).querySelectorAll('.error-msg, .success-msg')
-      .forEach(el => { el.style.display = 'none'; el.textContent = ''; });
-  }
+  cards.forEach(card => {
+    const dir    = card.dataset.direction;
+    const chan   = card.dataset.channel;
+    const status = card.dataset.status;
+    const text   = card.dataset.text;
+    let show = true;
 
-  async function submitLog() {
-    const btn   = document.getElementById('logSubmitBtn');
-    const errEl = document.getElementById('logError');
-    const okEl  = document.getElementById('logSuccess');
-    errEl.style.display = 'none';
-    okEl.style.display  = 'none';
-
-    const clientId = document.getElementById('log_clientId').value.trim();
-    const summary  = document.getElementById('log_summary').value.trim();
-    if (!clientId) { showError(errEl, 'Client ID is required.'); return; }
-    if (!summary)  { showError(errEl, 'Notes / summary is required.'); return; }
-
-    btn.textContent = 'Saving…';
-    btn.disabled = true;
-
-    try {
-      const params = new URLSearchParams({
-        action:    'logCorrespondence',
-        clientId,
-        channel:   document.getElementById('log_channel').value,
-        direction: document.getElementById('log_direction').value,
-        summary,
-        staffName: document.getElementById('log_staffName').value.trim(),
-        inquiryId: document.getElementById('log_inquiryId').value.trim(),
-        apptId:    document.getElementById('log_apptId').value.trim(),
-      });
-
-      const res  = await fetch(`${EXEC_URL}?${params}`);
-      const data = await res.json();
-      if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
-
-      okEl.textContent = `✓ Logged successfully`;
-      okEl.style.display = 'block';
-      setTimeout(() => { closeModal('logModal'); loadCorrespondence(); }, 1200);
-    } catch (e) {
-      showError(errEl, e.message);
-    } finally {
-      btn.textContent = 'Save';
-      btn.disabled = false;
+    if (activeFilter !== 'all') {
+      if      (activeFilter === 'open')     show = status === 'open';
+      else if (activeFilter === 'inbound')  show = dir === 'inbound';
+      else if (activeFilter === 'outbound') show = dir === 'outbound';
+      else show = chan === activeFilter;
     }
-  }
-
-  async function submitEmail() {
-    const btn   = document.getElementById('emailSubmitBtn');
-    const errEl = document.getElementById('emailError');
-    const okEl  = document.getElementById('emailSuccess');
-    errEl.style.display = 'none';
-    okEl.style.display  = 'none';
-
-    const clientId = document.getElementById('em_clientId').value.trim();
-    const toEmail  = document.getElementById('em_toEmail').value.trim();
-    const subject  = document.getElementById('em_subject').value.trim();
-    const body     = document.getElementById('em_body').value.trim();
-    if (!clientId) { showError(errEl, 'Client ID is required.'); return; }
-    if (!toEmail)  { showError(errEl, 'Recipient email is required.'); return; }
-    if (!subject)  { showError(errEl, 'Subject is required.'); return; }
-    if (!body)     { showError(errEl, 'Message body is required.'); return; }
-
-    btn.textContent = 'Sending…';
-    btn.disabled = true;
-
-    try {
-      const params = new URLSearchParams({
-        action:    'sendEmail',
-        clientId,
-        toEmail,
-        subject,
-        body,
-        staffName: document.getElementById('em_staffName').value.trim(),
-        apptId:    document.getElementById('em_apptId').value.trim(),
-      });
-
-      const res  = await fetch(`${EXEC_URL}?${params}`);
-      const data = await res.json();
-      if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
-
-      okEl.textContent = `✓ Sent and logged!`;
-      okEl.style.display = 'block';
-      setTimeout(() => { closeModal('emailModal'); loadCorrespondence(); }, 1500);
-    } catch (e) {
-      showError(errEl, e.message);
-    } finally {
-      btn.textContent = 'Send + Log';
-      btn.disabled = false;
-    }
-  }
-
-  function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) closeModal(overlay.id);
-    });
+    if (show && query) show = text.includes(query);
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
   });
 
-  loadCorrespondence();
+  document.getElementById('resultCount').textContent =
+    visible === 0 ? 'No results' : visible + ' entr' + (visible === 1 ? 'y' : 'ies');
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById(id).querySelectorAll('.msg-error, .msg-success')
+    .forEach(el => { el.style.display = 'none'; el.textContent = ''; });
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+
+// ── SUBMIT: LOG INTERACTION ────────────────────────────
+async function submitLog() {
+  const btn    = document.getElementById('logSubmitBtn');
+  const errEl  = document.getElementById('logError');
+  const okEl   = document.getElementById('logSuccess');
+  errEl.style.display = okEl.style.display = 'none';
+
+  const clientId = document.getElementById('log_clientId').value.trim();
+  const summary  = document.getElementById('log_summary').value.trim();
+  if (!clientId) { showMsg(errEl, 'Client ID is required.'); return; }
+  if (!summary)  { showMsg(errEl, 'Notes are required.'); return; }
+
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  try {
+    const params = new URLSearchParams({
+      action:    'logCorrespondence',
+      clientId,
+      channel:   document.getElementById('log_channel').value,
+      direction: document.getElementById('log_direction').value,
+      summary,
+      staffName: document.getElementById('log_staffName').value.trim(),
+      inquiryId: document.getElementById('log_inquiryId').value.trim(),
+      apptId:    document.getElementById('log_apptId').value.trim(),
+    });
+    const data = await jsonp(EXEC_URL + '?' + params);
+    if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
+    showMsg(okEl, '✓ Logged successfully');
+    setTimeout(() => { closeModal('logModal'); loadCorrespondence(); }, 1100);
+  } catch (e) {
+    showMsg(errEl, e.message);
+  } finally {
+    btn.textContent = 'Save';
+    btn.disabled = false;
+  }
+}
+
+// ── SUBMIT: SEND EMAIL ────────────────────────────────
+async function submitEmail() {
+  const btn   = document.getElementById('emailSubmitBtn');
+  const errEl = document.getElementById('emailError');
+  const okEl  = document.getElementById('emailSuccess');
+  errEl.style.display = okEl.style.display = 'none';
+
+  const clientId = document.getElementById('em_clientId').value.trim();
+  const toEmail  = document.getElementById('em_toEmail').value.trim();
+  const subject  = document.getElementById('em_subject').value.trim();
+  const body     = document.getElementById('em_body').value.trim();
+  if (!clientId) { showMsg(errEl, 'Client ID is required.'); return; }
+  if (!toEmail)  { showMsg(errEl, 'Recipient email is required.'); return; }
+  if (!subject)  { showMsg(errEl, 'Subject is required.'); return; }
+  if (!body)     { showMsg(errEl, 'Message body is required.'); return; }
+
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  try {
+    const params = new URLSearchParams({
+      action:    'sendEmail',
+      clientId,
+      toEmail,
+      subject,
+      body,
+      staffName: document.getElementById('em_staffName').value.trim(),
+      apptId:    document.getElementById('em_apptId').value.trim(),
+    });
+    const data = await jsonp(EXEC_URL + '?' + params);
+    if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
+    showMsg(okEl, '✓ Sent and logged!');
+    setTimeout(() => { closeModal('emailModal'); loadCorrespondence(); }, 1200);
+  } catch (e) {
+    showMsg(errEl, e.message);
+  } finally {
+    btn.textContent = 'Send + Log';
+    btn.disabled = false;
+  }
+}
+
+function showMsg(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadCorrespondence();
 </script>
 </body>
 </html>

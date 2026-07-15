@@ -336,6 +336,311 @@
     </div>
     <div class="field">
       <label>Your name</label>
+      <input type="text" id="em_staffName" placeholder="Jackie, Nicole, Tressa…<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty in Ink — Correspondence Log</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink:      #d4547a;
+      --pink-lt:   #f5dce5;
+      --ink:       #1a1a2e;
+      --gray:      #6b7280;
+      --gray-lt:   #f3f4f6;
+      --border:    #e5e7eb;
+      --white:     #ffffff;
+      --inbound:   #d1fae5;
+      --outbound:  #dbeafe;
+      --radius:    8px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-lt);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--ink);
+      color: var(--white);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
+    .header nav a {
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 20px;
+    }
+    .header nav a:hover { color: var(--white); }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toolbar input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      background: var(--white);
+    }
+    .toolbar input[type="text"]:focus { outline: none; border-color: var(--pink); }
+    .btn {
+      padding: 9px 18px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary   { background: var(--pink); color: var(--white); }
+    .btn-secondary { background: var(--white); color: var(--ink); border: 1px solid var(--border); }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card-header:hover { background: var(--gray-lt); }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .badge-inbound  { background: var(--inbound);  color: #065f46; }
+    .badge-outbound { background: var(--outbound); color: #1e40af; }
+
+    .channel-icon { font-size: 16px; flex-shrink: 0; }
+
+    .card-meta { flex: 1; min-width: 0; }
+    .card-subject { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-open      { background: #f59e0b; }
+    .status-sent      { background: #93c5fd; }
+    .status-responded { background: #34d399; }
+    .status-closed    { background: #d1d5db; }
+
+    .card-body {
+      display: none;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .card-body.open { display: block; }
+
+    .body-text {
+      color: #374151;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--gray-lt);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .body-meta { color: var(--gray); font-size: 12px; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .empty { text-align: center; padding: 48px 24px; color: var(--gray); }
+    .empty .icon { font-size: 40px; margin-bottom: 10px; }
+    .spinner {
+      display: inline-block;
+      width: 22px; height: 22px;
+      border: 3px solid var(--border);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      width: min(480px, 95vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal h2 { font-size: 18px; margin-bottom: 20px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--gray); }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: none; border-color: var(--pink);
+    }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .error-msg   { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+    .success-msg { color: #059669; font-size: 13px; margin-top: 8px; display: none; }
+
+    .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+
+    .result-count { font-size: 13px; color: var(--gray); margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✉️ Correspondence Log</h1>
+  <nav>
+    <a href="pii-appointments.html">Appointments</a>
+    <a href="pii-duplicate-finder.html">Duplicates</a>
+    <a href="pii-correspondence.html">Correspondence</a>
+  </nav>
+</div>
+
+<div class="container">
+
+  <div class="toolbar">
+    <input type="text" id="searchBox" placeholder="Search by client ID, subject, or notes…" oninput="filterCards()">
+    <button class="btn btn-secondary" onclick="loadCorrespondence()">↻ Refresh</button>
+    <button class="btn btn-primary" onclick="openLogModal()">+ Log Interaction</button>
+    <button class="btn btn-primary" onclick="openEmailModal()">✉ Send Email</button>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all"       onclick="setFilter(this)">All</button>
+    <button class="filter-btn"        data-filter="inbound"   onclick="setFilter(this)">Inbound</button>
+    <button class="filter-btn"        data-filter="outbound"  onclick="setFilter(this)">Outbound</button>
+    <button class="filter-btn"        data-filter="open"      onclick="setFilter(this)">⚠ Needs Reply</button>
+    <button class="filter-btn"        data-filter="email"     onclick="setFilter(this)">Email</button>
+    <button class="filter-btn"        data-filter="phone"     onclick="setFilter(this)">Phone</button>
+    <button class="filter-btn"        data-filter="dm"        onclick="setFilter(this)">DM</button>
+    <button class="filter-btn"        data-filter="in-person" onclick="setFilter(this)">In-person</button>
+  </div>
+
+  <div class="result-count" id="resultCount"></div>
+  <div id="corrList">
+    <div class="empty"><div class="spinner"></div><p style="margin-top:12px">Loading…</p></div>
+  </div>
+
+</div>
+
+<!-- Log Interaction Modal -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <h2>Log Interaction</h2>
+    <div class="field">
+      <label>Client ID</label>
+      <input type="text" id="log_clientId" placeholder="e.g. C_001">
+    </div>
+    <div class="field">
+      <label>Channel</label>
+      <select id="log_channel">
+        <option value="phone">Phone call</option>
+        <option value="sms">SMS / text</option>
+        <option value="dm">DM (Instagram / Facebook)</option>
+        <option value="in-person">In-person</option>
+        <option value="email">Email (manual)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Direction</label>
+      <select id="log_direction">
+        <option value="inbound">Inbound — client contacted us</option>
+        <option value="outbound">Outbound — we contacted client</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Your name</label>
+      <input type="text" id="log_staffName" placeholder="Jackie, Nicole, Tressa…">
+    </div>
+    <div class="field">
+      <label>Notes / summary</label>
+      <textarea id="log_summary" placeholder="Brief description of what was discussed…"></textarea>
+    </div>
+    <div class="field">
+      <label>Linked Inquiry ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <input type="text" id="log_inquiryId" placeholder="INQ_001">
+    </div>
+    <div class="field">
+      <label>Linked Appointment ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <input type="text" id="log_apptId" placeholder="APPT_001">
+    </div>
+    <div class="error-msg"   id="logError"></div>
+    <div class="success-msg" id="logSuccess"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('logModal')">Cancel</button>
+      <button class="btn btn-primary"   onclick="submitLog()" id="logSubmitBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Send Email Modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal">
+    <h2>Send CRM Email</h2>
+    <div class="field">
+      <label>Client ID</label>
+      <input type="text" id="em_clientId" placeholder="e.g. C_001">
+    </div>
+    <div class="field">
+      <label>To (email address)</label>
+      <input type="email" id="em_toEmail" placeholder="client@email.com">
+    </div>
+    <div class="field">
+      <label>Your name</label>
       <input type="text" id="em_staffName" placeholder="Jackie, Nicole, Tressa…">
     </div>
     <div class="field">
@@ -350,10 +655,8 @@
       <label>Linked Appointment ID <span style="color:var(--gray);font-weight:400">(optional)</span></label>
       <input type="text" id="em_apptId" placeholder="APPT_001">
     </div>
-
     <div class="error-msg"   id="emailError"></div>
     <div class="success-msg" id="emailSuccess"></div>
-
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('emailModal')">Cancel</button>
       <button class="btn btn-primary"   onclick="submitEmail()" id="emailSubmitBtn">Send + Log</button>
@@ -362,45 +665,25 @@
 </div>
 
 <script>
-  // ── CONFIG ────────────────────────────────────────────────
-  // Replace this with your Apps Script Web App URL
-  // (Manage Deployments → Web App URL)
   const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
 
-  // ── State ─────────────────────────────────────────────────
-  let allRows     = [];
+  let allRows      = [];
   let activeFilter = 'all';
 
-  // ── Channel display ───────────────────────────────────────
   const CHANNEL_ICONS = {
-    email:       '✉️',
-    phone:       '📞',
-    sms:         '💬',
-    dm:          '📱',
-    'in-person': '🤝',
+    email: '✉️', phone: '📞', sms: '💬', dm: '📱', 'in-person': '🤝'
   };
   const CHANNEL_LABELS = {
-    email:       'Email',
-    phone:       'Phone',
-    sms:         'SMS',
-    dm:          'DM',
-    'in-person': 'In-person',
+    email: 'Email', phone: 'Phone', sms: 'SMS', dm: 'DM', 'in-person': 'In-person'
   };
 
-  // ── Load all correspondence ───────────────────────────────
-  async function loadCorrespondence(clientId = '') {
+  async function loadCorrespondence() {
     const list = document.getElementById('corrList');
     list.innerHTML = '<div class="empty"><div class="spinner"></div><p style="margin-top:12px">Loading…</p></div>';
-
     try {
-      const params = new URLSearchParams({ action: 'getCorrespondence' });
-      if (clientId) params.append('clientId', clientId);
-
-      const res  = await fetch(`${EXEC_URL}?${params}`);
+      const res  = await fetch(`${EXEC_URL}?action=getCorrespondence`);
       const data = await res.json();
-
       if (!data.success) throw new Error(data.error || 'Unknown error');
-
       allRows = data.correspondence || [];
       renderCards(allRows);
     } catch (e) {
@@ -408,7 +691,6 @@
     }
   }
 
-  // ── Render ────────────────────────────────────────────────
   function renderCards(rows) {
     const list = document.getElementById('corrList');
     document.getElementById('resultCount').textContent =
@@ -433,7 +715,7 @@
              data-direction="${row.direction}"
              data-channel="${row.channel}"
              data-status="${status}"
-             data-text="${(row.subject + ' ' + row.clientId + ' ' + row.bodyPreview).toLowerCase()}">
+             data-text="${escHtml((row.subject + ' ' + row.clientId + ' ' + row.bodyPreview).toLowerCase())}">
           <div class="card-header" onclick="toggleCard(this)">
             <span class="channel-icon">${icon}</span>
             <span class="badge badge-${row.direction}">${row.direction}</span>
@@ -444,7 +726,9 @@
             <span class="status-dot status-${status}" title="${status}"></span>
           </div>
           <div class="card-body" id="body_${i}">
-            ${row.bodyPreview ? `<div class="body-text">${escHtml(row.bodyPreview)}</div>` : '<em style="color:var(--gray);font-size:13px">No preview available.</em>'}
+            ${row.bodyPreview
+              ? `<div class="body-text">${escHtml(row.bodyPreview)}</div>`
+              : '<em style="color:var(--gray);font-size:13px">No preview available.</em>'}
             <div class="body-meta">
               <span>Status: <strong>${status}</strong></span>
               ${row.inquiryId ? `<span>Inquiry: ${row.inquiryId}</span>` : ''}
@@ -458,11 +742,9 @@
   }
 
   function toggleCard(header) {
-    const body = header.nextElementSibling;
-    body.classList.toggle('open');
+    header.nextElementSibling.classList.toggle('open');
   }
 
-  // ── Filter ────────────────────────────────────────────────
   function setFilter(btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -474,33 +756,26 @@
     const query = document.getElementById('searchBox').value.toLowerCase();
     const cards = document.querySelectorAll('.card');
     let visible = 0;
-
     cards.forEach(card => {
-      const dir     = card.dataset.direction;
-      const chan    = card.dataset.channel;
-      const status  = card.dataset.status;
-      const text    = card.dataset.text;
-
+      const dir    = card.dataset.direction;
+      const chan   = card.dataset.channel;
+      const status = card.dataset.status;
+      const text   = card.dataset.text;
       let show = true;
       if (activeFilter !== 'all') {
-        if (activeFilter === 'open')      show = (status === 'open');
-        else if (activeFilter === 'inbound')  show = (dir === 'inbound');
-        else if (activeFilter === 'outbound') show = (dir === 'outbound');
-        else show = (chan === activeFilter);
+        if      (activeFilter === 'open')     show = status === 'open';
+        else if (activeFilter === 'inbound')  show = dir === 'inbound';
+        else if (activeFilter === 'outbound') show = dir === 'outbound';
+        else show = chan === activeFilter;
       }
       if (show && query) show = text.includes(query);
-
       card.style.display = show ? '' : 'none';
       if (show) visible++;
     });
-
-    const count = document.getElementById('resultCount');
-    count.textContent = visible === 0
-      ? 'No results'
-      : `${visible} entr${visible === 1 ? 'y' : 'ies'}`;
+    document.getElementById('resultCount').textContent =
+      visible === 0 ? 'No results' : `${visible} entr${visible === 1 ? 'y' : 'ies'}`;
   }
 
-  // ── Modals ────────────────────────────────────────────────
   function openLogModal()   { document.getElementById('logModal').classList.add('open'); }
   function openEmailModal() { document.getElementById('emailModal').classList.add('open'); }
   function closeModal(id) {
@@ -509,7 +784,6 @@
       .forEach(el => { el.style.display = 'none'; el.textContent = ''; });
   }
 
-  // ── Submit: Log manual interaction ────────────────────────
   async function submitLog() {
     const btn   = document.getElementById('logSubmitBtn');
     const errEl = document.getElementById('logError');
@@ -517,8 +791,8 @@
     errEl.style.display = 'none';
     okEl.style.display  = 'none';
 
-    const clientId  = document.getElementById('log_clientId').value.trim();
-    const summary   = document.getElementById('log_summary').value.trim();
+    const clientId = document.getElementById('log_clientId').value.trim();
+    const summary  = document.getElementById('log_summary').value.trim();
     if (!clientId) { showError(errEl, 'Client ID is required.'); return; }
     if (!summary)  { showError(errEl, 'Notes / summary is required.'); return; }
 
@@ -526,7 +800,7 @@
     btn.disabled = true;
 
     try {
-      const body = new URLSearchParams({
+      const params = new URLSearchParams({
         action:    'logCorrespondence',
         clientId,
         channel:   document.getElementById('log_channel').value,
@@ -537,11 +811,11 @@
         apptId:    document.getElementById('log_apptId').value.trim(),
       });
 
-      const res  = await fetch(EXEC_URL, { method: 'POST', body });
+      const res  = await fetch(`${EXEC_URL}?${params}`);
       const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Unknown error');
+      if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
 
-      okEl.textContent = `✓ Logged as ${data.corrId}`;
+      okEl.textContent = `✓ Logged successfully`;
       okEl.style.display = 'block';
       setTimeout(() => { closeModal('logModal'); loadCorrespondence(); }, 1200);
     } catch (e) {
@@ -552,7 +826,6 @@
     }
   }
 
-  // ── Submit: Send CRM email ────────────────────────────────
   async function submitEmail() {
     const btn   = document.getElementById('emailSubmitBtn');
     const errEl = document.getElementById('emailError');
@@ -573,7 +846,7 @@
     btn.disabled = true;
 
     try {
-      const formData = new URLSearchParams({
+      const params = new URLSearchParams({
         action:    'sendEmail',
         clientId,
         toEmail,
@@ -583,11 +856,11 @@
         apptId:    document.getElementById('em_apptId').value.trim(),
       });
 
-      const res  = await fetch(EXEC_URL, { method: 'POST', body: formData });
+      const res  = await fetch(`${EXEC_URL}?${params}`);
       const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Unknown error');
+      if (!data.success && data.status !== 'ok') throw new Error(data.error || data.message || 'Unknown error');
 
-      okEl.textContent = `✓ Sent and logged. Thread ID: ${data.threadId || 'n/a'}`;
+      okEl.textContent = `✓ Sent and logged!`;
       okEl.style.display = 'block';
       setTimeout(() => { closeModal('emailModal'); loadCorrespondence(); }, 1500);
     } catch (e) {
@@ -598,24 +871,19 @@
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────────
   function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
   function escHtml(str) {
     return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // Close modal on overlay click
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {
       if (e.target === overlay) closeModal(overlay.id);
     });
   });
 
-  // ── Init ──────────────────────────────────────────────────
   loadCorrespondence();
 </script>
 </body>

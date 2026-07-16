@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pretty in Ink — Inquiry Thread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #D4748F;
+  --pink-lt: #F2C8D4;
+  --cream: #FDF7F5;
+  --ink: #1C1213;
+  --gray: #6b7280;
+  --gray-lt: #f3f4f6;
+  --border: #e8dcd8;
+  --white: #ffffff;
+  --gold: #a1005a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: var(--ink); }
+.serif { font-family: 'Cormorant Garamond', serif; }
+
+/* ── NAV ── */
+.header {
+  background: var(--ink); color: var(--white); padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.header h1 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--pink-lt); }
+.header nav { display: flex; gap: 8px; }
+.header nav a {
+  color: rgba(255,255,255,0.75); text-decoration: none; font-size: 12.5px;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2);
+}
+.header nav a:hover { background: rgba(255,255,255,0.1); }
+.header nav a.active { background: var(--pink-lt); color: var(--ink); border-color: var(--pink-lt); }
+.back-link { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 12.5px; }
+.back-link:hover { color: white; }
+
+.layout { max-width: 860px; margin: 0 auto; padding-bottom: 60px; }
+
+/* ── LOADING / ERROR ── */
+.loading-screen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 40vh; gap: 12px; color: var(--gray);
+}
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--pink-lt);
+  border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── INQUIRY SUMMARY CARD ── */
+.inquiry-card {
+  background: var(--white); border-bottom: 2px solid var(--border);
+  padding: 18px 24px; position: sticky; top: 57px; z-index: 50;
+  transition: padding 0.2s;
+}
+.inquiry-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 16px; flex-wrap: wrap;
+}
+.inquiry-top h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; font-style: italic; line-height: 1.2; }
+.priority-badge {
+  font-family: 'DM Sans', sans-serif; font-style: normal;
+  font-size: 11px; font-weight: 700;
+  background: #fee2e2; color: #b91c1c; padding: 4px 10px;
+  border-radius: 999px; text-transform: uppercase; letter-spacing: 0.3px;
+  vertical-align: middle; margin-left: 8px; display: inline-block;
+}
+.inquiry-meta { font-size: 12.5px; color: var(--gray); margin-top: 3px; }
+.sla-badge {
+  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  background: #fde68a; color: #7c5800; text-transform: uppercase; letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.sla-badge.overdue { background: #fee2e2; color: #b91c1c; }
+.sla-badge.ok { background: #d1fae5; color: #065f46; }
+.card-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.minimize-btn {
+  background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 8px;
+  width: 28px; height: 28px; cursor: pointer; font-size: 11px; color: var(--gray);
+  display: flex; align-items: center; justify-content: center;
+}
+.minimize-btn:hover { background: var(--pink-lt); color: var(--ink); }
+
+#inquiryCardBody.minimized { display: none; }
+.inquiry-details {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px; margin-top: 14px;
+}
+.detail-chip { background: var(--gray-lt); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.detail-chip.conditional-chip { border: 1.5px dashed var(--pink-lt); background: var(--cream); }
+.chip-key {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gray);
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;
+}
+.chip-val { font-weight: 500; }
+.icon-pair { display: inline-flex; gap: 2px; }
+.flag-btn {
+  background: none; border: none; cursor: pointer; font-size: 11px; padding: 0 1px;
+  opacity: 0.3; vertical-align: middle; line-height: 1;
+}
+.flag-btn:hover { opacity: 1; }
+
+.ref-photos { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.ref-photo-wrap { position: relative; }
+.ref-photo-wrap img, .ref-photo-ph {
+  width: 56px; height: 56px; border-radius: 8px; object-fit: cover;
+  border: 1.5px solid var(--border); display: block; background: var(--gray-lt);
+  font-size: 22px; line-height: 56px; text-align: center;
+}
+.photo-icons {
+  position: absolute; bottom: -3px; right: -3px; background: white;
+  border-radius: 6px; padding: 1px 2px; display: flex; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+.photo-icons .flag-btn { opacity: 0.5; }
+
+.description-toggle {
+  font-size: 12px; color: var(--pink); background: none; border: none;
+  cursor: pointer; margin-top: 10px; font-weight: 600; display: block; text-align: left;
+  line-height: 1.5;
+}
+.description-text { font-size: 13px; color: var(--ink); margin-top: 6px; line-height: 1.6; display: none; }
+.description-text.expanded { display: block; }
+
+/* ── FLAG POPOVER ── */
+.flag-popover {
+  display: none; margin-top: 12px; background: var(--cream);
+  border: 1.5px solid var(--pink-lt); border-radius: 10px; padding: 14px;
+}
+.flag-popover.show { display: block; }
+.flag-popover-title { font-size: 12.5px; font-weight: 700; margin-bottom: 8px; color: var(--gold); }
+.flag-popover select, .flag-popover textarea {
+  width: 100%; padding: 8px 10px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 13px; font-family: inherit; margin-bottom: 8px;
+}
+.flag-popover textarea { min-height: 50px; resize: vertical; }
+.flag-popover-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.btn-mini {
+  padding: 6px 14px; border-radius: 999px; border: none;
+  font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.btn-mini-cancel { background: var(--gray-lt); color: var(--ink); }
+.btn-mini-add { background: var(--pink); color: white; }
+
+.flagged-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.flagged-item {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+  background: #fff4f4; border: 1px solid #f3c9c9; border-radius: 8px;
+  padding: 8px 12px; font-size: 12.5px;
+}
+.flagged-item .field-label { font-weight: 700; color: var(--gold); text-transform: capitalize; }
+.flagged-item .remove-flag { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 13px; flex-shrink: 0; }
+.btn-send-correction {
+  margin-top: 12px; width: 100%; padding: 11px; border-radius: 999px; border: none;
+  background: var(--ink); color: white; font-weight: 700; font-size: 13px; cursor: pointer;
+}
+.btn-send-correction:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── THREAD ── */
+.thread { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+.thread-date-sep {
+  text-align: center; font-size: 11px; color: var(--gray);
+  margin: 4px 0; display: flex; align-items: center; gap: 10px;
+}
+.thread-date-sep::before, .thread-date-sep::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.msg {
+  max-width: 74%; padding: 11px 14px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.55;
+}
+.msg.inbound {
+  background: var(--white); border: 1.5px solid var(--border);
+  align-self: flex-start; border-bottom-left-radius: 4px;
+}
+.msg.outbound {
+  background: var(--pink); color: white;
+  align-self: flex-end; border-bottom-right-radius: 4px;
+}
+.msg .msg-meta { font-size: 10.5px; opacity: 0.6; margin-top: 5px; }
+.msg.outbound .msg-meta { color: rgba(255,255,255,0.8); opacity: 1; }
+.msg .msg-body { white-space: pre-wrap; }
+
+.thread-empty { padding: 32px 24px; text-align: center; color: var(--gray); font-size: 13.5px; }
+
+/* ── QUICK REPLY ── */
+.quick-reply {
+  display: flex; gap: 8px; padding: 0 24px 16px; align-items: flex-end;
+}
+.quick-reply textarea {
+  flex: 1; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border);
+  font-size: 13.5px; font-family: inherit; resize: none; min-height: 42px; max-height: 120px;
+  line-height: 1.5;
+}
+.quick-reply textarea:focus { outline: none; border-color: var(--pink); }
+.quick-reply button {
+  background: var(--ink); color: white; border: none; border-radius: 999px;
+  padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; align-self: flex-end;
+}
+.quick-reply button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── QUOTE COMPOSER ── */
+.composer {
+  background: var(--white); border-top: 3px solid var(--pink-lt);
+  padding: 22px 24px 30px; margin-top: 8px;
+}
+.composer-header {
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; user-select: none;
+}
+.composer-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; }
+.composer-chev { font-size: 18px; color: var(--gray); transition: transform 0.2s; }
+.composer-chev.open { transform: rotate(180deg); }
+.composer-body { margin-top: 16px; }
+.composer-body.collapsed { display: none; }
+
+.autofill-bar {
+  font-size: 11.5px; color: var(--gray); background: var(--gray-lt);
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.autofill-bar button {
+  background: var(--pink-lt); border: none; color: var(--ink); font-size: 11px;
+  font-weight: 600; padding: 5px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+}
+
+.section-label {
+  font-size: 12px; font-weight: 700; margin: 22px 0 10px; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border); padding-bottom: 6px;
+}
+.field-group { margin-bottom: 14px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+label {
+  display: block; font-size: 11.5px; font-weight: 700; color: var(--gray);
+  margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px;
+}
+input[type=text], input[type=number], select, textarea.composer-ta {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 14px; font-family: inherit;
+}
+input:focus, select:focus, textarea.composer-ta:focus {
+  outline: none; border-color: var(--pink);
+}
+textarea.composer-ta { min-height: 64px; resize: vertical; }
+
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.checkbox-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+.checkbox-row label { margin: 0; text-transform: none; font-weight: 600; font-size: 13.5px; color: var(--ink); cursor: pointer; }
+
+.conditional-fields {
+  margin: 8px 0 14px 24px; padding: 12px 14px; background: var(--cream);
+  border-radius: 10px; border: 1px dashed var(--pink-lt); display: none;
+}
+.conditional-fields.show { display: block; }
+.conditional-fields .field-row { margin-bottom: 8px; }
+.conditional-fields .field-row:last-child { margin-bottom: 0; }
+
+.template-block {
+  background: var(--cream); border-radius: 10px; padding: 14px 16px;
+  font-size: 13px; line-height: 1.7; border: 1px solid var(--border); margin-top: 6px;
+}
+.template-block .t-section { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; display: block; margin-bottom: 4px; margin-top: 10px; }
+.template-block .t-section:first-child { margin-top: 0; }
+.template-block strong { color: var(--gold); }
+.std-note { font-size: 10.5px; color: var(--gray); font-style: italic; margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px; }
+.editable-flag { font-size: 10px; color: var(--pink); text-transform: uppercase; font-weight: 700; letter-spacing: 0.3px; }
+
+.send-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.btn { padding: 11px 22px; border-radius: 999px; border: none; font-weight: 700; font-size: 13.5px; cursor: pointer; font-family: inherit; }
+.btn-secondary { background: var(--gray-lt); color: var(--ink); }
+.btn-primary { background: var(--pink); color: white; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.status-msg { font-size: 13px; color: var(--gray); align-self: center; }
+.status-msg.err { color: #b91c1c; }
+.status-msg.ok { color: #065f46; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 class="serif">Pretty in Ink</h1>
+  <nav>
+    <a href="pii-inquiry-inbox.html" id="navInbox">Inquiries</a>
+    <a href="pii-appointments.html">Appointments</a>
+    <a href="pii-correspondence.html">Correspondence</a>
+  </nav>
+</div>
+
+<div class="layout" id="mainLayout">
+  <div class="loading-screen" id="loadingScreen">
+    <div class="spinner"></div>
+    <div>Loading inquiry…</div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
+
+// ── URL PARAMS ──────────────────────────────────────────────────
+const params   = new URLSearchParams(location.search);
+const INQUIRY_ID = params.get('inquiryId') || '';
+const ARTIST     = params.get('artist')    || '';
+
+// ── STATE ───────────────────────────────────────────────────────
+let inquiryData   = null;
+let threadRows    = [];
+let flaggedItems  = [];
+let reasonLib     = {};
+let currentFlagField = null;
+let currentFlagType  = 'correction';
+let cbId = 0;
+
+// ── JSONP ────────────────────────────────────────────────────────
+function jsonp(url) {
+  return new Promise(function(resolve, reject) {
+    var cb    = 'piiThread_' + (++cbId);
+    var sep   = url.includes('?') ? '&' : '?';
+    var el    = document.createElement('script');
+    el.src    = url + sep + 'callback=' + cb;
+    var timer = setTimeout(function() { cleanup(); reject(new Error('Timed out')); }, 20000);
+    window[cb] = function(data) { cleanup(); clearTimeout(timer); resolve(data); };
+    el.onerror = function() { cleanup(); clearTimeout(timer); reject(new Error('Network error')); };
+    function cleanup() { if (el.parentNode) el.parentNode.removeChild(el); delete window[cb]; }
+    document.head.appendChild(el);
+  });
+}
+
+function apiGet(action, extra) {
+  var q = Object.assign({ action: action }, extra || {});
+  var qs = Object.keys(q).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(q[k]); }).join('&');
+  return jsonp(EXEC_URL + '?' + qs);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+async function init() {
+  if (!INQUIRY_ID) {
+    showError('No inquiryId in URL. Add ?inquiryId=INQ_0001 to the URL.');
+    return;
+  }
+
+  try {
+    // Load inquiry, correspondence, and flag reasons in parallel
+    var [inqRes, corrRes, reasonRes] = await Promise.all([
+      apiGet('getInquiry',     { inquiryId: INQUIRY_ID }),
+      apiGet('getCorrespondence', { clientId: '__pending__' }), // placeholder — will re-fetch after we have clientId
+      apiGet('getFlagReasons'),
+    ]);
+
+    if (!inqRes.success) { showError('Could not load inquiry: ' + (inqRes.error || 'unknown error')); return; }
+
+    inquiryData = inqRes.inquiry;
+    reasonLib   = (reasonRes && reasonRes.reasons) ? reasonRes.reasons : {};
+
+    // Now fetch correspondence with real clientId
+    var corrRes2 = await apiGet('getCorrespondence', { clientId: inquiryData.clientId });
+    // Filter to only this inquiry's rows
+    threadRows = (corrRes2.correspondence || []).filter(function(r) {
+      return String(r.inquiryId) === String(INQUIRY_ID);
+    });
+    // Sort oldest-first for display
+    threadRows.sort(function(a, b) { return new Date(a.messageAt) - new Date(b.messageAt); });
+
+    renderPage();
+  } catch (e) {
+    showError('Failed to load: ' + e.message);
+  }
+}
+
+function showError(msg) {
+  document.getElementById('loadingScreen').innerHTML =
+    '<div style="color:#b91c1c;font-size:14px;padding:20px;text-align:center;">' + msg + '</div>';
+}
+
+// ── RENDER PAGE ──────────────────────────────────────────────────
+function renderPage() {
+  var layout = document.getElementById('mainLayout');
+  var inq = inquiryData;
+
+  var priorityBadge = inq.isPriority
+    ? '<span class="priority-badge">⚡ ' + escHtml(inq.timing) + '</span>'
+    : '';
+
+  var slaBadge = '';
+  if (inq.slaDueAt) {
+    var due = new Date(inq.slaDueAt);
+    var diffH = (due - Date.now()) / 36e5;
+    if (diffH < 0) {
+      slaBadge = '<span class="sla-badge overdue">⚠️ Overdue</span>';
+    } else if (diffH < 12) {
+      slaBadge = '<span class="sla-badge">⏳ Due in ' + Math.round(diffH) + 'h</span>';
+    } else {
+      slaBadge = '<span class="sla-badge ok">✓ ' + Math.round(diffH) + 'h left</span>';
+    }
+  }
+
+  var submittedLabel = inq.submittedAt
+    ? new Date(inq.submittedAt).toLocaleDateString('en-US', { month:'short', day:'numeric' })
+    : '';
+
+  // Conditional chips
+  var hasCoverup = inq.coverupType && inq.coverupType !== 'none' && inq.coverupType !== '';
+  var coverupDetailChip = hasCoverup ? chipHtml('coverupDetail', 'Existing Tattoo Details',
+    (inq.coverupSize || '—') + (inq.coverupAge ? ' · ' + inq.coverupAge : ''), true) : '';
+  var wordsDetailChip = inq.hasWords ? chipHtml('wordsDetail', 'Words / Lettering',
+    inq.wordsDetail || '—', true) : '';
+
+  // Reference photos
+  var photosHtml = '';
+  if (inq.photoUrls && inq.photoUrls.length) {
+    photosHtml = '<div class="ref-photos">';
+    inq.photoUrls.slice(0, 5).forEach(function(url, i) {
+      photosHtml += '<div class="ref-photo-wrap">' +
+        (i === 0 ? '<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>' : '') +
+        '<img src="' + escHtml(url) + '" onerror="this.style.display=\'none\'" />' +
+        '</div>';
+    });
+    photosHtml += '</div>';
+  } else {
+    photosHtml = '<div class="ref-photos"><div class="ref-photo-wrap" style="position:relative;">' +
+      '<div class="ref-photo-ph" style="font-size:20px;line-height:56px;text-align:center;">📷</div>' +
+      '<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>' +
+      '</div></div>';
+  }
+
+  var descSnippet = inq.description
+    ? (inq.description.length > 80 ? inq.description.substring(0, 80) + '…' : inq.description)
+    : '';
+
+  layout.innerHTML = `
+  <!-- STICKY INQUIRY SUMMARY -->
+  <div class="inquiry-card">
+    <div class="inquiry-top">
+      <div>
+        <h2>${escHtml(inq.clientName || '')}${priorityBadge}</h2>
+        <div class="inquiry-meta">${[
+          'Inquiry ' + escHtml(INQUIRY_ID),
+          inq.source      ? escHtml(inq.source)  : null,
+          inq.artist      ? escHtml(inq.artist)  : null,
+          submittedLabel  ? 'Submitted ' + submittedLabel : null,
+        ].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="card-controls">
+        ${slaBadge}
+        <button class="minimize-btn" id="minimizeBtn" onclick="toggleMinimize()" title="Minimize summary">▲</button>
+      </div>
+    </div>
+
+    <div id="inquiryCardBody">
+      <div class="inquiry-details">
+        ${chipHtml('placement',  'Placement',         inq.placement     || '—')}
+        ${chipHtml('size',       'Size (client est.)', inq.sizeEstimate  || '—')}
+        ${chipHtml('style',      'Color / B&W',       inq.style         || '—')}
+        ${chipHtml('coverup',    'Coverup',            coverupLabel(inq.coverupType))}
+        ${inq.additionalNotes ? chipHtml('description', 'Additional Notes', inq.additionalNotes) : ''}
+        ${coverupDetailChip}
+        ${wordsDetailChip}
+      </div>
+
+      ${photosHtml}
+
+      ${descSnippet ? `
+      <button class="description-toggle" onclick="toggleDesc(this)">
+        Description: "${escHtml(descSnippet)}"
+        <span class="icon-pair">
+          <button class="flag-btn" onclick="openFlag('description','correction');event.stopPropagation()">🚩</button>
+          <button class="flag-btn" onclick="openFlag('description','question');event.stopPropagation()">❓</button>
+        </span> ▾
+      </button>
+      <div class="description-text" id="descText">${escHtml(inq.description || '')}</div>` : ''}
+
+      <!-- FLAG POPOVER -->
+      <div class="flag-popover" id="flagPopover">
+        <div class="flag-popover-title"><span id="flagTypeLabel">Flag</span>: <span id="flagFieldName">—</span></div>
+        <select id="flagReason"><option value="">Select a common reason…</option></select>
+        <textarea id="flagCustom" placeholder="Or write a custom note…"></textarea>
+        <div class="flag-popover-actions">
+          <button class="btn-mini btn-mini-cancel" onclick="closeFlag()">Cancel</button>
+          <button class="btn-mini btn-mini-add" id="flagAddBtn" onclick="addFlag()">Add to request</button>
+        </div>
+      </div>
+
+      <div class="flagged-list" id="flaggedList"></div>
+      <button class="btn-send-correction" id="sendCorrectionBtn" onclick="sendCorrectionRequest()" style="display:none;">Send to Client →</button>
+    </div>
+  </div>
+
+  <!-- THREAD -->
+  <div class="thread" id="threadEl">
+    ${renderThreadBubbles()}
+  </div>
+
+  <!-- QUICK REPLY -->
+  <div class="quick-reply">
+    <textarea id="replyText" placeholder="Reply to ${escHtml(inq.clientName || 'client')}…" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply();}"
+      oninput="autoResizeTextarea(this)"></textarea>
+    <button onclick="sendReply()" id="replyBtn">Send</button>
+  </div>
+
+  <!-- QUOTE COMPOSER -->
+  <div class="composer">
+    <div class="composer-header" onclick="toggleComposer()">
+      <h2>Build Quote &amp; Booking Instructions</h2>
+      <span class="composer-chev" id="composerChev">▾</span>
+    </div>
+    <div class="composer-body collapsed" id="composerBody">
+      ${renderQuoteComposer(inq)}
+    </div>
+  </div>
+  `;
+}
+
+function chipHtml(field, label, value, conditional) {
+  return `<div class="detail-chip${conditional ? ' conditional-chip' : ''}" data-field="${field}">
+    <div class="chip-key">${escHtml(label)}<span class="icon-pair"><button class="flag-btn" onclick="openFlag('${field}','correction')">🚩</button><button class="flag-btn" onclick="openFlag('${field}','question')">❓</button></span></div>
+    <div class="chip-val">${escHtml(String(value))}</div>
+  </div>`;
+}
+
+function coverupLabel(type) {
+  if (!type || type === 'none') return 'No';
+  if (type === 'tattoo') return 'Yes — tattoo';
+  if (type === 'scar')   return 'Yes — scar';
+  if (type === 'both')   return 'Yes — tattoo + scar';
+  return type;
+}
+
+// ── THREAD RENDERING ─────────────────────────────────────────────
+function renderThreadBubbles() {
+  if (!threadRows.length) {
+    return '<div class="thread-empty">No correspondence logged yet for this inquiry.</div>';
+  }
+
+  var html = '';
+  var lastDate = '';
+  threadRows.forEach(function(row) {
+    var d = row.messageAt ? new Date(row.messageAt) : null;
+    var dateLabel = d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+    if (dateLabel && dateLabel !== lastDate) {
+      html += '<div class="thread-date-sep">' + dateLabel + '</div>';
+      lastDate = dateLabel;
+    }
+    var timeLabel = d ? d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+    var isOut = row.direction === 'outbound';
+    var sender = isOut ? escHtml(row.staffName || 'Studio') : escHtml(inquiryData.clientName || 'Client');
+    html += `<div class="msg ${isOut ? 'outbound' : 'inbound'}">
+      <div class="msg-body">${escHtml(row.bodyPreview || '')}</div>
+      <div class="msg-meta">${sender} · ${timeLabel}</div>
+    </div>`;
+  });
+  return html;
+}
+
+function addBubbleToThread(direction, body, sender) {
+  var thread = document.getElementById('threadEl');
+  var now    = new Date();
+  var time   = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  var el     = document.createElement('div');
+  el.className = 'msg ' + direction;
+  el.innerHTML = '<div class="msg-body">' + escHtml(body) + '</div>' +
+    '<div class="msg-meta">' + escHtml(sender) + ' · ' + time + '</div>';
+  thread.appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+// ── QUICK REPLY ──────────────────────────────────────────────────
+async function sendReply() {
+  var btn  = document.getElementById('replyBtn');
+  var area = document.getElementById('replyText');
+  var body = area.value.trim();
+  if (!body) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    var res = await apiGet('sendEmail', {
+      clientId:  inquiryData.clientId,
+      toEmail:   inquiryData.clientEmail,
+      subject:   'Re: Your tattoo inquiry — Pretty in Ink',
+      body:      body,
+      inquiryId: INQUIRY_ID,
+      staffName: ARTIST || 'Studio',
+    });
+
+    if (res.success) {
+      addBubbleToThread('outbound', body, ARTIST || 'Studio');
+      area.value = '';
+      area.style.height = '';
+    } else {
+      alert('Send failed: ' + (res.error || 'unknown error'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send';
+}
+
+// ── FLAG SYSTEM ──────────────────────────────────────────────────
+function openFlag(fieldKey, type) {
+  currentFlagField = fieldKey;
+  currentFlagType  = type;
+  var nice = niceFieldName(fieldKey);
+  document.getElementById('flagFieldName').textContent = nice;
+  document.getElementById('flagTypeLabel').textContent = type === 'question' ? 'Question' : 'Flag';
+  document.getElementById('flagAddBtn').textContent = type === 'question' ? 'Add question' : 'Add to correction request';
+
+  var sel     = document.getElementById('flagReason');
+  var customEl = document.getElementById('flagCustom');
+  if (type === 'question') {
+    sel.style.display = 'none';
+    customEl.placeholder = 'What do you want to ask the client about this?';
+  } else {
+    sel.style.display = 'block';
+    sel.innerHTML = '<option value="">Select a common reason…</option>';
+    var reasons = reasonLib[fieldKey] || [];
+    reasons.forEach(function(r) {
+      var opt = document.createElement('option');
+      opt.value = r; opt.textContent = r;
+      sel.appendChild(opt);
+    });
+    customEl.placeholder = 'Or write a custom note for this field…';
+  }
+  customEl.value = '';
+
+  var popover = document.getElementById('flagPopover');
+  popover.classList.add('show');
+  popover.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeFlag() {
+  document.getElementById('flagPopover').classList.remove('show');
+  currentFlagField = null;
+}
+
+function addFlag() {
+  var sel    = document.getElementById('flagReason');
+  var custom = document.getElementById('flagCustom').value.trim();
+  var text   = custom || (currentFlagType === 'correction' ? sel.value : '');
+  if (!text) { alert('Write a note first.'); return; }
+
+  flaggedItems.push({ field: currentFlagField, reason: text, type: currentFlagType });
+  renderFlaggedList();
+  closeFlag();
+}
+
+function removeFlag(index) {
+  flaggedItems.splice(index, 1);
+  renderFlaggedList();
+}
+
+function renderFlaggedList() {
+  var list    = document.getElementById('flaggedList');
+  var sendBtn = document.getElementById('sendCorrectionBtn');
+  if (!list) return;
+  if (!flaggedItems.length) {
+    list.innerHTML = '';
+    sendBtn.style.display = 'none';
+    return;
+  }
+  list.innerHTML = flaggedItems.map(function(item, i) {
+    return '<div class="flagged-item">' +
+      '<div><span class="field-label">' + (item.type === 'question' ? '❓' : '🚩') + ' ' + escHtml(niceFieldName(item.field)) + ':</span> ' + escHtml(item.reason) + '</div>' +
+      '<button class="remove-flag" onclick="removeFlag(' + i + ')">✕</button>' +
+      '</div>';
+  }).join('');
+  sendBtn.style.display = 'block';
+}
+
+async function sendCorrectionRequest() {
+  var corrections = flaggedItems.filter(function(i) { return i.type === 'correction'; });
+  var questions   = flaggedItems.filter(function(i) { return i.type === 'question'; });
+  var clientFirst = (inquiryData.clientName || 'there').split(' ')[0];
+
+  var body = 'Hi ' + clientFirst + ', thanks for sending this over!\n';
+  if (corrections.length) {
+    body += '\nBefore I can put together an accurate quote, could you help clarify a couple of things:\n';
+    corrections.forEach(function(item) { body += '• ' + niceFieldName(item.field) + ': ' + item.reason + '\n'; });
+  }
+  if (questions.length) {
+    body += '\nAlso had a couple of quick questions:\n';
+    questions.forEach(function(item) { body += '• ' + niceFieldName(item.field) + ': ' + item.reason + '\n'; });
+  }
+  body += '\nOnce I have that, I\'ll get your quote right over. Thanks so much!';
+
+  var btn = document.getElementById('sendCorrectionBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    var res = await apiGet('sendCorrection', {
+      inquiryId:   INQUIRY_ID,
+      clientId:    inquiryData.clientId,
+      clientEmail: inquiryData.clientEmail,
+      clientName:  inquiryData.clientName,
+      staffName:   ARTIST || 'Studio',
+      bodyText:    body,
+    });
+
+    if (res.success) {
+      addBubbleToThread('outbound', body, ARTIST || 'Studio');
+      flaggedItems = [];
+      renderFlaggedList();
+    } else {
+      alert('Send failed: ' + (res.error || 'unknown error'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send to Client →';
+}
+
+// ── QUOTE COMPOSER RENDER ────────────────────────────────────────
+function renderQuoteComposer(inq) {
+  var cvTattoo = inq.coverupType === 'tattoo' || inq.coverupType === 'both';
+  var cvScar   = inq.coverupType === 'scar'   || inq.coverupType === 'both';
+  var artistBookingName = escHtml((inq.artist || 'Artist') + ' 2026');
+
+  return `
+  <div class="autofill-bar">
+    <span>Fields pre-filled from the inquiry — edit anything that changed.</span>
+    <button onclick="autofillFromInquiry()">↻ Re-autofill</button>
+  </div>
+
+  <div class="section-label">Design Specs</div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label>Placement</label>
+      <input type="text" id="qPlacement" value="${escAttr(inq.placement || '')}">
+    </div>
+    <div class="field-group">
+      <label>Size (final, in inches)</label>
+      <input type="text" id="qSize" value="${escAttr(inq.sizeEstimate || '')}" placeholder="e.g. 8.5 x 11">
+    </div>
+  </div>
+
+  <div class="checkbox-row">
+    <input type="checkbox" id="cvTattoo" ${cvTattoo ? 'checked' : ''} onchange="toggleConditional('cvTattoo','coverupTattooFields')">
+    <label for="cvTattoo">This covers an existing tattoo</label>
+  </div>
+  <div class="conditional-fields ${cvTattoo ? 'show' : ''}" id="coverupTattooFields">
+    <div class="field-row">
+      <div class="field-group"><label>Existing tattoo size</label><input type="text" id="cvTattooSize" value="${escAttr(inq.coverupSize || '')}"></div>
+      <div class="field-group"><label>Approx. age</label><input type="text" id="cvTattooAge" value="${escAttr(inq.coverupAge || '')}"></div>
+    </div>
+  </div>
+
+  <div class="checkbox-row">
+    <input type="checkbox" id="cvScar" ${cvScar ? 'checked' : ''} onchange="toggleConditional('cvScar','coverupScarFields')">
+    <label for="cvScar">This covers a scar</label>
+  </div>
+  <div class="conditional-fields ${cvScar ? 'show' : ''}" id="coverupScarFields">
+    <div class="field-row">
+      <div class="field-group"><label>Scar size</label><input type="text" id="cvScarSize" placeholder="e.g. 2 x 1"></div>
+      <div class="field-group"><label>Scar age</label><input type="text" id="cvScarAge" placeholder="e.g. 3 years"></div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label>Style</label>
+    <select id="qStyle">
+      <option value="">— Select —</option>
+      <option>Fine line</option>
+      <option>Fine line with dot work shading</option>
+      <option>Realistic</option>
+      <option>Saturated color</option>
+      <option>High-contrast black &amp; grey</option>
+      <option>Black outline / linework only</option>
+      <option>Traditional</option>
+    </select>
+    <div style="font-size:11.5px;color:var(--gray);margin-top:5px;">Client's color preference: <strong>${escHtml(inq.style || '—')}</strong></div>
+  </div>
+
+  <div class="field-group">
+    <label>Design details</label>
+    <textarea class="composer-ta" id="qDesign">${escHtml(inq.description || '')}</textarea>
+  </div>
+
+  <div class="checkbox-row">
+    <input type="checkbox" id="hasWords" ${inq.hasWords ? 'checked' : ''} onchange="toggleConditional('hasWords','wordsFields')">
+    <label for="hasWords">Includes words / symbols / lettering</label>
+  </div>
+  <div class="conditional-fields ${inq.hasWords ? 'show' : ''}" id="wordsFields">
+    <div class="field-row">
+      <div class="field-group"><label>Text content</label><input type="text" id="qWordsText" value="${escAttr(inq.wordsDetail || '')}" placeholder="Exact words/symbols"></div>
+      <div class="field-group"><label>Font</label><input type="text" id="qFont" placeholder="Font name"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Pricing &amp; Logistics</div>
+
+  <div class="field-row">
+    <div class="field-group">
+      <label>Price</label>
+      <input type="text" id="qPrice" placeholder="e.g. $1,200">
+    </div>
+    <div class="field-group">
+      <label>Estimated time</label>
+      <input type="text" id="qTime" placeholder="e.g. 5-6 hr">
+    </div>
+  </div>
+  <div class="field-group">
+    <label>Numbing size needed</label>
+    <select id="numbingSize" onchange="updateBookingBlock()">
+      <option>N/A</option>
+      <option>S</option>
+      <option>M</option>
+      <option>L</option>
+      <option>XL</option>
+    </select>
+  </div>
+
+  <div class="section-label">Financing &amp; Booking <span class="editable-flag">(auto-generated, editable)</span></div>
+  <div class="template-block" id="bookingBlock">
+    <span class="t-section">financing</span>
+    📣 We offer afterpay if you'd like to finance your tattoo, read more at <strong>www.prettyinink.net/tattoolayaway</strong>
+    <br><br>
+    <span class="t-section">booking</span>
+    📅 Ready to book? Head to <strong>www.prettyinink.net/booking</strong>
+    <br>• Select the appropriate price quote under "<strong id="artistBookingName">${artistBookingName}</strong>"
+    <br>• Add on any numbing/merchandise you'd like
+    <br>&nbsp;&nbsp;• You'll need size: <strong id="numbingSizeDisplay">N/A</strong>
+  </div>
+
+  <div class="section-label">Disclaimers <span class="editable-flag" style="font-weight:400;">(standard wording — do not paraphrase)</span></div>
+  <div class="template-block">
+    ***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***
+    <br><br>
+    **if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**
+    <br><br>
+    ***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time &amp; wait in their vehicle while the numbing is working.***
+    <br><br>
+    ***should you want an appointment sooner than what is available in the artist's schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***
+  </div>
+
+  <div class="section-label">What's Next</div>
+  <div class="template-block">
+    **you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don't miss future correspondence**
+    <br><br>
+    **A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**
+    <br><br>
+    See you soon!!
+    <div class="std-note">📌 "whitelist/email" language is flagged for a future update once the client portal replaces email-based sketch delivery — matches the deferred copy-audit already on the to-do list.</div>
+  </div>
+
+  <div class="send-row">
+    <span class="status-msg" id="quoteSendStatus"></span>
+    <button class="btn btn-secondary" onclick="saveDraftQuote()">Save Draft</button>
+    <button class="btn btn-primary" id="sendQuoteBtn" onclick="sendQuote()">Send Quote &amp; Log</button>
+  </div>
+  `;
+}
+
+// ── QUOTE ACTIONS ─────────────────────────────────────────────────
+function toggleComposer() {
+  var body = document.getElementById('composerBody');
+  var chev = document.getElementById('composerChev');
+  var collapsed = body.classList.toggle('collapsed');
+  chev.classList.toggle('open', !collapsed);
+}
+
+function toggleConditional(checkboxId, targetId) {
+  var checked = document.getElementById(checkboxId).checked;
+  var el = document.getElementById(targetId);
+  if (el) el.classList.toggle('show', checked);
+}
+
+function updateBookingBlock() {
+  var size = document.getElementById('numbingSize').value;
+  var el   = document.getElementById('numbingSizeDisplay');
+  if (el) el.textContent = size;
+}
+
+function autofillFromInquiry() {
+  if (!inquiryData) return;
+  var inq = inquiryData;
+  setValue('qPlacement', inq.placement || '');
+  setValue('qSize',      inq.sizeEstimate || '');
+  setValue('qDesign',    inq.description || '');
+  setValue('qStyle',     inq.style || '');
+  setValue('qWordsText', inq.wordsDetail || '');
+}
+
+function setValue(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+function saveDraftQuote() {
+  // Store in sessionStorage as a simple local draft
+  var draft = collectQuoteData();
+  sessionStorage.setItem('quoteDraft_' + INQUIRY_ID, JSON.stringify(draft));
+  var status = document.getElementById('quoteSendStatus');
+  status.textContent = 'Draft saved.';
+  status.className = 'status-msg ok';
+  setTimeout(function() { status.textContent = ''; }, 2000);
+}
+
+function collectQuoteData() {
+  return {
+    placement:       v('qPlacement'),
+    sizeFinal:       v('qSize'),
+    style:           v('qStyle'),
+    price:           v('qPrice'),
+    estimatedTime:   v('qTime'),
+    numbingSize:     v('numbingSize'),
+    coverupTattoo:   document.getElementById('cvTattoo') && document.getElementById('cvTattoo').checked,
+    coverupTattooSize: v('cvTattooSize'),
+    coverupTattooAge:  v('cvTattooAge'),
+    coverupScar:     document.getElementById('cvScar') && document.getElementById('cvScar').checked,
+    coverupScarSize: v('cvScarSize'),
+    coverupScarAge:  v('cvScarAge'),
+    hasWords:        document.getElementById('hasWords') && document.getElementById('hasWords').checked,
+    wordsDetail:     v('qWordsText') + (v('qFont') ? ' (' + v('qFont') + ')' : ''),
+    designDetails:   v('qDesign'),
+  };
+}
+
+function v(id) {
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+async function sendQuote() {
+  var d = collectQuoteData();
+  if (!d.price) { alert('Enter a price before sending.'); return; }
+
+  var inq     = inquiryData;
+  var first   = (inq.clientName || 'there').split(' ')[0];
+  var artist  = ARTIST || inq.artist || 'Studio';
+
+  // Compose the full quote email body
+  var body = 'Hi ' + first + '!\n\n';
+  body += 'Here is your price quote from Pretty in Ink:\n\n';
+  body += '• Design: ' + (d.designDetails || d.style || '') + '\n';
+  body += '• Placement: ' + (d.placement || '') + '\n';
+  body += '• Size: ' + (d.sizeFinal || '') + '\n';
+  body += '• Style: ' + (d.style || '') + '\n';
+  if (d.coverupTattoo) body += '• Covers existing tattoo (' + (d.coverupTattooSize || '') + ', ~' + (d.coverupTattooAge || '') + ')\n';
+  if (d.coverupScar)   body += '• Covers scar (' + (d.coverupScarSize || '') + ', ~' + (d.coverupScarAge || '') + ')\n';
+  if (d.hasWords)      body += '• Includes lettering/words: ' + (d.wordsDetail || '') + '\n';
+  body += '\n';
+  body += '💰 Price estimate: ' + d.price + '\n';
+  body += '⏱ Estimated time: ' + (d.estimatedTime || '') + '\n\n';
+
+  body += '📣 We offer afterpay if you\'d like to finance your tattoo, read more at www.prettyinink.net/tattoolayaway\n\n';
+  body += '📅 Ready to book? Head to www.prettyinink.net/booking\n';
+  body += '• Select the appropriate price quote under "' + artist + ' 2026"\n';
+  body += '• Add on any numbing/merchandise you\'d like\n';
+  if (d.numbingSize && d.numbingSize !== 'N/A') body += '  • You\'ll need size: ' + d.numbingSize + '\n';
+  body += '\n';
+  body += '***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***\n\n';
+  body += '**if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**\n\n';
+  body += '***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time & wait in their vehicle while the numbing is working.***\n\n';
+  body += '***should you want an appointment sooner than what is available in the artist\'s schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***\n\n';
+  body += '**you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don\'t miss future correspondence**\n\n';
+  body += '**A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**\n\n';
+  body += 'See you soon!!';
+
+  var btn    = document.getElementById('sendQuoteBtn');
+  var status = document.getElementById('quoteSendStatus');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  status.textContent = '';
+
+  try {
+    var res = await apiGet('sendQuote', Object.assign({
+      inquiryId:   INQUIRY_ID,
+      clientId:    inq.clientId,
+      clientEmail: inq.clientEmail,
+      clientName:  inq.clientName,
+      staffName:   artist,
+      subject:     'Your tattoo quote from Pretty in Ink — ' + first,
+      bodyText:    body,
+    }, d));
+
+    if (res.success) {
+      addBubbleToThread('outbound', body, artist);
+      status.textContent = '✓ Quote sent & logged!';
+      status.className = 'status-msg ok';
+      setTimeout(function() { status.textContent = ''; }, 4000);
+    } else {
+      status.textContent = 'Error: ' + (res.error || 'unknown');
+      status.className = 'status-msg err';
+    }
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    status.className = 'status-msg err';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send Quote & Log';
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────────
+function toggleMinimize() {
+  var body = document.getElementById('inquiryCardBody');
+  var btn  = document.getElementById('minimizeBtn');
+  var min  = body.classList.toggle('minimized');
+  btn.textContent = min ? '▼' : '▲';
+  btn.title = min ? 'Expand inquiry details' : 'Minimize to see more of the thread';
+}
+
+function toggleDesc(btn) {
+  var el = document.getElementById('descText');
+  if (!el) return;
+  el.classList.toggle('expanded');
+  var expanded = el.classList.contains('expanded');
+  btn.textContent = btn.textContent.replace(expanded ? '▾' : '▴', expanded ? '▴' : '▾');
+}
+
+function autoResizeTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function niceFieldName(key) {
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, function(s) { return s.toUpperCase(); });
+}
+
+function escHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function escAttr(s) {
+  return String(s || '').replace(/"/g, '&quot;');
+}
+
+// ── START ────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

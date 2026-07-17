@@ -17,6 +17,8 @@
   --border: #e8dcd8;
   --white: #ffffff;
   --gold: #a1005a;
+  --green: #065f46;
+  --green-lt: #d1fae5;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: var(--ink); }
@@ -34,18 +36,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
   padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2);
 }
 .header nav a:hover { background: rgba(255,255,255,0.1); }
-.header nav a.active { background: var(--pink-lt); color: var(--ink); border-color: var(--pink-lt); }
 
 .layout { max-width: 860px; margin: 0 auto; padding-bottom: 60px; }
 
-.loading-screen {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 50vh; gap: 12px; color: var(--gray);
-}
-.spinner {
-  width: 32px; height: 32px; border: 3px solid var(--pink-lt);
-  border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite;
-}
+.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 12px; color: var(--gray); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--pink-lt); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── INQUIRY SUMMARY CARD ── */
@@ -55,26 +50,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 }
 .inquiry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .inquiry-top h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; font-style: italic; line-height: 1.2; }
-.priority-badge {
-  font-family: 'DM Sans', sans-serif; font-style: normal; font-size: 11px; font-weight: 700;
-  background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 999px;
-  text-transform: uppercase; letter-spacing: 0.3px; vertical-align: middle; margin-left: 8px;
-}
 .inquiry-meta { font-size: 12.5px; color: var(--gray); margin-top: 3px; }
 .card-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.badge {
-  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
-  text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
-}
-.badge.quote-sent { background: #d1fae5; color: #065f46; }
-.badge.sla-urgent { background: #fde68a; color: #7c5800; }
-.badge.sla-overdue { background: #fee2e2; color: #b91c1c; }
-.badge.sla-ok { background: #d1fae5; color: #065f46; }
-.minimize-btn {
-  background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 8px;
-  width: 28px; height: 28px; cursor: pointer; font-size: 11px; color: var(--gray);
-  display: flex; align-items: center; justify-content: center;
-}
+.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.badge.quote-sent { background: var(--green-lt); color: var(--green); }
+.minimize-btn { background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; font-size: 11px; color: var(--gray); display: flex; align-items: center; justify-content: center; }
 .minimize-btn:hover { background: var(--pink-lt); }
 #inquiryCardBody.minimized { display: none; }
 
@@ -84,23 +64,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .chip-key { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gray); display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
 .chip-val { font-weight: 500; }
 .icon-pair { display: inline-flex; gap: 2px; }
-.flag-btn { background: none; border: none; cursor: pointer; font-size: 11px; padding: 0 1px; opacity: 0.3; vertical-align: middle; }
+.flag-btn { background: none; border: none; cursor: pointer; font-size: 11px; padding: 0 1px; opacity: 0.3; }
 .flag-btn:hover { opacity: 1; }
 
 .ref-photos { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .ref-photo-wrap { position: relative; }
-.ref-photo-wrap img, .ref-photo-ph {
-  width: 56px; height: 56px; border-radius: 8px; object-fit: cover;
-  border: 1.5px solid var(--border); display: block; background: var(--gray-lt);
-  font-size: 22px; line-height: 56px; text-align: center;
-}
+.ref-photo-wrap img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; border: 1.5px solid var(--border); display: block; }
+.ref-photo-ph { width: 56px; height: 56px; border-radius: 8px; background: var(--gray-lt); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 22px; }
 .photo-icons { position: absolute; bottom: -3px; right: -3px; background: white; border-radius: 6px; padding: 1px 2px; display: flex; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 
 .description-toggle { font-size: 12px; color: var(--pink); background: none; border: none; cursor: pointer; margin-top: 10px; font-weight: 600; display: block; text-align: left; line-height: 1.5; }
 .description-text { font-size: 13px; color: var(--ink); margin-top: 6px; line-height: 1.6; display: none; }
 .description-text.expanded { display: block; }
 
-/* ── FLAG POPOVER ── */
+/* ── FLAG SYSTEM ── */
 .flag-popover { display: none; margin-top: 12px; background: var(--cream); border: 1.5px solid var(--pink-lt); border-radius: 10px; padding: 14px; }
 .flag-popover.show { display: block; }
 .flag-popover-title { font-size: 12.5px; font-weight: 700; margin-bottom: 8px; color: var(--gold); }
@@ -117,6 +94,36 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .flagged-item .remove-flag { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 13px; flex-shrink: 0; }
 .btn-send-correction { margin-top: 12px; width: 100%; padding: 11px; border-radius: 999px; border: none; background: var(--ink); color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
 .btn-send-correction:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── QUOTE ON FILE PANEL ── */
+.quote-panel {
+  background: var(--white); border-left: 4px solid var(--green); margin: 12px 24px 0;
+  border-radius: 12px; padding: 16px 18px; border: 1.5px solid var(--green-lt);
+  border-left: 4px solid #10b981;
+}
+.quote-panel-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.quote-panel-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic;
+  display: flex; align-items: center; gap: 8px;
+}
+.quote-panel-title .sent-date { font-family: 'DM Sans', sans-serif; font-style: normal; font-size: 11px; color: var(--gray); font-weight: 400; }
+.quote-edit-btn {
+  background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 999px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+  color: var(--ink); display: flex; align-items: center; gap: 5px;
+}
+.quote-edit-btn:hover { border-color: var(--pink); color: var(--pink); }
+.quote-fields {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;
+}
+.qf {
+  background: var(--green-lt); border-radius: 8px; padding: 7px 10px; font-size: 12.5px;
+}
+.qf-key { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: #065f46; margin-bottom: 2px; }
+.qf-val { font-weight: 700; color: var(--ink); }
+.quote-notes { font-size: 12.5px; color: var(--gray); margin-top: 10px; line-height: 1.5; border-top: 1px solid var(--green-lt); padding-top: 8px; }
 
 /* ── THREAD ── */
 .thread { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
@@ -180,7 +187,7 @@ textarea.composer-ta { min-height: 64px; resize: vertical; }
 <div class="header">
   <h1>Pretty in Ink</h1>
   <nav>
-    <a href="pii-inquiry-inbox.html" id="navInbox">Inquiries</a>
+    <a href="pii-inquiry-inbox.html">Inquiries</a>
     <a href="pii-appointments.html">Appointments</a>
     <a href="pii-correspondence.html">Correspondence</a>
   </nav>
@@ -189,7 +196,7 @@ textarea.composer-ta { min-height: 64px; resize: vertical; }
 <div class="layout" id="mainLayout">
   <div class="loading-screen" id="loadingScreen">
     <div class="spinner"></div>
-    <div>Loading inquiry…</div>
+    <div id="loadingMsg">Loading inquiry…</div>
   </div>
 </div>
 
@@ -202,13 +209,14 @@ const ARTIST     = params.get('artist')    || '';
 
 let inquiryData  = null;
 let threadRows   = [];
-let flaggedItems = [];
 let reasonLib    = {};
+let savedQuote   = null;
+let flaggedItems = [];
 let currentFlagField = null;
 let currentFlagType  = 'correction';
 let cbId = 0;
 
-// ── JSONP — one at a time to avoid Apps Script concurrent request limits ──
+// ── JSONP — sequential to avoid Apps Script concurrent limits ──
 function jsonp(url) {
   return new Promise(function(resolve, reject) {
     var cb    = 'piiThread_' + (++cbId);
@@ -229,64 +237,49 @@ function apiGet(action, extra) {
   return jsonp(EXEC_URL + '?' + qs);
 }
 
-// ── INIT — sequential to avoid concurrent Apps Script rejections ──────────
+// ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  if (!INQUIRY_ID) { showError('No inquiryId in URL. Add ?inquiryId=INQ_0001 to the URL.'); return; }
-
+  if (!INQUIRY_ID) { showError('No inquiryId in URL.'); return; }
   try {
-    // Step 1: load inquiry
-    updateLoadingMsg('Loading inquiry…');
+    setLoading('Loading inquiry…');
     var inqRes = await apiGet('getInquiry', { inquiryId: INQUIRY_ID });
     if (!inqRes.success) { showError('Could not load inquiry: ' + (inqRes.error || 'unknown')); return; }
     inquiryData = inqRes.inquiry;
 
-    // Step 2: load correspondence
-    updateLoadingMsg('Loading thread…');
+    setLoading('Loading correspondence…');
     var corrRes = await apiGet('getCorrespondence', { clientId: inquiryData.clientId });
     threadRows = ((corrRes && corrRes.correspondence) || []).filter(function(r) {
       return String(r.inquiryId) === String(INQUIRY_ID);
     });
-    threadRows.sort(function(a, b) { return new Date(a.messageAt) - new Date(b.messageAt); });
+    threadRows.sort(function(a, b) { return new Date(a.messageAt || 0) - new Date(b.messageAt || 0); });
 
-    // Step 3: load flag reasons
-    updateLoadingMsg('Loading…');
+    setLoading('Loading quote…');
+    var quoteRes = await apiGet('getQuote', { inquiryId: INQUIRY_ID });
+    savedQuote = (quoteRes && quoteRes.quote) || null;
+
+    setLoading('Loading…');
     var reasonRes = await apiGet('getFlagReasons');
     reasonLib = (reasonRes && reasonRes.reasons) ? reasonRes.reasons : {};
 
     renderPage();
-  } catch (e) {
+  } catch(e) {
     showError('Failed to load: ' + e.message);
   }
 }
 
-function updateLoadingMsg(msg) {
-  var el = document.querySelector('#loadingScreen div:last-child');
-  if (el) el.textContent = msg;
-}
-
+function setLoading(msg) { var el = document.getElementById('loadingMsg'); if (el) el.textContent = msg; }
 function showError(msg) {
   document.getElementById('loadingScreen').innerHTML =
     '<div style="color:#b91c1c;font-size:14px;padding:20px;text-align:center;max-width:400px;">' + msg + '</div>';
 }
 
-// ── RENDER PAGE ────────────────────────────────────────────────────────────
+// ── RENDER PAGE ───────────────────────────────────────────────
 function renderPage() {
   var layout = document.getElementById('mainLayout');
   var inq    = inquiryData;
 
-  var priorityBadge = inq.isPriority
-    ? '<span class="priority-badge">⚡ ' + escHtml(inq.timing) + '</span>' : '';
-
   var quoteSentBadge = inq.status === 'quoted'
     ? '<span class="badge quote-sent">✓ Quote Sent</span>' : '';
-
-  var slaBadge = '';
-  if (inq.slaDueAt) {
-    var due = new Date(inq.slaDueAt), diffH = (due - Date.now()) / 36e5;
-    if      (diffH < 0)  slaBadge = '<span class="badge sla-overdue">⚠️ Overdue</span>';
-    else if (diffH < 12) slaBadge = '<span class="badge sla-urgent">⏳ Due in ' + Math.round(diffH) + 'h</span>';
-    else                 slaBadge = '<span class="badge sla-ok">✓ ' + Math.round(diffH) + 'h left</span>';
-  }
 
   var metaParts = [
     'Inquiry ' + escHtml(INQUIRY_ID),
@@ -295,37 +288,41 @@ function renderPage() {
     inq.submittedAt ? 'Submitted ' + new Date(inq.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : null,
   ].filter(Boolean).join(' · ');
 
-  var hasCoverup = inq.coverupType && inq.coverupType !== 'none';
-  var coverupDetailChip = hasCoverup ? chipHtml('coverupDetail','Existing Tattoo Details',(inq.coverupSize||'—')+(inq.coverupAge?' · '+inq.coverupAge:''),true) : '';
-  var wordsDetailChip   = inq.hasWords ? chipHtml('wordsDetail','Words / Lettering', inq.wordsDetail||'—', true) : '';
-  var notesChip = inq.additionalNotes ? chipHtml('description','Additional Notes', inq.additionalNotes) : '';
+  var hasCoverup      = inq.coverupType && inq.coverupType !== 'none';
+  var coverupChip     = hasCoverup ? chipHtml('coverupDetail','Existing Tattoo',(inq.coverupSize||'—')+(inq.coverupAge?' · '+inq.coverupAge:''),true) : '';
+  var wordsChip       = inq.hasWords ? chipHtml('wordsDetail','Words / Lettering', inq.wordsDetail||'—', true) : '';
+  var notesChip       = inq.additionalNotes ? chipHtml('description','Additional Notes', inq.additionalNotes) : '';
 
   var photosHtml = '<div class="ref-photos">';
   var photos = (inq.photoUrls && inq.photoUrls.length) ? inq.photoUrls.slice(0,5) : [];
   if (photos.length) {
-    photos.forEach(function(url, i) {
+    photos.forEach(function(url,i) {
       photosHtml += '<div class="ref-photo-wrap">' +
-        (i===0 ? '<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>' : '') +
+        (i===0?'<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>':'') +
         '<img src="'+escHtml(url)+'" onerror="this.style.display=\'none\'">' +
         '</div>';
     });
   } else {
-    photosHtml += '<div class="ref-photo-wrap" style="position:relative"><div class="ref-photo-ph">📷</div>' +
+    photosHtml += '<div class="ref-photo-wrap"><div class="ref-photo-ph">📷</div>' +
       '<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div></div>';
   }
   photosHtml += '</div>';
 
   var descSnippet = inq.description ? (inq.description.length>80 ? inq.description.substring(0,80)+'…' : inq.description) : '';
 
+  // Quote panel HTML
+  var quotePanelHtml = savedQuote ? renderQuotePanel(savedQuote) : '';
+
   layout.innerHTML = `
+  <!-- INQUIRY SUMMARY (sticky) -->
   <div class="inquiry-card">
     <div class="inquiry-top">
       <div>
-        <h2>${escHtml(inq.clientName||'')}${priorityBadge}</h2>
+        <h2>${escHtml(inq.clientName||'')}</h2>
         <div class="inquiry-meta">${metaParts}</div>
       </div>
       <div class="card-controls">
-        ${quoteSentBadge}${slaBadge}
+        ${quoteSentBadge}
         <button class="minimize-btn" id="minimizeBtn" onclick="toggleMinimize()">▲</button>
       </div>
     </div>
@@ -335,17 +332,19 @@ function renderPage() {
         ${chipHtml('size','Size (client est.)',inq.sizeEstimate||'—')}
         ${chipHtml('style','Color / B&W',inq.style||'—')}
         ${chipHtml('coverup','Coverup',coverupLabel(inq.coverupType))}
-        ${coverupDetailChip}${wordsDetailChip}${notesChip}
+        ${coverupChip}${wordsChip}${notesChip}
       </div>
       ${photosHtml}
-      ${descSnippet ? `<button class="description-toggle" onclick="toggleDesc(this)">Description: "${escHtml(descSnippet)}" <span class="icon-pair"><button class="flag-btn" onclick="openFlag('description','correction');event.stopPropagation()">🚩</button><button class="flag-btn" onclick="openFlag('description','question');event.stopPropagation()">❓</button></span> ▾</button><div class="description-text" id="descText">${escHtml(inq.description||'')}</div>` : ''}
+      ${descSnippet ? `<button class="description-toggle" onclick="toggleDesc(this)">Description: "${escHtml(descSnippet)}" ▾</button><div class="description-text" id="descText">${escHtml(inq.description||'')}</div>` : ''}
+
+      <!-- FLAGS -->
       <div class="flag-popover" id="flagPopover">
         <div class="flag-popover-title"><span id="flagTypeLabel">Flag</span>: <span id="flagFieldName">—</span></div>
         <select id="flagReason"><option value="">Select a common reason…</option></select>
         <textarea id="flagCustom" placeholder="Or write a custom note…"></textarea>
         <div class="flag-popover-actions">
           <button class="btn-mini btn-mini-cancel" onclick="closeFlag()">Cancel</button>
-          <button class="btn-mini btn-mini-add" id="flagAddBtn" onclick="addFlag()">Add to request</button>
+          <button class="btn-mini btn-mini-add" id="flagAddBtn" onclick="addFlag()">Add</button>
         </div>
       </div>
       <div class="flagged-list" id="flaggedList"></div>
@@ -353,8 +352,13 @@ function renderPage() {
     </div>
   </div>
 
+  <!-- QUOTE ON FILE -->
+  ${quotePanelHtml}
+
+  <!-- THREAD -->
   <div class="thread" id="threadEl">${renderThreadBubbles()}</div>
 
+  <!-- QUICK REPLY -->
   <div class="quick-reply">
     <textarea id="replyText" placeholder="Reply to ${escHtml(inq.clientName||'client')}…" rows="1"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply();}"
@@ -362,32 +366,76 @@ function renderPage() {
     <button onclick="sendReply()" id="replyBtn">Send</button>
   </div>
 
+  <!-- QUOTE COMPOSER -->
   <div class="composer">
     <div class="composer-header" onclick="toggleComposer()">
-      <h2>Build Quote &amp; Booking Instructions</h2>
+      <h2 id="composerTitle">${savedQuote ? 'Revise Quote' : 'Build Quote &amp; Booking Instructions'}</h2>
       <span class="composer-chev" id="composerChev">▾</span>
     </div>
     <div class="composer-body collapsed" id="composerBody">
-      ${renderQuoteComposer(inq)}
+      ${renderQuoteComposer(inq, savedQuote)}
     </div>
   </div>
   `;
 }
 
-function chipHtml(field, label, value, conditional) {
-  return '<div class="detail-chip'+(conditional?' conditional-chip':'')+'" data-field="'+field+'">' +
-    '<div class="chip-key">'+escHtml(label)+'<span class="icon-pair"><button class="flag-btn" onclick="openFlag(\''+field+'\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\''+field+'\',\'question\')">❓</button></span></div>' +
-    '<div class="chip-val">'+escHtml(String(value))+'</div></div>';
-}
-function coverupLabel(t) {
-  if (!t||t==='none') return 'No';
-  if (t==='tattoo') return 'Yes — tattoo';
-  if (t==='scar')   return 'Yes — scar';
-  if (t==='both')   return 'Yes — tattoo + scar';
-  return t;
+// ── QUOTE PANEL ───────────────────────────────────────────────
+function renderQuotePanel(q) {
+  var sentDate = q.sentAt ? new Date(q.sentAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '';
+  var fields = [
+    q.placement     ? { k:'Placement',   v: q.placement }     : null,
+    q.sizeFinal     ? { k:'Final Size',  v: q.sizeFinal }     : null,
+    q.style         ? { k:'Style',       v: q.style }         : null,
+    q.price         ? { k:'Price',       v: q.price }         : null,
+    q.estimatedTime ? { k:'Est. Time',   v: q.estimatedTime } : null,
+    q.numbingSize && q.numbingSize !== 'N/A' ? { k:'Numbing Size', v: q.numbingSize } : null,
+  ].filter(Boolean);
+
+  var fieldsHtml = '<div class="quote-fields">' +
+    fields.map(function(f){
+      return '<div class="qf"><div class="qf-key">'+escHtml(f.k)+'</div><div class="qf-val">'+escHtml(f.v)+'</div></div>';
+    }).join('') + '</div>';
+
+  var notes = [];
+  if (q.coverupTattoo) notes.push('Covers existing tattoo');
+  if (q.coverupScar)   notes.push('Covers scar');
+  if (q.hasWords)      notes.push('Includes lettering');
+  if (q.designDetails) notes.push(q.designDetails);
+  var notesHtml = notes.length ? '<div class="quote-notes">' + escHtml(notes.join(' · ')) + '</div>' : '';
+
+  return '<div class="quote-panel" id="quotePanelEl">' +
+    '<div class="quote-panel-header">' +
+      '<div class="quote-panel-title">✓ Quote on File <span class="sent-date">Sent ' + escHtml(sentDate) + '</span></div>' +
+      '<button class="quote-edit-btn" onclick="editQuote()">✏️ Revise</button>' +
+    '</div>' +
+    fieldsHtml +
+    notesHtml +
+  '</div>';
 }
 
-// ── THREAD ────────────────────────────────────────────────────────────────
+function editQuote() {
+  // Pre-fill composer from saved quote and open it
+  if (savedQuote) {
+    setV('qPlacement', savedQuote.placement);
+    setV('qSize',      savedQuote.sizeFinal);
+    setV('qStyle',     savedQuote.style);
+    setV('qPrice',     savedQuote.price);
+    setV('qTime',      savedQuote.estimatedTime);
+    setV('numbingSize',savedQuote.numbingSize||'N/A');
+    setV('qDesign',    savedQuote.designDetails);
+    updateBookingBlock();
+    if (savedQuote.coverupTattoo) { var el=document.getElementById('cvTattoo'); if(el){el.checked=true; toggleConditional('cvTattoo','coverupTattooFields');} }
+    if (savedQuote.coverupScar)   { var el=document.getElementById('cvScar');   if(el){el.checked=true; toggleConditional('cvScar','coverupScarFields');} }
+    if (savedQuote.hasWords)      { var el=document.getElementById('hasWords'); if(el){el.checked=true; toggleConditional('hasWords','wordsFields');} }
+  }
+  var body = document.getElementById('composerBody');
+  var chev = document.getElementById('composerChev');
+  if (body) body.classList.remove('collapsed');
+  if (chev) chev.classList.add('open');
+  document.querySelector('.composer').scrollIntoView({behavior:'smooth'});
+}
+
+// ── THREAD ────────────────────────────────────────────────────
 function renderThreadBubbles() {
   if (!threadRows.length) return '<div class="thread-empty">No correspondence logged yet for this inquiry.</div>';
   var html = '', lastDate = '';
@@ -405,20 +453,18 @@ function renderThreadBubbles() {
 
 function addBubble(direction, body, sender) {
   var thread = document.getElementById('threadEl');
-  var now    = new Date();
-  var el     = document.createElement('div');
+  var el = document.createElement('div');
   el.className = 'msg ' + direction;
+  var now = new Date();
   el.innerHTML = '<div class="msg-body">'+escHtml(body)+'</div><div class="msg-meta">'+escHtml(sender)+' · '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</div>';
   thread.appendChild(el);
   el.scrollIntoView({behavior:'smooth',block:'end'});
 }
 
-// ── QUICK REPLY ────────────────────────────────────────────────────────────
+// ── QUICK REPLY ───────────────────────────────────────────────
 async function sendReply() {
-  var btn  = document.getElementById('replyBtn');
-  var area = document.getElementById('replyText');
-  var body = area.value.trim();
-  if (!body) return;
+  var btn = document.getElementById('replyBtn'), area = document.getElementById('replyText');
+  var body = area.value.trim(); if (!body) return;
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
     var res = await apiGet('sendEmail', { clientId: inquiryData.clientId, toEmail: inquiryData.clientEmail, subject: 'Re: Your tattoo inquiry — Pretty in Ink', body: body, inquiryId: INQUIRY_ID, staffName: ARTIST||'Studio' });
@@ -428,20 +474,20 @@ async function sendReply() {
   btn.disabled = false; btn.textContent = 'Send';
 }
 
-// ── FLAG SYSTEM ───────────────────────────────────────────────────────────
+// ── FLAG SYSTEM ───────────────────────────────────────────────
 function openFlag(fieldKey, type) {
   currentFlagField = fieldKey; currentFlagType = type;
   document.getElementById('flagFieldName').textContent = niceFieldName(fieldKey);
   document.getElementById('flagTypeLabel').textContent = type==='question' ? 'Question' : 'Flag';
-  document.getElementById('flagAddBtn').textContent = type==='question' ? 'Add question' : 'Add to correction request';
+  document.getElementById('flagAddBtn').textContent    = type==='question' ? 'Add question' : 'Add to correction request';
   var sel = document.getElementById('flagReason'), customEl = document.getElementById('flagCustom');
-  if (type==='question') { sel.style.display='none'; customEl.placeholder='What do you want to ask the client about this?'; }
+  if (type==='question') { sel.style.display='none'; customEl.placeholder='What do you want to ask?'; }
   else {
     sel.style.display='block'; sel.innerHTML='<option value="">Select a common reason…</option>';
     (reasonLib[fieldKey]||[]).forEach(function(r){ var o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
     customEl.placeholder='Or write a custom note…';
   }
-  customEl.value='';
+  customEl.value = '';
   document.getElementById('flagPopover').classList.add('show');
   document.getElementById('flagPopover').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -467,11 +513,11 @@ async function sendCorrectionRequest() {
   var corrections = flaggedItems.filter(function(i){return i.type==='correction';});
   var questions   = flaggedItems.filter(function(i){return i.type==='question';});
   var first = (inquiryData.clientName||'there').split(' ')[0];
-  var body  = 'Hi '+first+', thanks for sending this over!\n';
+  var body = 'Hi '+first+', thanks for sending this over!\n';
   if (corrections.length) { body+='\nBefore I can put together an accurate quote, could you help clarify a couple of things:\n'; corrections.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';}); }
   if (questions.length)   { body+='\nAlso had a couple of quick questions:\n'; questions.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';}); }
   body += '\nOnce I have that, I\'ll get your quote right over. Thanks so much!';
-  var btn = document.getElementById('sendCorrectionBtn');
+  var btn=document.getElementById('sendCorrectionBtn');
   btn.disabled=true; btn.textContent='Sending…';
   try {
     var res = await apiGet('sendCorrection', { inquiryId:INQUIRY_ID, clientId:inquiryData.clientId, clientEmail:inquiryData.clientEmail, clientName:inquiryData.clientName, staffName:ARTIST||'Studio', bodyText:body });
@@ -481,17 +527,18 @@ async function sendCorrectionRequest() {
   btn.disabled=false; btn.textContent='Send to Client →';
 }
 
-// ── QUOTE COMPOSER ────────────────────────────────────────────────────────
-function renderQuoteComposer(inq) {
-  var cvTattoo = inq.coverupType==='tattoo'||inq.coverupType==='both';
-  var cvScar   = inq.coverupType==='scar'  ||inq.coverupType==='both';
+// ── QUOTE COMPOSER ────────────────────────────────────────────
+function renderQuoteComposer(inq, existingQuote) {
+  var q = existingQuote || {};
+  var cvTattoo = q.coverupTattoo || (inq.coverupType==='tattoo'||inq.coverupType==='both');
+  var cvScar   = q.coverupScar   || (inq.coverupType==='scar'  ||inq.coverupType==='both');
   var artistName = escHtml((inq.artist||ARTIST||'Artist')+' 2026');
   return `
-  <div class="autofill-bar"><span>Fields pre-filled from the inquiry — edit anything that changed.</span><button onclick="autofillFromInquiry()">↻ Re-autofill</button></div>
+  <div class="autofill-bar"><span>Fields pre-filled from the inquiry — edit anything before resending.</span><button onclick="autofillFromInquiry()">↻ Re-autofill</button></div>
   <div class="section-label">Design Specs</div>
   <div class="field-row">
-    <div class="field-group"><label>Placement</label><input type="text" id="qPlacement" value="${escAttr(inq.placement||'')}"></div>
-    <div class="field-group"><label>Size (final, in inches)</label><input type="text" id="qSize" value="${escAttr(inq.sizeEstimate||'')}" placeholder="e.g. 8 x 10"></div>
+    <div class="field-group"><label>Placement</label><input type="text" id="qPlacement" value="${escAttr(q.placement||inq.placement||'')}"></div>
+    <div class="field-group"><label>Size (final, in inches)</label><input type="text" id="qSize" value="${escAttr(q.sizeFinal||inq.sizeEstimate||'')}" placeholder="e.g. 8 x 10"></div>
   </div>
   <div class="checkbox-row"><input type="checkbox" id="cvTattoo" ${cvTattoo?'checked':''} onchange="toggleConditional('cvTattoo','coverupTattooFields')"><label for="cvTattoo">This covers an existing tattoo</label></div>
   <div class="conditional-fields ${cvTattoo?'show':''}" id="coverupTattooFields">
@@ -503,46 +550,45 @@ function renderQuoteComposer(inq) {
   </div>
   <div class="field-group">
     <label>Style</label>
-    <select id="qStyle"><option value="">— Select —</option><option>Fine line</option><option>Fine line with dot work shading</option><option>Realistic</option><option>Saturated color</option><option>High-contrast black &amp; grey</option><option>Black outline / linework only</option><option>Traditional</option></select>
+    <select id="qStyle"><option value="">— Select —</option><option ${q.style==='Fine line'?'selected':''}>Fine line</option><option ${q.style==='Fine line with dot work shading'?'selected':''}>Fine line with dot work shading</option><option ${q.style==='Realistic'?'selected':''}>Realistic</option><option ${q.style==='Saturated color'?'selected':''}>Saturated color</option><option ${q.style==='High-contrast black &amp; grey'?'selected':''}>High-contrast black &amp; grey</option><option ${q.style==='Black outline / linework only'?'selected':''}>Black outline / linework only</option><option ${q.style==='Traditional'?'selected':''}>Traditional</option></select>
     <div style="font-size:11.5px;color:var(--gray);margin-top:5px;">Client's color preference: <strong>${escHtml(inq.style||'—')}</strong></div>
   </div>
-  <div class="field-group"><label>Design details</label><textarea class="composer-ta" id="qDesign">${escHtml(inq.description||'')}</textarea></div>
-  <div class="checkbox-row"><input type="checkbox" id="hasWords" ${inq.hasWords?'checked':''} onchange="toggleConditional('hasWords','wordsFields')"><label for="hasWords">Includes words / symbols / lettering</label></div>
-  <div class="conditional-fields ${inq.hasWords?'show':''}" id="wordsFields">
+  <div class="field-group"><label>Design details</label><textarea class="composer-ta" id="qDesign">${escHtml(q.designDetails||inq.description||'')}</textarea></div>
+  <div class="checkbox-row"><input type="checkbox" id="hasWords" ${(q.hasWords||inq.hasWords)?'checked':''} onchange="toggleConditional('hasWords','wordsFields')"><label for="hasWords">Includes words / symbols / lettering</label></div>
+  <div class="conditional-fields ${(q.hasWords||inq.hasWords)?'show':''}" id="wordsFields">
     <div class="field-row"><div class="field-group"><label>Text content</label><input type="text" id="qWordsText" value="${escAttr(inq.wordsDetail||'')}" placeholder="Exact words"></div><div class="field-group"><label>Font</label><input type="text" id="qFont" placeholder="Font name"></div></div>
   </div>
   <div class="section-label">Pricing &amp; Logistics</div>
   <div class="field-row">
-    <div class="field-group"><label>Price</label><input type="text" id="qPrice" placeholder="e.g. $1,200"></div>
-    <div class="field-group"><label>Estimated time</label><input type="text" id="qTime" placeholder="e.g. 5-6 hr"></div>
+    <div class="field-group"><label>Price</label><input type="text" id="qPrice" value="${escAttr(q.price||'')}" placeholder="e.g. $1,200"></div>
+    <div class="field-group"><label>Estimated time</label><input type="text" id="qTime" value="${escAttr(q.estimatedTime||'')}" placeholder="e.g. 5-6 hr"></div>
   </div>
   <div class="field-group">
     <label>Numbing size needed</label>
-    <select id="numbingSize" onchange="updateBookingBlock()"><option>N/A</option><option>S</option><option>M</option><option>L</option><option>XL</option></select>
+    <select id="numbingSize" onchange="updateBookingBlock()"><option>N/A</option><option ${q.numbingSize==='S'?'selected':''}>S</option><option ${q.numbingSize==='M'?'selected':''}>M</option><option ${q.numbingSize==='L'?'selected':''}>L</option><option ${q.numbingSize==='XL'?'selected':''}>XL</option></select>
   </div>
   <div class="section-label">Financing &amp; Booking <span class="editable-flag">(auto-generated)</span></div>
   <div class="template-block" id="bookingBlock">
     <span class="t-section">financing</span>📣 We offer afterpay if you'd like to finance your tattoo, read more at <strong>www.prettyinink.net/tattoolayaway</strong><br><br>
     <span class="t-section">booking</span>📅 Ready to book? Head to <strong>www.prettyinink.net/booking</strong><br>• Select the appropriate price quote under "<strong id="artistBookingName">${artistName}</strong>"<br>• Add on any numbing/merchandise you'd like<br>&nbsp;&nbsp;• You'll need size: <strong id="numbingSizeDisplay">N/A</strong>
   </div>
-  <div class="section-label">Disclaimers <span class="editable-flag" style="font-weight:400;">(standard wording — do not paraphrase)</span></div>
+  <div class="section-label">Disclaimers <span class="editable-flag" style="font-weight:400;">(standard wording)</span></div>
   <div class="template-block">
     ***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***<br><br>
     **if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**<br><br>
     ***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time &amp; wait in their vehicle while the numbing is working.***<br><br>
-    ***should you want an appointment sooner than what is available in the artist's schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***
+    ***should you want an appointment sooner than what is available in the artist\'s schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price.***
   </div>
   <div class="section-label">What's Next</div>
   <div class="template-block">
     **you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don't miss future correspondence**<br><br>
     **A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**<br><br>
     See you soon!!
-    <div class="std-note">📌 "whitelist/email" language flagged for future update once client portal is live.</div>
   </div>
   <div class="send-row">
     <span class="status-msg" id="quoteSendStatus"></span>
     <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
-    <button class="btn btn-primary" id="sendQuoteBtn" onclick="sendQuote()">Send Quote &amp; Log</button>
+    <button class="btn btn-primary" id="sendQuoteBtn" onclick="sendQuote()">${existingQuote ? 'Send Revised Quote' : 'Send Quote &amp; Log'}</button>
   </div>`;
 }
 
@@ -551,12 +597,10 @@ function toggleComposer() {
   document.getElementById('composerChev').classList.toggle('open');
 }
 function toggleConditional(cbId, targetId) {
-  var el = document.getElementById(targetId);
-  if (el) el.classList.toggle('show', document.getElementById(cbId).checked);
+  var el = document.getElementById(targetId); if(el) el.classList.toggle('show', document.getElementById(cbId).checked);
 }
 function updateBookingBlock() {
-  var el = document.getElementById('numbingSizeDisplay');
-  if (el) el.textContent = document.getElementById('numbingSize').value;
+  var el = document.getElementById('numbingSizeDisplay'); if(el) el.textContent = document.getElementById('numbingSize').value;
 }
 function autofillFromInquiry() {
   if (!inquiryData) return;
@@ -574,12 +618,11 @@ function saveDraft() {
 }
 function collectQuote() {
   return { placement:gV('qPlacement'), sizeFinal:gV('qSize'), style:gV('qStyle'), price:gV('qPrice'), estimatedTime:gV('qTime'), numbingSize:gV('numbingSize'),
-    coverupTattoo: document.getElementById('cvTattoo')&&document.getElementById('cvTattoo').checked,
-    coverupTattooSize:gV('cvTattooSize'), coverupTattooAge:gV('cvTattooAge'),
-    coverupScar: document.getElementById('cvScar')&&document.getElementById('cvScar').checked,
-    coverupScarSize:gV('cvScarSize'), coverupScarAge:gV('cvScarAge'),
-    hasWords: document.getElementById('hasWords')&&document.getElementById('hasWords').checked,
-    wordsDetail: gV('qWordsText')+(gV('qFont')?' ('+gV('qFont')+')':''), designDetails:gV('qDesign') };
+    coverupTattoo: !!(document.getElementById('cvTattoo')&&document.getElementById('cvTattoo').checked),
+    coverupScar:   !!(document.getElementById('cvScar')&&document.getElementById('cvScar').checked),
+    hasWords:      !!(document.getElementById('hasWords')&&document.getElementById('hasWords').checked),
+    wordsDetail:   gV('qWordsText')+(gV('qFont')?' ('+gV('qFont')+')':''),
+    designDetails: gV('qDesign') };
 }
 async function sendQuote() {
   var d = collectQuote();
@@ -589,8 +632,8 @@ async function sendQuote() {
   var artist = ARTIST||inq.artist||'Studio';
   var body = 'Hi '+first+'!\n\nHere is your price quote from Pretty in Ink:\n\n';
   body += '• Design: '+(d.designDetails||d.style||'')+'\n• Placement: '+(d.placement||'')+'\n• Size: '+(d.sizeFinal||'')+'\n• Style: '+(d.style||'')+'\n';
-  if (d.coverupTattoo) body += '• Covers existing tattoo ('+(d.coverupTattooSize||'')+', ~'+(d.coverupTattooAge||'')+')\n';
-  if (d.coverupScar)   body += '• Covers scar ('+(d.coverupScarSize||'')+', ~'+(d.coverupScarAge||'')+')\n';
+  if (d.coverupTattoo) body += '• Covers existing tattoo\n';
+  if (d.coverupScar)   body += '• Covers scar\n';
   if (d.hasWords)      body += '• Includes lettering: '+(d.wordsDetail||'')+'\n';
   body += '\n💰 Price estimate: '+d.price+'\n⏱ Estimated time: '+(d.estimatedTime||'')+'\n\n';
   body += '📣 We offer afterpay — www.prettyinink.net/tattoolayaway\n\n📅 Ready to book? Head to www.prettyinink.net/booking\n• Select the quote under "'+artist+' 2026"\n• Add any numbing/merchandise you\'d like\n';
@@ -600,24 +643,50 @@ async function sendQuote() {
   btn.disabled=true; btn.textContent='Sending…'; status.textContent='';
   try {
     var res = await apiGet('sendQuote', Object.assign({ inquiryId:INQUIRY_ID, clientId:inq.clientId, clientEmail:inq.clientEmail, clientName:inq.clientName, staffName:artist, subject:'Your tattoo quote from Pretty in Ink — '+first, bodyText:body }, d));
-    if (res.success) { addBubble('outbound',body,artist); status.textContent='✓ Quote sent & logged!'; status.className='status-msg ok'; setTimeout(function(){status.textContent='';},4000); }
-    else { status.textContent='Error: '+(res.error||'unknown'); status.className='status-msg err'; }
+    if (res.success) {
+      addBubble('outbound',body,artist);
+      savedQuote = Object.assign({ sentAt: new Date().toISOString(), staffName: artist }, d);
+      // Refresh the quote panel
+      var panel = document.getElementById('quotePanelEl');
+      var newPanelHtml = renderQuotePanel(savedQuote);
+      if (panel) {
+        panel.outerHTML = newPanelHtml;
+      } else {
+        // Insert before thread
+        var thread = document.getElementById('threadEl');
+        var div = document.createElement('div');
+        div.innerHTML = newPanelHtml;
+        thread.parentNode.insertBefore(div.firstChild, thread);
+      }
+      document.getElementById('composerTitle').textContent = 'Revise Quote';
+      btn.textContent = 'Send Revised Quote';
+      status.textContent='✓ Quote sent & saved!'; status.className='status-msg ok';
+      setTimeout(function(){status.textContent='';},4000);
+    } else { status.textContent='Error: '+(res.error||'unknown'); status.className='status-msg err'; }
   } catch(e) { status.textContent='Error: '+e.message; status.className='status-msg err'; }
-  btn.disabled=false; btn.textContent='Send Quote & Log';
+  btn.disabled=false;
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────
 function toggleMinimize() {
   var body=document.getElementById('inquiryCardBody'), btn=document.getElementById('minimizeBtn');
-  var min=body.classList.toggle('minimized');
-  btn.textContent=min?'▼':'▲';
+  btn.textContent = body.classList.toggle('minimized') ? '▼' : '▲';
 }
-function toggleDesc(btn) {
-  var el=document.getElementById('descText'); if(!el) return;
-  el.classList.toggle('expanded');
-}
+function toggleDesc(btn) { var el=document.getElementById('descText'); if(el) el.classList.toggle('expanded'); }
 function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
 function niceFieldName(k) { return k.replace(/([A-Z])/g,' $1').replace(/^./,function(s){return s.toUpperCase();}); }
+function coverupLabel(t) {
+  if (!t||t==='none') return 'No';
+  if (t==='tattoo') return 'Yes — tattoo';
+  if (t==='scar')   return 'Yes — scar';
+  if (t==='both')   return 'Yes — tattoo + scar';
+  return t;
+}
+function chipHtml(field, label, value, conditional) {
+  return '<div class="detail-chip'+(conditional?' conditional-chip':'')+'" data-field="'+field+'">' +
+    '<div class="chip-key">'+escHtml(label)+'<span class="icon-pair"><button class="flag-btn" onclick="openFlag(\''+field+'\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\''+field+'\',\'question\')">❓</button></span></div>' +
+    '<div class="chip-val">'+escHtml(String(value))+'</div></div>';
+}
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
 

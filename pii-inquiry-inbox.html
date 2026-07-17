@@ -123,6 +123,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .status-chip.in-progress { background: #dbeafe; color: #1d4ed8; }
 .status-chip.quoted    { background: #fef3c7; color: #92400e; }
 .status-chip.booked    { background: #d1fae5; color: #065f46; }
+.status-chip.quoted    { background: #d1fae5; color: #065f46; }
 .status-chip.closed    { background: var(--gray-lt); color: var(--gray); }
 .open-arrow { font-size: 18px; color: var(--gray); align-self: center; }
 </style>
@@ -258,19 +259,28 @@ function renderList() {
   screen.style.display = 'none';
   list.style.display = 'block';
 
-  // Separate priority from normal
-  var priority = filtered.filter(function(i) { return i.isPriority; });
-  var normal   = filtered.filter(function(i) { return !i.isPriority; });
+  // Split into Your Turn / Their Turn / Closed
+  var yourTurn   = filtered.filter(function(i) { return i.needsReply === true; });
+  var theirTurn  = filtered.filter(function(i) { return i.needsReply === false; });
+  var closed     = filtered.filter(function(i) { return i.needsReply === null; });
 
   var html = '';
-  if (priority.length) {
-    html += '<div class="section-group"><div class="section-head">⚡ Needs attention soon (' + priority.length + ')</div>';
-    priority.forEach(function(inq) { html += rowHtml(inq); });
+  if (yourTurn.length) {
+    html += '<div class="section-group">';
+    html += '<div class="section-head">👋 Your Turn — awaiting your response (' + yourTurn.length + ')</div>';
+    yourTurn.forEach(function(inq) { html += rowHtml(inq); });
     html += '</div>';
   }
-  if (normal.length) {
-    html += '<div class="section-group"><div class="section-head">All inquiries</div>';
-    normal.forEach(function(inq) { html += rowHtml(inq); });
+  if (theirTurn.length) {
+    html += '<div class="section-group">';
+    html += '<div class="section-head">⏳ Their Turn — waiting on client (' + theirTurn.length + ')</div>';
+    theirTurn.forEach(function(inq) { html += rowHtml(inq); });
+    html += '</div>';
+  }
+  if (closed.length) {
+    html += '<div class="section-group">';
+    html += '<div class="section-head" style="color:#9ca3af;">Closed / Archived (' + closed.length + ')</div>';
+    closed.forEach(function(inq) { html += rowHtml(inq); });
     html += '</div>';
   }
 
@@ -320,8 +330,8 @@ function rowHtml(inq) {
       <div class="row-chips">${chips}</div>
     </div>
     <div class="row-aside">
+      ${inq.status === 'quoted' ? '<span class="status-chip quoted">✓ Quote Sent</span>' : '<span class="status-chip ' + statusClass + '">' + escHtml(inq.status || 'new') + '</span>'}
       ${slaBadge}
-      <span class="status-chip ${statusClass}">${escHtml(inq.status || 'new')}</span>
     </div>
   </a>`;
 }

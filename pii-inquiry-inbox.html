@@ -16,7 +16,6 @@
   --gray-lt: #f3f4f6;
   --border: #e8dcd8;
   --white: #ffffff;
-  --gold: #a1005a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
@@ -36,96 +35,107 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .header nav a:hover { background: rgba(255,255,255,0.1); }
 .header nav a.active { background: var(--pink-lt); color: var(--ink); border-color: var(--pink-lt); }
 
+/* ── PAGE HERO ── */
+.hero { text-align: center; padding: 36px 24px 20px; }
+.hero-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--pink); margin-bottom: 8px; }
+.hero h2 { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 400; line-height: 1.1; }
+.hero h2 em { font-style: italic; color: var(--pink); }
+.hero-sub { color: var(--gray); font-size: 14px; margin-top: 6px; }
+.hero-rule { width: 50px; height: 2px; background: var(--pink-lt); margin: 14px auto 0; border-radius: 2px; }
+
 /* ── TOOLBAR ── */
-.toolbar {
-  background: var(--white); border-bottom: 1px solid var(--border);
-  padding: 14px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px 0; }
+.updated-label { font-size: 12px; color: var(--gray); }
+.btn-refresh {
+  background: var(--white); border: 1.5px solid var(--border); border-radius: 999px;
+  padding: 7px 16px; font-size: 12.5px; font-family: inherit; cursor: pointer; color: var(--ink);
+  display: flex; align-items: center; gap: 5px;
 }
-.toolbar-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; font-style: italic; flex: 1; min-width: 120px; }
-.filter-group { display: flex; align-items: center; gap: 8px; }
-.filter-group label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.4px; }
-.filter-group select {
-  padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 8px;
-  font-size: 13px; font-family: inherit; background: white; cursor: pointer;
+.btn-refresh:hover { border-color: var(--pink); color: var(--pink); }
+
+/* ── FILTERS ── */
+.filters { padding: 16px 24px 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.filter-select {
+  padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 999px;
+  font-size: 13px; font-family: inherit; background: var(--white); color: var(--ink); cursor: pointer;
 }
-.filter-group select:focus { outline: none; border-color: var(--pink); }
-.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-select:focus { outline: none; border-color: var(--pink); }
+.pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
 .pill {
-  padding: 5px 14px; border-radius: 999px; border: 1.5px solid var(--border);
-  font-size: 12.5px; font-weight: 600; background: white; cursor: pointer; color: var(--gray);
+  padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer; background: var(--white); color: var(--gray);
   transition: all 0.15s;
 }
+.pill:hover { border-color: var(--pink); color: var(--pink); }
 .pill.active { background: var(--pink); border-color: var(--pink); color: white; }
-.pill:hover:not(.active) { border-color: var(--pink); color: var(--ink); }
-.pill .cnt { font-size: 11px; margin-left: 3px; opacity: 0.8; }
-
-/* ── STATE SCREENS ── */
-.state-screen {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 40vh; gap: 12px; color: var(--gray); font-size: 14px;
-}
-.spinner {
-  width: 30px; height: 30px; border: 3px solid var(--pink-lt);
-  border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+.pill-count { font-size: 11px; opacity: 0.75; margin-left: 4px; }
 
 /* ── LIST ── */
-.list-wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+.list-wrap { padding: 6px 24px 60px; }
 
-.section-group { margin-bottom: 28px; }
 .section-head {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
-  color: var(--gray); margin-bottom: 10px; padding: 0 2px;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 10px;
+  margin: 22px 0 10px;
 }
-.section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section-head-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-style: italic; font-weight: 400; color: var(--ink); white-space: nowrap;
+}
+.section-head-count {
+  font-size: 12px; font-weight: 700; color: var(--gray);
+  background: var(--gray-lt); border-radius: 999px; padding: 2px 9px;
+}
+.section-head-line { flex: 1; height: 1px; background: var(--border); }
 
-/* ── INQUIRY CARD — appointment-style compact ── */
+/* ── INQUIRY ROW CARDS ── */
 .inquiry-row {
   background: var(--white);
   border: 1px solid var(--border);
   border-left: 4px solid var(--pink);
   border-radius: 10px;
-  padding: 12px 16px 12px 14px;
+  padding: 11px 16px 11px 14px;
   margin-bottom: 7px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  text-decoration: none;
-  color: inherit;
+  display: flex; align-items: center; gap: 14px;
+  text-decoration: none; color: inherit;
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .inquiry-row:hover { box-shadow: 0 2px 10px rgba(212,116,143,0.15); border-color: var(--pink); }
 .inquiry-row.their-turn { border-left-color: var(--border); }
 .inquiry-row.their-turn:hover { border-left-color: var(--gray); border-color: var(--border); }
 
-.row-body { flex: 1; min-width: 0; }
-.row-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
-.row-sub { font-size: 11.5px; color: var(--gray); margin-top: 3px; }
-.row-chips { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
-.chip-sm {
-  font-size: 11.5px; padding: 2px 9px; border-radius: 6px;
-  background: var(--gray-lt); border: 1px solid var(--border); color: var(--ink);
-  white-space: nowrap;
+.row-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--pink-lt); color: var(--pink); font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.chip-sm.coverup { background: var(--cream); border-color: var(--pink-lt); color: var(--gold); }
+.row-avatar.their { background: var(--gray-lt); color: var(--gray); }
 
-.row-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.row-body { flex: 1; min-width: 0; }
+.row-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-meta { font-size: 12px; color: var(--gray); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* status chips */
-.st {
-  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+.row-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.status-pill {
+  font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
   text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
 }
-.st.new        { background: #ede9fe; color: #5b21b6; }
-.st.in-progress { background: #dbeafe; color: #1d4ed8; }
-.st.quoted     { background: #d1fae5; color: #065f46; }
-.st.booked     { background: #d1fae5; color: #065f46; }
-.st.closed     { background: var(--gray-lt); color: var(--gray); }
-.st.default    { background: var(--gray-lt); color: var(--gray); }
+.status-new      { background: #e0f2fe; color: #0369a1; }
+.status-quoted   { background: #d1fae5; color: #065f46; }
+.status-booked   { background: #ede9fe; color: #5b21b6; }
+.status-progress { background: #fef9c3; color: #713f12; }
+.status-closed, .status-archived { background: var(--gray-lt); color: var(--gray); }
+.quote-badge {
+  font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+  background: #d1fae5; color: #065f46; white-space: nowrap;
+}
+.row-date { font-size: 11.5px; color: var(--gray); }
 
-.row-arrow { font-size: 16px; color: var(--border); }
+.empty-state { color: var(--gray); font-size: 13.5px; padding: 10px 0 4px; }
+
+/* ── LOADING / ERROR ── */
+.loading-msg { text-align: center; padding: 48px 24px; color: var(--gray); font-size: 14px; }
+.spinner { width: 28px; height: 28px; border: 3px solid var(--pink-lt); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -139,203 +149,190 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   </nav>
 </div>
 
+<div class="hero">
+  <div class="hero-eyebrow">Pretty in Ink Tattoos</div>
+  <h2 id="heroTitle">Inquiry <em>Inbox</em></h2>
+  <div class="hero-sub" id="heroSub">Loading…</div>
+  <div class="hero-rule"></div>
+</div>
+
 <div class="toolbar">
-  <div class="toolbar-title">Inquiry Inbox</div>
-  <div class="filter-group">
-    <label>Artist</label>
-    <select id="artistFilter" onchange="applyFilters()">
-      <option value="">All artists</option>
-      <option>Tressa</option>
-      <option>Jackie</option>
-    </select>
-  </div>
-  <div class="filter-pills" id="statusPills">
-    <button class="pill active" data-status="" onclick="setPillFilter(this)">All <span class="cnt" id="cntAll"></span></button>
-    <button class="pill" data-status="new" onclick="setPillFilter(this)">New <span class="cnt" id="cntNew"></span></button>
-    <button class="pill" data-status="in-progress" onclick="setPillFilter(this)">In Progress <span class="cnt" id="cntInProgress"></span></button>
-    <button class="pill" data-status="quoted" onclick="setPillFilter(this)">Quoted <span class="cnt" id="cntQuoted"></span></button>
-    <button class="pill" data-status="booked" onclick="setPillFilter(this)">Booked <span class="cnt" id="cntBooked"></span></button>
+  <div class="updated-label" id="updatedLabel"></div>
+  <button class="btn-refresh" onclick="loadInquiries()">↻ Refresh</button>
+</div>
+
+<div class="filters">
+  <select class="filter-select" id="artistFilter" onchange="loadInquiries()">
+    <option value="">All Artists</option>
+    <option value="Tressa">Tressa</option>
+    <option value="Jackie">Jackie</option>
+  </select>
+  <div class="pill-group">
+    <button class="pill active" data-filter="all"       onclick="setPill(this)">All <span class="pill-count" id="cAll"></span></button>
+    <button class="pill"        data-filter="new"       onclick="setPill(this)">New <span class="pill-count" id="cNew"></span></button>
+    <button class="pill"        data-filter="yourturn"  onclick="setPill(this)">Your Turn <span class="pill-count" id="cYourTurn"></span></button>
+    <button class="pill"        data-filter="theirturn" onclick="setPill(this)">Their Turn <span class="pill-count" id="cTheirTurn"></span></button>
+    <button class="pill"        data-filter="quoted"    onclick="setPill(this)">Quoted <span class="pill-count" id="cQuoted"></span></button>
+    <button class="pill"        data-filter="booked"    onclick="setPill(this)">Booked <span class="pill-count" id="cBooked"></span></button>
   </div>
 </div>
 
-<div class="list-wrap">
-  <div class="state-screen" id="stateScreen">
-    <div class="spinner"></div>
-    <div>Loading inquiries…</div>
-  </div>
-  <div id="listContent" style="display:none;"></div>
+<div class="list-wrap" id="listWrap">
+  <div class="loading-msg"><div class="spinner"></div>Loading inquiries…</div>
 </div>
 
 <script>
 const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
 
-const urlParams     = new URLSearchParams(location.search);
-const DEFAULT_ARTIST = urlParams.get('artist') || '';
+var allInquiries = [];
+var activeFilter = 'all';
+var cbId = 0;
 
-let allInquiries = [];
-let activeStatus = '';
-let cbId = 0;
-
-// ── JSONP ────────────────────────────────────────────────────
 function jsonp(url) {
   return new Promise(function(resolve, reject) {
-    var cb    = 'piiInbox_' + (++cbId);
-    var sep   = url.includes('?') ? '&' : '?';
-    var el    = document.createElement('script');
-    el.src    = url + sep + 'callback=' + cb;
+    var cb  = 'piiInbox_' + (++cbId);
+    var el  = document.createElement('script');
+    el.src  = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
     var timer = setTimeout(function() { cleanup(); reject(new Error('Timed out')); }, 25000);
     window[cb] = function(data) { cleanup(); clearTimeout(timer); resolve(data); };
-    el.onerror = function() { cleanup(); clearTimeout(timer); reject(new Error('Network error')); };
+    el.onerror = function() { cleanup(); clearTimeout(timer); reject(new Error('Network error — check Apps Script deployment')); };
     function cleanup() { if (el.parentNode) el.parentNode.removeChild(el); delete window[cb]; }
     document.head.appendChild(el);
   });
 }
 
-// ── INIT ─────────────────────────────────────────────────────
-async function initFixed() {
-  if (DEFAULT_ARTIST) document.getElementById('artistFilter').value = DEFAULT_ARTIST;
+function apiGet(action, extra) {
+  var q  = Object.assign({ action: action }, extra || {});
+  var qs = Object.keys(q).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(q[k]); }).join('&');
+  return jsonp(EXEC_URL + '?' + qs);
+}
+
+async function loadInquiries() {
+  document.getElementById('listWrap').innerHTML = '<div class="loading-msg"><div class="spinner"></div>Loading inquiries…</div>';
+  document.getElementById('updatedLabel').textContent = '';
   var artist = document.getElementById('artistFilter').value;
   try {
-    var res = await jsonp(EXEC_URL + '?action=getInquiries&artist=' + encodeURIComponent(artist) + '&status=');
-    if (!res.success) { showState('Could not load inquiries: ' + (res.error || '')); return; }
+    var res = await apiGet('getInquiries', { artist: artist, status: '' });
+    if (!res.success) { showError(res.error || 'Failed to load'); return; }
     allInquiries = res.inquiries || [];
-    updateCounts();
+    var now = new Date();
+    document.getElementById('updatedLabel').textContent = 'Updated ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    document.getElementById('heroTitle').innerHTML = artist
+      ? escHtml(artist) + '\'s <em>Inquiries</em>'
+      : 'Inquiry <em>Inbox</em>';
     renderList();
-  } catch (e) {
-    showState('Error: ' + e.message);
+  } catch(e) {
+    showError(e.message);
   }
 }
 
-function showState(msg) {
-  document.getElementById('stateScreen').innerHTML =
-    '<div style="color:var(--gray);text-align:center;padding:20px;">' + msg + '</div>';
-  document.getElementById('stateScreen').style.display = 'flex';
-  document.getElementById('listContent').style.display = 'none';
-}
-
-// ── FILTERS ──────────────────────────────────────────────────
-function setPillFilter(el) {
-  document.querySelectorAll('.pill').forEach(function(p) { p.classList.remove('active'); });
-  el.classList.add('active');
-  activeStatus = el.dataset.status;
-  renderList();
-}
-
-async function applyFilters() {
-  document.getElementById('stateScreen').innerHTML = '<div class="spinner"></div><div>Loading…</div>';
-  document.getElementById('stateScreen').style.display = 'flex';
-  document.getElementById('listContent').style.display = 'none';
-  await initFixed();
-}
-
-function updateCounts() {
-  var counts = { '': 0, 'new': 0, 'in-progress': 0, 'quoted': 0, 'booked': 0 };
-  allInquiries.forEach(function(inq) {
-    counts['']++;
-    if (counts[inq.status] !== undefined) counts[inq.status]++;
-  });
-  setCount('cntAll', counts['']);
-  setCount('cntNew', counts['new']);
-  setCount('cntInProgress', counts['in-progress']);
-  setCount('cntQuoted', counts['quoted']);
-  setCount('cntBooked', counts['booked']);
-}
-function setCount(id, n) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = n > 0 ? n : '';
-}
-
-// ── RENDER ───────────────────────────────────────────────────
-function renderList() {
-  var list   = document.getElementById('listContent');
-  var screen = document.getElementById('stateScreen');
-
-  var filtered = allInquiries.filter(function(inq) {
-    if (activeStatus && inq.status !== activeStatus) return false;
+function getFiltered() {
+  return allInquiries.filter(function(i) {
+    if (activeFilter === 'all')       return i.status !== 'closed' && i.status !== 'archived';
+    if (activeFilter === 'new')       return i.status === 'new';
+    if (activeFilter === 'yourturn')  return i.needsReply === true;
+    if (activeFilter === 'theirturn') return i.needsReply === false;
+    if (activeFilter === 'quoted')    return i.status === 'quoted';
+    if (activeFilter === 'booked')    return i.status === 'booked';
     return true;
   });
+}
 
-  if (!filtered.length) {
-    showState('No inquiries match these filters.');
-    return;
-  }
+function renderList() {
+  var open    = allInquiries.filter(function(i){ return i.status !== 'closed' && i.status !== 'archived'; });
+  var filtered = getFiltered();
 
-  screen.style.display = 'none';
-  list.style.display = 'block';
+  // Pill counts always reflect open inquiries
+  document.getElementById('cAll').textContent      = open.length;
+  document.getElementById('cNew').textContent      = open.filter(function(i){ return i.status==='new'; }).length;
+  document.getElementById('cYourTurn').textContent = open.filter(function(i){ return i.needsReply===true; }).length;
+  document.getElementById('cTheirTurn').textContent= open.filter(function(i){ return i.needsReply===false; }).length;
+  document.getElementById('cQuoted').textContent   = open.filter(function(i){ return i.status==='quoted'; }).length;
+  document.getElementById('cBooked').textContent   = open.filter(function(i){ return i.status==='booked'; }).length;
 
-  var yourTurn  = filtered.filter(function(i) { return i.needsReply === true; });
-  var theirTurn = filtered.filter(function(i) { return i.needsReply === false; });
-  var closed    = filtered.filter(function(i) { return i.needsReply === null || i.needsReply === undefined; });
+  var openCount = filtered.length;
+  document.getElementById('heroSub').textContent = openCount + ' open inquir' + (openCount===1?'y':'ies');
+
+  // Split into sections
+  var yourTurn  = filtered.filter(function(i){ return i.needsReply===true; });
+  var theirTurn = filtered.filter(function(i){ return i.needsReply===false; });
+  var closed    = filtered.filter(function(i){ return i.needsReply===null||i.needsReply===undefined; });
 
   var html = '';
 
-  if (yourTurn.length) {
-    html += '<div class="section-group">';
-    html += '<div class="section-head">👋 Your Turn &nbsp;·&nbsp; ' + yourTurn.length + ' awaiting response</div>';
-    yourTurn.forEach(function(inq) { html += rowHtml(inq, false); });
-    html += '</div>';
-  }
-  if (theirTurn.length) {
-    html += '<div class="section-group">';
-    html += '<div class="section-head">⏳ Their Turn &nbsp;·&nbsp; ' + theirTurn.length + ' waiting on client</div>';
-    theirTurn.forEach(function(inq) { html += rowHtml(inq, true); });
-    html += '</div>';
-  }
-  if (closed.length) {
-    html += '<div class="section-group">';
-    html += '<div class="section-head" style="color:#9ca3af;">Closed / Archived &nbsp;·&nbsp; ' + closed.length + '</div>';
-    closed.forEach(function(inq) { html += rowHtml(inq, true); });
-    html += '</div>';
+  if (!filtered.length) {
+    html = '<div class="empty-state">No inquiries match these filters.</div>';
+  } else {
+    if (yourTurn.length) {
+      html += sectionHead('Your Turn', yourTurn.length);
+      yourTurn.forEach(function(i){ html += rowHtml(i, false); });
+    }
+    if (theirTurn.length) {
+      html += sectionHead('Their Turn', theirTurn.length);
+      theirTurn.forEach(function(i){ html += rowHtml(i, true); });
+    }
+    if (closed.length) {
+      html += sectionHead('Closed / Archived', closed.length);
+      closed.forEach(function(i){ html += rowHtml(i, true); });
+    }
   }
 
-  list.innerHTML = html;
+  document.getElementById('listWrap').innerHTML = html;
+}
+
+function sectionHead(label, count) {
+  return '<div class="section-head">' +
+    '<span class="section-head-label">' + escHtml(label) + '</span>' +
+    '<span class="section-head-count">' + count + '</span>' +
+    '<span class="section-head-line"></span>' +
+  '</div>';
 }
 
 function rowHtml(inq, theirTurn) {
+  var initials = (inq.clientName||'?').split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase();
   var href = 'pii-inquiry-thread.html?inquiryId=' + encodeURIComponent(inq.inquiryId) +
-    (inq.artist ? '&artist=' + encodeURIComponent(inq.artist) : '');
+             (inq.artist ? '&artist=' + encodeURIComponent(inq.artist) : '');
 
-  var submittedLabel = inq.submittedAt
-    ? new Date(inq.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : '';
+  var metaParts = [inq.placement, inq.style, inq.artist].filter(Boolean).join(' · ');
 
-  var subParts = [];
-  if (inq.source)      subParts.push(escHtml(inq.source));
-  if (inq.artist)      subParts.push(escHtml(inq.artist));
-  if (submittedLabel)  subParts.push('Submitted ' + submittedLabel);
-  var subLine = subParts.join(' · ');
+  var statusClass = {
+    'new':'status-new','in_progress':'status-progress','quoted':'status-quoted',
+    'booked':'status-booked','closed':'status-closed','archived':'status-archived'
+  }[inq.status] || 'status-new';
 
-  var chips = '';
-  if (inq.placement)    chips += '<span class="chip-sm">' + escHtml(inq.placement) + '</span>';
-  if (inq.style)        chips += '<span class="chip-sm">' + escHtml(inq.style) + '</span>';
-  if (inq.sizeEstimate) chips += '<span class="chip-sm">' + escHtml(inq.sizeEstimate) + '</span>';
-  if (inq.isCoverup)    chips += '<span class="chip-sm coverup">Coverup</span>';
+  var quoteBadge = inq.status==='quoted' ? '<span class="quote-badge">✓ Quote Sent</span>' : '';
+  var dateLabel  = inq.submittedAt ? new Date(inq.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
 
-  // Status label
-  var stLabel = inq.status === 'quoted' ? '✓ Quote Sent' :
-                inq.status === 'in-progress' ? 'In Progress' :
-                inq.status ? inq.status.charAt(0).toUpperCase() + inq.status.slice(1) : 'New';
-  var stClass = inq.status || 'new';
-
-  return '<a class="inquiry-row' + (theirTurn ? ' their-turn' : '') + '" href="' + escHtml(href) + '">' +
+  return '<a class="inquiry-row' + (theirTurn?' their-turn':'') + '" href="' + escHtml(href) + '">' +
+    '<div class="row-avatar' + (theirTurn?' their':'') + '">' + escHtml(initials) + '</div>' +
     '<div class="row-body">' +
-      '<div class="row-name">' + escHtml(inq.clientName || inq.clientId || '—') + '</div>' +
-      (subLine ? '<div class="row-sub">' + subLine + '</div>' : '') +
-      (chips   ? '<div class="row-chips">' + chips + '</div>' : '') +
+      '<div class="row-name">' + escHtml(inq.clientName||inq.clientId||'—') + '</div>' +
+      '<div class="row-meta">' + escHtml(metaParts) + '</div>' +
     '</div>' +
-    '<div class="row-aside">' +
-      '<span class="st ' + escHtml(stClass) + '">' + escHtml(stLabel) + '</span>' +
+    '<div class="row-right">' +
+      quoteBadge +
+      '<span class="status-pill ' + statusClass + '">' + escHtml(inq.status) + '</span>' +
+      (dateLabel ? '<span class="row-date">' + escHtml(dateLabel) + '</span>' : '') +
     '</div>' +
-    '<span class="row-arrow">›</span>' +
   '</a>';
 }
 
-function escHtml(s) {
-  return String(s || '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function setPill(btn) {
+  document.querySelectorAll('.pill').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  activeFilter = btn.getAttribute('data-filter');
+  renderList();
 }
 
-initFixed();
+function showError(msg) {
+  document.getElementById('listWrap').innerHTML = '<div class="loading-msg" style="color:#b91c1c;">' + escHtml(msg) + '</div>';
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadInquiries();
 </script>
 </body>
 </html>

@@ -17,11 +17,12 @@
   --border: #e8dcd8;
   --white: #ffffff;
   --gold: #a1005a;
-  --green: #065f46;
+  --green: #10b981;
   --green-lt: #d1fae5;
+  --green-dark: #065f46;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: var(--ink); }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
 
 /* ── NAV ── */
 .header {
@@ -53,7 +54,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .inquiry-meta { font-size: 12.5px; color: var(--gray); margin-top: 3px; }
 .card-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
-.badge.quote-sent { background: var(--green-lt); color: var(--green); }
+.badge.quote-sent { background: var(--green-lt); color: var(--green-dark); }
 .minimize-btn { background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; font-size: 11px; color: var(--gray); display: flex; align-items: center; justify-content: center; }
 .minimize-btn:hover { background: var(--pink-lt); }
 #inquiryCardBody.minimized { display: none; }
@@ -87,7 +88,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .btn-mini { padding: 6px 14px; border-radius: 999px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .btn-mini-cancel { background: var(--gray-lt); color: var(--ink); }
 .btn-mini-add { background: var(--pink); color: white; }
-
 .flagged-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .flagged-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; background: #fff4f4; border: 1px solid #f3c9c9; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; }
 .flagged-item .field-label { font-weight: 700; color: var(--gold); text-transform: capitalize; }
@@ -97,31 +97,28 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 
 /* ── QUOTE ON FILE PANEL ── */
 .quote-panel {
-  background: var(--white); border-left: 4px solid var(--green); margin: 12px 24px 0;
-  border-radius: 12px; padding: 16px 18px; border: 1.5px solid var(--green-lt);
-  border-left: 4px solid #10b981;
+  margin: 12px 24px 0;
+  background: var(--white);
+  border: 1.5px solid var(--green-lt);
+  border-left: 4px solid var(--green);
+  border-radius: 12px;
+  padding: 16px 18px;
 }
-.quote-panel-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
-}
+.quote-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .quote-panel-title {
   font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 10px; color: var(--green-dark);
 }
 .quote-panel-title .sent-date { font-family: 'DM Sans', sans-serif; font-style: normal; font-size: 11px; color: var(--gray); font-weight: 400; }
 .quote-edit-btn {
-  background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 999px;
+  background: var(--white); border: 1.5px solid var(--border); border-radius: 999px;
   padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
   color: var(--ink); display: flex; align-items: center; gap: 5px;
 }
 .quote-edit-btn:hover { border-color: var(--pink); color: var(--pink); }
-.quote-fields {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;
-}
-.qf {
-  background: var(--green-lt); border-radius: 8px; padding: 7px 10px; font-size: 12.5px;
-}
-.qf-key { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: #065f46; margin-bottom: 2px; }
+.quote-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.qf { background: var(--green-lt); border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
+.qf-key { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--green-dark); margin-bottom: 3px; }
 .qf-val { font-weight: 700; color: var(--ink); }
 .quote-notes { font-size: 12.5px; color: var(--gray); margin-top: 10px; line-height: 1.5; border-top: 1px solid var(--green-lt); padding-top: 8px; }
 
@@ -139,7 +136,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 
 /* ── QUICK REPLY ── */
 .quick-reply { display: flex; gap: 8px; padding: 0 24px 16px; align-items: flex-end; }
-.quick-reply textarea { flex: 1; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border); font-size: 13.5px; font-family: inherit; resize: none; min-height: 42px; max-height: 120px; line-height: 1.5; }
+.quick-reply textarea { flex: 1; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border); font-size: 13.5px; font-family: inherit; resize: none; min-height: 42px; max-height: 120px; line-height: 1.5; background: var(--white); }
 .quick-reply textarea:focus { outline: none; border-color: var(--pink); }
 .quick-reply button { background: var(--ink); color: white; border: none; border-radius: 999px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; align-self: flex-end; }
 .quick-reply button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -158,7 +155,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 .field-group { margin-bottom: 14px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 label { display: block; font-size: 11.5px; font-weight: 700; color: var(--gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
-input[type=text], select, textarea.composer-ta { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; }
+input[type=text], select, textarea.composer-ta { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--white); }
 input:focus, select:focus, textarea.composer-ta:focus { outline: none; border-color: var(--pink); }
 textarea.composer-ta { min-height: 64px; resize: vertical; }
 .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -179,7 +176,7 @@ textarea.composer-ta { min-height: 64px; resize: vertical; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .status-msg { font-size: 13px; color: var(--gray); }
 .status-msg.err { color: #b91c1c; }
-.status-msg.ok { color: #065f46; }
+.status-msg.ok { color: var(--green-dark); }
 </style>
 </head>
 <body>
@@ -216,13 +213,11 @@ let currentFlagField = null;
 let currentFlagType  = 'correction';
 let cbId = 0;
 
-// ── JSONP — sequential to avoid Apps Script concurrent limits ──
 function jsonp(url) {
   return new Promise(function(resolve, reject) {
     var cb    = 'piiThread_' + (++cbId);
-    var sep   = url.includes('?') ? '&' : '?';
     var el    = document.createElement('script');
-    el.src    = url + sep + 'callback=' + cb;
+    el.src    = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
     var timer = setTimeout(function() { cleanup(); reject(new Error('Timed out after 25s')); }, 25000);
     window[cb] = function(data) { cleanup(); clearTimeout(timer); resolve(data); };
     el.onerror = function() { cleanup(); clearTimeout(timer); reject(new Error('Network error — check EXEC_URL or Apps Script deployment')); };
@@ -233,25 +228,24 @@ function jsonp(url) {
 
 function apiGet(action, extra) {
   var q  = Object.assign({ action: action }, extra || {});
-  var qs = Object.keys(q).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(q[k]); }).join('&');
+  var qs = Object.keys(q).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(q[k]); }).join('&');
   return jsonp(EXEC_URL + '?' + qs);
 }
 
-// ── INIT ──────────────────────────────────────────────────────
 async function init() {
   if (!INQUIRY_ID) { showError('No inquiryId in URL.'); return; }
   try {
     setLoading('Loading inquiry…');
     var inqRes = await apiGet('getInquiry', { inquiryId: INQUIRY_ID });
-    if (!inqRes.success) { showError('Could not load inquiry: ' + (inqRes.error || 'unknown')); return; }
+    if (!inqRes.success) { showError('Could not load inquiry: ' + (inqRes.error||'unknown')); return; }
     inquiryData = inqRes.inquiry;
 
-    setLoading('Loading correspondence…');
+    setLoading('Loading thread…');
     var corrRes = await apiGet('getCorrespondence', { clientId: inquiryData.clientId });
-    threadRows = ((corrRes && corrRes.correspondence) || []).filter(function(r) {
+    threadRows = ((corrRes && corrRes.correspondence) || []).filter(function(r){
       return String(r.inquiryId) === String(INQUIRY_ID);
     });
-    threadRows.sort(function(a, b) { return new Date(a.messageAt || 0) - new Date(b.messageAt || 0); });
+    threadRows.sort(function(a,b){ return new Date(a.messageAt||0) - new Date(b.messageAt||0); });
 
     setLoading('Loading quote…');
     var quoteRes = await apiGet('getQuote', { inquiryId: INQUIRY_ID });
@@ -267,54 +261,45 @@ async function init() {
   }
 }
 
-function setLoading(msg) { var el = document.getElementById('loadingMsg'); if (el) el.textContent = msg; }
+function setLoading(msg) { var el=document.getElementById('loadingMsg'); if(el) el.textContent=msg; }
 function showError(msg) {
   document.getElementById('loadingScreen').innerHTML =
-    '<div style="color:#b91c1c;font-size:14px;padding:20px;text-align:center;max-width:400px;">' + msg + '</div>';
+    '<div style="color:#b91c1c;font-size:14px;padding:20px;text-align:center;max-width:400px;">'+msg+'</div>';
 }
 
-// ── RENDER PAGE ───────────────────────────────────────────────
 function renderPage() {
   var layout = document.getElementById('mainLayout');
   var inq    = inquiryData;
 
-  var quoteSentBadge = inq.status === 'quoted'
-    ? '<span class="badge quote-sent">✓ Quote Sent</span>' : '';
+  var quoteSentBadge = inq.status==='quoted' ? '<span class="badge quote-sent">✓ Quote Sent</span>' : '';
 
   var metaParts = [
-    'Inquiry ' + escHtml(INQUIRY_ID),
+    'Inquiry '+escHtml(INQUIRY_ID),
     inq.source     ? escHtml(inq.source)  : null,
     inq.artist     ? escHtml(inq.artist)  : null,
-    inq.submittedAt ? 'Submitted ' + new Date(inq.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : null,
+    inq.submittedAt ? 'Submitted '+new Date(inq.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : null,
   ].filter(Boolean).join(' · ');
 
-  var hasCoverup      = inq.coverupType && inq.coverupType !== 'none';
-  var coverupChip     = hasCoverup ? chipHtml('coverupDetail','Existing Tattoo',(inq.coverupSize||'—')+(inq.coverupAge?' · '+inq.coverupAge:''),true) : '';
-  var wordsChip       = inq.hasWords ? chipHtml('wordsDetail','Words / Lettering', inq.wordsDetail||'—', true) : '';
-  var notesChip       = inq.additionalNotes ? chipHtml('description','Additional Notes', inq.additionalNotes) : '';
+  var hasCoverup = inq.coverupType && inq.coverupType !== 'none';
+  var coverupChip = hasCoverup ? chipHtml('coverupDetail','Existing Tattoo',(inq.coverupSize||'—')+(inq.coverupAge?' · '+inq.coverupAge:''),true) : '';
+  var wordsChip   = inq.hasWords ? chipHtml('wordsDetail','Words / Lettering',inq.wordsDetail||'—',true) : '';
+  var notesChip   = inq.additionalNotes ? chipHtml('description','Additional Notes',inq.additionalNotes) : '';
 
   var photosHtml = '<div class="ref-photos">';
   var photos = (inq.photoUrls && inq.photoUrls.length) ? inq.photoUrls.slice(0,5) : [];
   if (photos.length) {
-    photos.forEach(function(url,i) {
-      photosHtml += '<div class="ref-photo-wrap">' +
-        (i===0?'<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>':'') +
-        '<img src="'+escHtml(url)+'" onerror="this.style.display=\'none\'">' +
-        '</div>';
+    photos.forEach(function(url,i){
+      photosHtml += '<div class="ref-photo-wrap">'+(i===0?'<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div>':'')+'<img src="'+escHtml(url)+'" onerror="this.style.display=\'none\'"></div>';
     });
   } else {
-    photosHtml += '<div class="ref-photo-wrap"><div class="ref-photo-ph">📷</div>' +
-      '<div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div></div>';
+    photosHtml += '<div class="ref-photo-wrap"><div class="ref-photo-ph">📷</div><div class="photo-icons"><button class="flag-btn" onclick="openFlag(\'photos\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\'photos\',\'question\')">❓</button></div></div>';
   }
   photosHtml += '</div>';
 
   var descSnippet = inq.description ? (inq.description.length>80 ? inq.description.substring(0,80)+'…' : inq.description) : '';
-
-  // Quote panel HTML
   var quotePanelHtml = savedQuote ? renderQuotePanel(savedQuote) : '';
 
   layout.innerHTML = `
-  <!-- INQUIRY SUMMARY (sticky) -->
   <div class="inquiry-card">
     <div class="inquiry-top">
       <div>
@@ -335,9 +320,7 @@ function renderPage() {
         ${coverupChip}${wordsChip}${notesChip}
       </div>
       ${photosHtml}
-      ${descSnippet ? `<button class="description-toggle" onclick="toggleDesc(this)">Description: "${escHtml(descSnippet)}" ▾</button><div class="description-text" id="descText">${escHtml(inq.description||'')}</div>` : ''}
-
-      <!-- FLAGS -->
+      ${descSnippet?`<button class="description-toggle" onclick="toggleDesc(this)">Description: "${escHtml(descSnippet)}" ▾</button><div class="description-text" id="descText">${escHtml(inq.description||'')}</div>`:''}
       <div class="flag-popover" id="flagPopover">
         <div class="flag-popover-title"><span id="flagTypeLabel">Flag</span>: <span id="flagFieldName">—</span></div>
         <select id="flagReason"><option value="">Select a common reason…</option></select>
@@ -352,13 +335,10 @@ function renderPage() {
     </div>
   </div>
 
-  <!-- QUOTE ON FILE -->
   ${quotePanelHtml}
 
-  <!-- THREAD -->
   <div class="thread" id="threadEl">${renderThreadBubbles()}</div>
 
-  <!-- QUICK REPLY -->
   <div class="quick-reply">
     <textarea id="replyText" placeholder="Reply to ${escHtml(inq.clientName||'client')}…" rows="1"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply();}"
@@ -366,175 +346,165 @@ function renderPage() {
     <button onclick="sendReply()" id="replyBtn">Send</button>
   </div>
 
-  <!-- QUOTE COMPOSER -->
   <div class="composer">
     <div class="composer-header" onclick="toggleComposer()">
-      <h2 id="composerTitle">${savedQuote ? 'Revise Quote' : 'Build Quote &amp; Booking Instructions'}</h2>
+      <h2 id="composerTitle">${savedQuote?'Revise Quote':'Build Quote &amp; Booking Instructions'}</h2>
       <span class="composer-chev" id="composerChev">▾</span>
     </div>
     <div class="composer-body collapsed" id="composerBody">
       ${renderQuoteComposer(inq, savedQuote)}
     </div>
-  </div>
-  `;
+  </div>`;
 }
 
 // ── QUOTE PANEL ───────────────────────────────────────────────
 function renderQuotePanel(q) {
   var sentDate = q.sentAt ? new Date(q.sentAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '';
   var fields = [
-    q.placement     ? { k:'Placement',   v: q.placement }     : null,
-    q.sizeFinal     ? { k:'Final Size',  v: q.sizeFinal }     : null,
-    q.style         ? { k:'Style',       v: q.style }         : null,
-    q.price         ? { k:'Price',       v: q.price }         : null,
-    q.estimatedTime ? { k:'Est. Time',   v: q.estimatedTime } : null,
-    q.numbingSize && q.numbingSize !== 'N/A' ? { k:'Numbing Size', v: q.numbingSize } : null,
+    q.placement     ? {k:'Placement',   v:q.placement}     : null,
+    q.sizeFinal     ? {k:'Final Size',  v:q.sizeFinal}     : null,
+    q.style         ? {k:'Style',       v:q.style}         : null,
+    q.price         ? {k:'Price',       v:q.price}         : null,
+    q.estimatedTime ? {k:'Est. Time',   v:q.estimatedTime} : null,
+    (q.numbingSize && q.numbingSize!=='N/A') ? {k:'Numbing Size',v:q.numbingSize} : null,
   ].filter(Boolean);
 
-  var fieldsHtml = '<div class="quote-fields">' +
-    fields.map(function(f){
-      return '<div class="qf"><div class="qf-key">'+escHtml(f.k)+'</div><div class="qf-val">'+escHtml(f.v)+'</div></div>';
-    }).join('') + '</div>';
+  var fieldsHtml = '<div class="quote-fields">'+fields.map(function(f){
+    return '<div class="qf"><div class="qf-key">'+escHtml(f.k)+'</div><div class="qf-val">'+escHtml(f.v)+'</div></div>';
+  }).join('')+'</div>';
 
   var notes = [];
   if (q.coverupTattoo) notes.push('Covers existing tattoo');
   if (q.coverupScar)   notes.push('Covers scar');
   if (q.hasWords)      notes.push('Includes lettering');
   if (q.designDetails) notes.push(q.designDetails);
-  var notesHtml = notes.length ? '<div class="quote-notes">' + escHtml(notes.join(' · ')) + '</div>' : '';
+  var notesHtml = notes.length ? '<div class="quote-notes">'+escHtml(notes.join(' · '))+'</div>' : '';
 
-  return '<div class="quote-panel" id="quotePanelEl">' +
-    '<div class="quote-panel-header">' +
-      '<div class="quote-panel-title">✓ Quote on File <span class="sent-date">Sent ' + escHtml(sentDate) + '</span></div>' +
-      '<button class="quote-edit-btn" onclick="editQuote()">✏️ Revise</button>' +
-    '</div>' +
-    fieldsHtml +
-    notesHtml +
+  return '<div class="quote-panel" id="quotePanelEl">'+
+    '<div class="quote-panel-header">'+
+      '<div class="quote-panel-title">✓ Quote on File <span class="sent-date">Sent '+escHtml(sentDate)+'</span></div>'+
+      '<button class="quote-edit-btn" onclick="editQuote()">✏️ Revise</button>'+
+    '</div>'+
+    fieldsHtml+notesHtml+
   '</div>';
 }
 
 function editQuote() {
-  // Pre-fill composer from saved quote and open it
   if (savedQuote) {
-    setV('qPlacement', savedQuote.placement);
-    setV('qSize',      savedQuote.sizeFinal);
-    setV('qStyle',     savedQuote.style);
-    setV('qPrice',     savedQuote.price);
-    setV('qTime',      savedQuote.estimatedTime);
-    setV('numbingSize',savedQuote.numbingSize||'N/A');
-    setV('qDesign',    savedQuote.designDetails);
+    setV('qPlacement',  savedQuote.placement);
+    setV('qSize',       savedQuote.sizeFinal);
+    setV('qStyle',      savedQuote.style);
+    setV('qPrice',      savedQuote.price);
+    setV('qTime',       savedQuote.estimatedTime);
+    setV('numbingSize', savedQuote.numbingSize||'N/A');
+    setV('qDesign',     savedQuote.designDetails);
     updateBookingBlock();
-    if (savedQuote.coverupTattoo) { var el=document.getElementById('cvTattoo'); if(el){el.checked=true; toggleConditional('cvTattoo','coverupTattooFields');} }
-    if (savedQuote.coverupScar)   { var el=document.getElementById('cvScar');   if(el){el.checked=true; toggleConditional('cvScar','coverupScarFields');} }
-    if (savedQuote.hasWords)      { var el=document.getElementById('hasWords'); if(el){el.checked=true; toggleConditional('hasWords','wordsFields');} }
+    ['cvTattoo','cvScar','hasWords'].forEach(function(id){
+      var el=document.getElementById(id); if(el){ var checked=(id==='cvTattoo'&&savedQuote.coverupTattoo)||(id==='cvScar'&&savedQuote.coverupScar)||(id==='hasWords'&&savedQuote.hasWords); el.checked=checked; }
+    });
+    toggleConditional('cvTattoo','coverupTattooFields');
+    toggleConditional('cvScar','coverupScarFields');
+    toggleConditional('hasWords','wordsFields');
   }
-  var body = document.getElementById('composerBody');
-  var chev = document.getElementById('composerChev');
-  if (body) body.classList.remove('collapsed');
-  if (chev) chev.classList.add('open');
+  var body=document.getElementById('composerBody'), chev=document.getElementById('composerChev');
+  if(body) body.classList.remove('collapsed');
+  if(chev) chev.classList.add('open');
   document.querySelector('.composer').scrollIntoView({behavior:'smooth'});
 }
 
 // ── THREAD ────────────────────────────────────────────────────
 function renderThreadBubbles() {
   if (!threadRows.length) return '<div class="thread-empty">No correspondence logged yet for this inquiry.</div>';
-  var html = '', lastDate = '';
-  threadRows.forEach(function(row) {
+  var html='', lastDate='';
+  threadRows.forEach(function(row){
     var d = row.messageAt ? new Date(row.messageAt) : null;
-    var dateLabel = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
-    if (dateLabel && dateLabel !== lastDate) { html += '<div class="thread-date-sep">'+dateLabel+'</div>'; lastDate = dateLabel; }
-    var time   = d ? d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
-    var isOut  = row.direction === 'outbound';
+    var dateLabel = d && !isNaN(d) ? d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    if (dateLabel && dateLabel!==lastDate) { html+='<div class="thread-date-sep">'+dateLabel+'</div>'; lastDate=dateLabel; }
+    var time   = d && !isNaN(d) ? d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
+    var isOut  = row.direction==='outbound';
     var sender = isOut ? escHtml(row.staffName||'Studio') : escHtml(inquiryData.clientName||'Client');
-    html += '<div class="msg '+(isOut?'outbound':'inbound')+'"><div class="msg-body">'+escHtml(row.bodyPreview||'')+'</div><div class="msg-meta">'+sender+' · '+time+'</div></div>';
+    var body   = row.bodyPreview || row.subject || '';
+    html+='<div class="msg '+(isOut?'outbound':'inbound')+'"><div class="msg-body">'+escHtml(body)+'</div><div class="msg-meta">'+sender+' · '+time+'</div></div>';
   });
   return html;
 }
 
 function addBubble(direction, body, sender) {
-  var thread = document.getElementById('threadEl');
-  var el = document.createElement('div');
-  el.className = 'msg ' + direction;
-  var now = new Date();
-  el.innerHTML = '<div class="msg-body">'+escHtml(body)+'</div><div class="msg-meta">'+escHtml(sender)+' · '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</div>';
-  thread.appendChild(el);
-  el.scrollIntoView({behavior:'smooth',block:'end'});
+  var thread=document.getElementById('threadEl');
+  var el=document.createElement('div'); el.className='msg '+direction;
+  var now=new Date();
+  el.innerHTML='<div class="msg-body">'+escHtml(body)+'</div><div class="msg-meta">'+escHtml(sender)+' · '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</div>';
+  thread.appendChild(el); el.scrollIntoView({behavior:'smooth',block:'end'});
 }
 
 // ── QUICK REPLY ───────────────────────────────────────────────
 async function sendReply() {
-  var btn = document.getElementById('replyBtn'), area = document.getElementById('replyText');
-  var body = area.value.trim(); if (!body) return;
-  btn.disabled = true; btn.textContent = 'Sending…';
+  var btn=document.getElementById('replyBtn'), area=document.getElementById('replyText');
+  var body=area.value.trim(); if(!body) return;
+  btn.disabled=true; btn.textContent='Sending…';
   try {
-    var res = await apiGet('sendEmail', { clientId: inquiryData.clientId, toEmail: inquiryData.clientEmail, subject: 'Re: Your tattoo inquiry — Pretty in Ink', body: body, inquiryId: INQUIRY_ID, staffName: ARTIST||'Studio' });
-    if (res.success) { addBubble('outbound', body, ARTIST||'Studio'); area.value = ''; area.style.height = ''; }
+    var res=await apiGet('sendEmail',{clientId:inquiryData.clientId,toEmail:inquiryData.clientEmail,subject:'Re: Your tattoo inquiry — Pretty in Ink',body:body,inquiryId:INQUIRY_ID,staffName:ARTIST||'Studio'});
+    if(res.success){addBubble('outbound',body,ARTIST||'Studio');area.value='';area.style.height='';}
     else alert('Send failed: '+(res.error||'unknown'));
-  } catch(e) { alert('Error: '+e.message); }
-  btn.disabled = false; btn.textContent = 'Send';
+  } catch(e){alert('Error: '+e.message);}
+  btn.disabled=false; btn.textContent='Send';
 }
 
 // ── FLAG SYSTEM ───────────────────────────────────────────────
-function openFlag(fieldKey, type) {
-  currentFlagField = fieldKey; currentFlagType = type;
-  document.getElementById('flagFieldName').textContent = niceFieldName(fieldKey);
-  document.getElementById('flagTypeLabel').textContent = type==='question' ? 'Question' : 'Flag';
-  document.getElementById('flagAddBtn').textContent    = type==='question' ? 'Add question' : 'Add to correction request';
-  var sel = document.getElementById('flagReason'), customEl = document.getElementById('flagCustom');
-  if (type==='question') { sel.style.display='none'; customEl.placeholder='What do you want to ask?'; }
-  else {
-    sel.style.display='block'; sel.innerHTML='<option value="">Select a common reason…</option>';
-    (reasonLib[fieldKey]||[]).forEach(function(r){ var o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
-    customEl.placeholder='Or write a custom note…';
-  }
-  customEl.value = '';
+function openFlag(fieldKey,type){
+  currentFlagField=fieldKey; currentFlagType=type;
+  document.getElementById('flagFieldName').textContent=niceFieldName(fieldKey);
+  document.getElementById('flagTypeLabel').textContent=type==='question'?'Question':'Flag';
+  document.getElementById('flagAddBtn').textContent=type==='question'?'Add question':'Add to correction request';
+  var sel=document.getElementById('flagReason'), customEl=document.getElementById('flagCustom');
+  if(type==='question'){sel.style.display='none';customEl.placeholder='What do you want to ask?';}
+  else{sel.style.display='block';sel.innerHTML='<option value="">Select a common reason…</option>';(reasonLib[fieldKey]||[]).forEach(function(r){var o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o);});customEl.placeholder='Or write a custom note…';}
+  customEl.value='';
   document.getElementById('flagPopover').classList.add('show');
   document.getElementById('flagPopover').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function closeFlag() { document.getElementById('flagPopover').classList.remove('show'); currentFlagField=null; }
-function addFlag() {
-  var custom = document.getElementById('flagCustom').value.trim();
-  var text   = custom || (currentFlagType==='correction' ? document.getElementById('flagReason').value : '');
-  if (!text) { alert('Write a note first.'); return; }
-  flaggedItems.push({field:currentFlagField, reason:text, type:currentFlagType});
-  renderFlaggedList(); closeFlag();
+function closeFlag(){document.getElementById('flagPopover').classList.remove('show');currentFlagField=null;}
+function addFlag(){
+  var custom=document.getElementById('flagCustom').value.trim();
+  var text=custom||(currentFlagType==='correction'?document.getElementById('flagReason').value:'');
+  if(!text){alert('Write a note first.');return;}
+  flaggedItems.push({field:currentFlagField,reason:text,type:currentFlagType});
+  renderFlaggedList();closeFlag();
 }
-function removeFlag(i) { flaggedItems.splice(i,1); renderFlaggedList(); }
-function renderFlaggedList() {
-  var list=document.getElementById('flaggedList'), btn=document.getElementById('sendCorrectionBtn');
-  if (!list) return;
-  if (!flaggedItems.length) { list.innerHTML=''; btn.style.display='none'; return; }
-  list.innerHTML = flaggedItems.map(function(item,i){
-    return '<div class="flagged-item"><div><span class="field-label">'+(item.type==='question'?'❓':'🚩')+' '+escHtml(niceFieldName(item.field))+':</span> '+escHtml(item.reason)+'</div><button class="remove-flag" onclick="removeFlag('+i+')">✕</button></div>';
-  }).join('');
+function removeFlag(i){flaggedItems.splice(i,1);renderFlaggedList();}
+function renderFlaggedList(){
+  var list=document.getElementById('flaggedList'),btn=document.getElementById('sendCorrectionBtn');
+  if(!list)return;
+  if(!flaggedItems.length){list.innerHTML='';btn.style.display='none';return;}
+  list.innerHTML=flaggedItems.map(function(item,i){return '<div class="flagged-item"><div><span class="field-label">'+(item.type==='question'?'❓':'🚩')+' '+escHtml(niceFieldName(item.field))+':</span> '+escHtml(item.reason)+'</div><button class="remove-flag" onclick="removeFlag('+i+')">✕</button></div>';}).join('');
   btn.style.display='block';
 }
-async function sendCorrectionRequest() {
-  var corrections = flaggedItems.filter(function(i){return i.type==='correction';});
-  var questions   = flaggedItems.filter(function(i){return i.type==='question';});
-  var first = (inquiryData.clientName||'there').split(' ')[0];
-  var body = 'Hi '+first+', thanks for sending this over!\n';
-  if (corrections.length) { body+='\nBefore I can put together an accurate quote, could you help clarify a couple of things:\n'; corrections.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';}); }
-  if (questions.length)   { body+='\nAlso had a couple of quick questions:\n'; questions.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';}); }
-  body += '\nOnce I have that, I\'ll get your quote right over. Thanks so much!';
+async function sendCorrectionRequest(){
+  var corrections=flaggedItems.filter(function(i){return i.type==='correction';});
+  var questions=flaggedItems.filter(function(i){return i.type==='question';});
+  var first=(inquiryData.clientName||'there').split(' ')[0];
+  var body='Hi '+first+', thanks for sending this over!\n';
+  if(corrections.length){body+='\nBefore I can put together an accurate quote, could you help clarify a couple of things:\n';corrections.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';});}
+  if(questions.length){body+='\nAlso had a couple of quick questions:\n';questions.forEach(function(item){body+='• '+niceFieldName(item.field)+': '+item.reason+'\n';});}
+  body+='\nOnce I have that, I\'ll get your quote right over. Thanks so much!';
   var btn=document.getElementById('sendCorrectionBtn');
-  btn.disabled=true; btn.textContent='Sending…';
-  try {
-    var res = await apiGet('sendCorrection', { inquiryId:INQUIRY_ID, clientId:inquiryData.clientId, clientEmail:inquiryData.clientEmail, clientName:inquiryData.clientName, staffName:ARTIST||'Studio', bodyText:body });
-    if (res.success) { addBubble('outbound',body,ARTIST||'Studio'); flaggedItems=[]; renderFlaggedList(); }
+  btn.disabled=true;btn.textContent='Sending…';
+  try{
+    var res=await apiGet('sendCorrection',{inquiryId:INQUIRY_ID,clientId:inquiryData.clientId,clientEmail:inquiryData.clientEmail,clientName:inquiryData.clientName,staffName:ARTIST||'Studio',bodyText:body});
+    if(res.success){addBubble('outbound',body,ARTIST||'Studio');flaggedItems=[];renderFlaggedList();}
     else alert('Send failed: '+(res.error||'unknown'));
-  } catch(e) { alert('Error: '+e.message); }
-  btn.disabled=false; btn.textContent='Send to Client →';
+  }catch(e){alert('Error: '+e.message);}
+  btn.disabled=false;btn.textContent='Send to Client →';
 }
 
 // ── QUOTE COMPOSER ────────────────────────────────────────────
-function renderQuoteComposer(inq, existingQuote) {
-  var q = existingQuote || {};
-  var cvTattoo = q.coverupTattoo || (inq.coverupType==='tattoo'||inq.coverupType==='both');
-  var cvScar   = q.coverupScar   || (inq.coverupType==='scar'  ||inq.coverupType==='both');
-  var artistName = escHtml((inq.artist||ARTIST||'Artist')+' 2026');
+function renderQuoteComposer(inq,existingQuote){
+  var q=existingQuote||{};
+  var cvTattoo=q.coverupTattoo||(inq.coverupType==='tattoo'||inq.coverupType==='both');
+  var cvScar=q.coverupScar||(inq.coverupType==='scar'||inq.coverupType==='both');
+  var artistName=escHtml((inq.artist||ARTIST||'Artist')+' 2026');
   return `
-  <div class="autofill-bar"><span>Fields pre-filled from the inquiry — edit anything before resending.</span><button onclick="autofillFromInquiry()">↻ Re-autofill</button></div>
+  <div class="autofill-bar"><span>Fields pre-filled from the inquiry.</span><button onclick="autofillFromInquiry()">↻ Re-autofill from inquiry</button></div>
   <div class="section-label">Design Specs</div>
   <div class="field-row">
     <div class="field-group"><label>Placement</label><input type="text" id="qPlacement" value="${escAttr(q.placement||inq.placement||'')}"></div>
@@ -550,7 +520,7 @@ function renderQuoteComposer(inq, existingQuote) {
   </div>
   <div class="field-group">
     <label>Style</label>
-    <select id="qStyle"><option value="">— Select —</option><option ${q.style==='Fine line'?'selected':''}>Fine line</option><option ${q.style==='Fine line with dot work shading'?'selected':''}>Fine line with dot work shading</option><option ${q.style==='Realistic'?'selected':''}>Realistic</option><option ${q.style==='Saturated color'?'selected':''}>Saturated color</option><option ${q.style==='High-contrast black &amp; grey'?'selected':''}>High-contrast black &amp; grey</option><option ${q.style==='Black outline / linework only'?'selected':''}>Black outline / linework only</option><option ${q.style==='Traditional'?'selected':''}>Traditional</option></select>
+    <select id="qStyle"><option value="">— Select —</option><option>Fine line</option><option>Fine line with dot work shading</option><option>Realistic</option><option>Saturated color</option><option>High-contrast black &amp; grey</option><option>Black outline / linework only</option><option>Traditional</option></select>
     <div style="font-size:11.5px;color:var(--gray);margin-top:5px;">Client's color preference: <strong>${escHtml(inq.style||'—')}</strong></div>
   </div>
   <div class="field-group"><label>Design details</label><textarea class="composer-ta" id="qDesign">${escHtml(q.designDetails||inq.description||'')}</textarea></div>
@@ -563,132 +533,82 @@ function renderQuoteComposer(inq, existingQuote) {
     <div class="field-group"><label>Price</label><input type="text" id="qPrice" value="${escAttr(q.price||'')}" placeholder="e.g. $1,200"></div>
     <div class="field-group"><label>Estimated time</label><input type="text" id="qTime" value="${escAttr(q.estimatedTime||'')}" placeholder="e.g. 5-6 hr"></div>
   </div>
-  <div class="field-group">
-    <label>Numbing size needed</label>
-    <select id="numbingSize" onchange="updateBookingBlock()"><option>N/A</option><option ${q.numbingSize==='S'?'selected':''}>S</option><option ${q.numbingSize==='M'?'selected':''}>M</option><option ${q.numbingSize==='L'?'selected':''}>L</option><option ${q.numbingSize==='XL'?'selected':''}>XL</option></select>
+  <div class="field-group"><label>Numbing size needed</label>
+    <select id="numbingSize" onchange="updateBookingBlock()"><option>N/A</option><option>S</option><option>M</option><option>L</option><option>XL</option></select>
   </div>
   <div class="section-label">Financing &amp; Booking <span class="editable-flag">(auto-generated)</span></div>
   <div class="template-block" id="bookingBlock">
     <span class="t-section">financing</span>📣 We offer afterpay if you'd like to finance your tattoo, read more at <strong>www.prettyinink.net/tattoolayaway</strong><br><br>
     <span class="t-section">booking</span>📅 Ready to book? Head to <strong>www.prettyinink.net/booking</strong><br>• Select the appropriate price quote under "<strong id="artistBookingName">${artistName}</strong>"<br>• Add on any numbing/merchandise you'd like<br>&nbsp;&nbsp;• You'll need size: <strong id="numbingSizeDisplay">N/A</strong>
   </div>
-  <div class="section-label">Disclaimers <span class="editable-flag" style="font-weight:400;">(standard wording)</span></div>
+  <div class="section-label">Disclaimers</div>
   <div class="template-block">
     ***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***<br><br>
     **if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**<br><br>
     ***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time &amp; wait in their vehicle while the numbing is working.***<br><br>
-    ***should you want an appointment sooner than what is available in the artist\'s schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price.***
+    ***should you want an appointment sooner than what is available in the artist's schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***
   </div>
   <div class="section-label">What's Next</div>
   <div class="template-block">
-    **you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don't miss future correspondence**<br><br>
+    **you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist**<br><br>
     **A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**<br><br>
     See you soon!!
   </div>
   <div class="send-row">
     <span class="status-msg" id="quoteSendStatus"></span>
     <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
-    <button class="btn btn-primary" id="sendQuoteBtn" onclick="sendQuote()">${existingQuote ? 'Send Revised Quote' : 'Send Quote &amp; Log'}</button>
+    <button class="btn btn-primary" id="sendQuoteBtn" onclick="sendQuote()">${existingQuote?'Send Revised Quote':'Send Quote &amp; Log'}</button>
   </div>`;
 }
 
-function toggleComposer() {
-  document.getElementById('composerBody').classList.toggle('collapsed');
-  document.getElementById('composerChev').classList.toggle('open');
-}
-function toggleConditional(cbId, targetId) {
-  var el = document.getElementById(targetId); if(el) el.classList.toggle('show', document.getElementById(cbId).checked);
-}
-function updateBookingBlock() {
-  var el = document.getElementById('numbingSizeDisplay'); if(el) el.textContent = document.getElementById('numbingSize').value;
-}
-function autofillFromInquiry() {
-  if (!inquiryData) return;
-  setV('qPlacement', inquiryData.placement||'');
-  setV('qSize',      inquiryData.sizeEstimate||'');
-  setV('qDesign',    inquiryData.description||'');
-  setV('qWordsText', inquiryData.wordsDetail||'');
-}
-function setV(id,val) { var el=document.getElementById(id); if(el) el.value=val; }
-function gV(id) { var el=document.getElementById(id); return el?el.value:''; }
-function saveDraft() {
-  sessionStorage.setItem('draft_'+INQUIRY_ID, JSON.stringify(collectQuote()));
-  var s=document.getElementById('quoteSendStatus'); s.textContent='Draft saved.'; s.className='status-msg ok';
-  setTimeout(function(){s.textContent='';},2000);
-}
-function collectQuote() {
-  return { placement:gV('qPlacement'), sizeFinal:gV('qSize'), style:gV('qStyle'), price:gV('qPrice'), estimatedTime:gV('qTime'), numbingSize:gV('numbingSize'),
-    coverupTattoo: !!(document.getElementById('cvTattoo')&&document.getElementById('cvTattoo').checked),
-    coverupScar:   !!(document.getElementById('cvScar')&&document.getElementById('cvScar').checked),
-    hasWords:      !!(document.getElementById('hasWords')&&document.getElementById('hasWords').checked),
-    wordsDetail:   gV('qWordsText')+(gV('qFont')?' ('+gV('qFont')+')':''),
-    designDetails: gV('qDesign') };
-}
-async function sendQuote() {
-  var d = collectQuote();
-  if (!d.price) { alert('Enter a price before sending.'); return; }
-  var inq    = inquiryData;
-  var first  = (inq.clientName||'there').split(' ')[0];
-  var artist = ARTIST||inq.artist||'Studio';
-  var body = 'Hi '+first+'!\n\nHere is your price quote from Pretty in Ink:\n\n';
-  body += '• Design: '+(d.designDetails||d.style||'')+'\n• Placement: '+(d.placement||'')+'\n• Size: '+(d.sizeFinal||'')+'\n• Style: '+(d.style||'')+'\n';
-  if (d.coverupTattoo) body += '• Covers existing tattoo\n';
-  if (d.coverupScar)   body += '• Covers scar\n';
-  if (d.hasWords)      body += '• Includes lettering: '+(d.wordsDetail||'')+'\n';
-  body += '\n💰 Price estimate: '+d.price+'\n⏱ Estimated time: '+(d.estimatedTime||'')+'\n\n';
-  body += '📣 We offer afterpay — www.prettyinink.net/tattoolayaway\n\n📅 Ready to book? Head to www.prettyinink.net/booking\n• Select the quote under "'+artist+' 2026"\n• Add any numbing/merchandise you\'d like\n';
-  if (d.numbingSize&&d.numbingSize!=='N/A') body += '  • You\'ll need size: '+d.numbingSize+'\n';
-  body += '\n***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***\n\n**if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**\n\n***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time & wait in their vehicle while the numbing is working.***\n\n***should you want an appointment sooner than what is available in the artist\'s schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***\n\n**you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don\'t miss future correspondence**\n\n**A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**\n\nSee you soon!!';
-  var btn=document.getElementById('sendQuoteBtn'), status=document.getElementById('quoteSendStatus');
-  btn.disabled=true; btn.textContent='Sending…'; status.textContent='';
-  try {
-    var res = await apiGet('sendQuote', Object.assign({ inquiryId:INQUIRY_ID, clientId:inq.clientId, clientEmail:inq.clientEmail, clientName:inq.clientName, staffName:artist, subject:'Your tattoo quote from Pretty in Ink — '+first, bodyText:body }, d));
-    if (res.success) {
+function toggleComposer(){document.getElementById('composerBody').classList.toggle('collapsed');document.getElementById('composerChev').classList.toggle('open');}
+function toggleConditional(cbId,targetId){var el=document.getElementById(targetId);if(el)el.classList.toggle('show',document.getElementById(cbId).checked);}
+function updateBookingBlock(){var el=document.getElementById('numbingSizeDisplay');if(el)el.textContent=document.getElementById('numbingSize').value;}
+function autofillFromInquiry(){if(!inquiryData)return;setV('qPlacement',inquiryData.placement||'');setV('qSize',inquiryData.sizeEstimate||'');setV('qDesign',inquiryData.description||'');setV('qWordsText',inquiryData.wordsDetail||'');}
+function setV(id,val){var el=document.getElementById(id);if(el)el.value=val;}
+function gV(id){var el=document.getElementById(id);return el?el.value:'';}
+function saveDraft(){sessionStorage.setItem('draft_'+INQUIRY_ID,JSON.stringify(collectQuote()));var s=document.getElementById('quoteSendStatus');s.textContent='Draft saved.';s.className='status-msg ok';setTimeout(function(){s.textContent='';},2000);}
+function collectQuote(){return{placement:gV('qPlacement'),sizeFinal:gV('qSize'),style:gV('qStyle'),price:gV('qPrice'),estimatedTime:gV('qTime'),numbingSize:gV('numbingSize'),coverupTattoo:!!(document.getElementById('cvTattoo')&&document.getElementById('cvTattoo').checked),coverupScar:!!(document.getElementById('cvScar')&&document.getElementById('cvScar').checked),hasWords:!!(document.getElementById('hasWords')&&document.getElementById('hasWords').checked),wordsDetail:gV('qWordsText')+(gV('qFont')?' ('+gV('qFont')+')':''),designDetails:gV('qDesign')};}
+async function sendQuote(){
+  var d=collectQuote();
+  if(!d.price){alert('Enter a price before sending.');return;}
+  var inq=inquiryData, first=(inq.clientName||'there').split(' ')[0], artist=ARTIST||inq.artist||'Studio';
+  var body='Hi '+first+'!\n\nHere is your price quote from Pretty in Ink:\n\n';
+  body+='• Design: '+(d.designDetails||d.style||'')+'\n• Placement: '+(d.placement||'')+'\n• Size: '+(d.sizeFinal||'')+'\n• Style: '+(d.style||'')+'\n';
+  if(d.coverupTattoo)body+='• Covers existing tattoo\n';
+  if(d.coverupScar)body+='• Covers scar\n';
+  if(d.hasWords)body+='• Includes lettering: '+(d.wordsDetail||'')+'\n';
+  body+='\n💰 Price estimate: '+d.price+'\n⏱ Estimated time: '+(d.estimatedTime||'')+'\n\n';
+  body+='📣 We offer afterpay — www.prettyinink.net/tattoolayaway\n\n📅 Ready to book? Head to www.prettyinink.net/booking\n• Select the quote under "'+artist+' 2026"\n';
+  if(d.numbingSize&&d.numbingSize!=='N/A')body+='  • You\'ll need numbing size: '+d.numbingSize+'\n';
+  body+='\n***Please note...this price quote is valid for 30 days from the time given, but you are welcome to book as far out as needed within the available dates.***\n\n**if you are scheduling an appt with an estimation of anything over 5 hours please choose a day and time with little to no time constraints as sometimes the tattoo may take more time than expected**\n\n***If you opt-in for our numbing service, you may not book an appointment earlier than 10:00am. We do ask that clients arrive 1 hour prior to their appointment time & wait in their vehicle while the numbing is working.***\n\n***should you want an appointment sooner than what is available in the artist\'s schedule--she does offer an expedited service fee. The expedited service fee is an additional 25% of the price quote on top of the full price. If you prefer this option, please continue scheduling on an available day and reply to this email with your desire to expedite.***\n\n**you should receive a booking confirmation from "Appointy" after placing deposit and scheduling an appointment — please add this email to your whitelist so you don\'t miss future correspondence**\n\n**A rough sketch will be emailed within 72 hours of your scheduled appointment for your review.**\n\nSee you soon!!';
+  var btn=document.getElementById('sendQuoteBtn'),status=document.getElementById('quoteSendStatus');
+  btn.disabled=true;btn.textContent='Sending…';status.textContent='';
+  try{
+    var res=await apiGet('sendQuote',Object.assign({inquiryId:INQUIRY_ID,clientId:inq.clientId,clientEmail:inq.clientEmail,clientName:inq.clientName,staffName:artist,subject:'Your tattoo quote from Pretty in Ink — '+first,bodyText:body},d));
+    if(res.success){
       addBubble('outbound',body,artist);
-      savedQuote = Object.assign({ sentAt: new Date().toISOString(), staffName: artist }, d);
-      // Refresh the quote panel
-      var panel = document.getElementById('quotePanelEl');
-      var newPanelHtml = renderQuotePanel(savedQuote);
-      if (panel) {
-        panel.outerHTML = newPanelHtml;
-      } else {
-        // Insert before thread
-        var thread = document.getElementById('threadEl');
-        var div = document.createElement('div');
-        div.innerHTML = newPanelHtml;
-        thread.parentNode.insertBefore(div.firstChild, thread);
-      }
-      document.getElementById('composerTitle').textContent = 'Revise Quote';
-      btn.textContent = 'Send Revised Quote';
-      status.textContent='✓ Quote sent & saved!'; status.className='status-msg ok';
+      savedQuote=Object.assign({sentAt:new Date().toISOString(),staffName:artist},d);
+      var panel=document.getElementById('quotePanelEl');
+      var newHtml=renderQuotePanel(savedQuote);
+      if(panel){panel.outerHTML=newHtml;}else{var thread=document.getElementById('threadEl');var div=document.createElement('div');div.innerHTML=newHtml;thread.parentNode.insertBefore(div.firstChild,thread);}
+      document.getElementById('composerTitle').textContent='Revise Quote';
+      btn.textContent='Send Revised Quote';
+      status.textContent='✓ Quote sent & saved!';status.className='status-msg ok';
       setTimeout(function(){status.textContent='';},4000);
-    } else { status.textContent='Error: '+(res.error||'unknown'); status.className='status-msg err'; }
-  } catch(e) { status.textContent='Error: '+e.message; status.className='status-msg err'; }
+    }else{status.textContent='Error: '+(res.error||'unknown');status.className='status-msg err';}
+  }catch(e){status.textContent='Error: '+e.message;status.className='status-msg err';}
   btn.disabled=false;
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function toggleMinimize() {
-  var body=document.getElementById('inquiryCardBody'), btn=document.getElementById('minimizeBtn');
-  btn.textContent = body.classList.toggle('minimized') ? '▼' : '▲';
-}
-function toggleDesc(btn) { var el=document.getElementById('descText'); if(el) el.classList.toggle('expanded'); }
-function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-function niceFieldName(k) { return k.replace(/([A-Z])/g,' $1').replace(/^./,function(s){return s.toUpperCase();}); }
-function coverupLabel(t) {
-  if (!t||t==='none') return 'No';
-  if (t==='tattoo') return 'Yes — tattoo';
-  if (t==='scar')   return 'Yes — scar';
-  if (t==='both')   return 'Yes — tattoo + scar';
-  return t;
-}
-function chipHtml(field, label, value, conditional) {
-  return '<div class="detail-chip'+(conditional?' conditional-chip':'')+'" data-field="'+field+'">' +
-    '<div class="chip-key">'+escHtml(label)+'<span class="icon-pair"><button class="flag-btn" onclick="openFlag(\''+field+'\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\''+field+'\',\'question\')">❓</button></span></div>' +
-    '<div class="chip-val">'+escHtml(String(value))+'</div></div>';
-}
-function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
+function toggleMinimize(){var body=document.getElementById('inquiryCardBody'),btn=document.getElementById('minimizeBtn');btn.textContent=body.classList.toggle('minimized')?'▼':'▲';}
+function toggleDesc(btn){var el=document.getElementById('descText');if(el)el.classList.toggle('expanded');}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function niceFieldName(k){return k.replace(/([A-Z])/g,' $1').replace(/^./,function(s){return s.toUpperCase();});}
+function coverupLabel(t){if(!t||t==='none')return 'No';if(t==='tattoo')return 'Yes — tattoo';if(t==='scar')return 'Yes — scar';if(t==='both')return 'Yes — tattoo + scar';return t;}
+function chipHtml(field,label,value,conditional){return '<div class="detail-chip'+(conditional?' conditional-chip':'')+'" data-field="'+field+'"><div class="chip-key">'+escHtml(label)+'<span class="icon-pair"><button class="flag-btn" onclick="openFlag(\''+field+'\',\'correction\')">🚩</button><button class="flag-btn" onclick="openFlag(\''+field+'\',\'question\')">❓</button></span></div><div class="chip-val">'+escHtml(String(value))+'</div></div>';}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escAttr(s){return String(s||'').replace(/"/g,'&quot;');}
 
 init();
 </script>

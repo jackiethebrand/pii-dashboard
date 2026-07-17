@@ -43,8 +43,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .hero-sub { color: var(--gray); font-size: 14px; margin-top: 6px; }
 .hero-rule { width: 50px; height: 2px; background: var(--pink-lt); margin: 14px auto 0; border-radius: 2px; }
 
+/* ── CENTERED CONTENT WRAPPER ── */
+.page-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 /* ── TOOLBAR ── */
-.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px 0; }
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0 0;
+}
 .updated-label { font-size: 12px; color: var(--gray); }
 .btn-refresh {
   background: var(--white); border: 1.5px solid var(--border); border-radius: 999px;
@@ -54,7 +64,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .btn-refresh:hover { border-color: var(--pink); color: var(--pink); }
 
 /* ── FILTERS ── */
-.filters { padding: 16px 24px 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.filters { padding: 14px 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .filter-select {
   padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 999px;
   font-size: 13px; font-family: inherit; background: var(--white); color: var(--ink); cursor: pointer;
@@ -71,11 +81,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .pill-count { font-size: 11px; opacity: 0.75; margin-left: 4px; }
 
 /* ── LIST ── */
-.list-wrap { padding: 6px 24px 60px; }
+.list-wrap { padding: 4px 0 60px; }
 
 .section-head {
   display: flex; align-items: center; gap: 10px;
-  margin: 22px 0 10px;
+  margin: 20px 0 10px;
 }
 .section-head-label {
   font-family: 'Cormorant Garamond', serif;
@@ -104,8 +114,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .inquiry-row.their-turn:hover { border-left-color: var(--gray); border-color: var(--border); }
 
 .row-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--pink-lt); color: var(--pink); font-weight: 700; font-size: 14px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--pink-lt); color: var(--pink); font-weight: 700; font-size: 13px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .row-avatar.their { background: var(--gray-lt); color: var(--gray); }
@@ -130,10 +140,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 .row-date { font-size: 11.5px; color: var(--gray); }
 
-.empty-state { color: var(--gray); font-size: 13.5px; padding: 10px 0 4px; }
+.empty-state { color: var(--gray); font-size: 13.5px; padding: 12px 0; }
 
 /* ── LOADING / ERROR ── */
-.loading-msg { text-align: center; padding: 48px 24px; color: var(--gray); font-size: 14px; }
+.loading-msg { text-align: center; padding: 48px 0; color: var(--gray); font-size: 14px; }
 .spinner { width: 28px; height: 28px; border: 3px solid var(--pink-lt); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -156,30 +166,34 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   <div class="hero-rule"></div>
 </div>
 
-<div class="toolbar">
-  <div class="updated-label" id="updatedLabel"></div>
-  <button class="btn-refresh" onclick="loadInquiries()">↻ Refresh</button>
-</div>
+<div class="page-wrap">
 
-<div class="filters">
-  <select class="filter-select" id="artistFilter" onchange="loadInquiries()">
-    <option value="">All Artists</option>
-    <option value="Tressa">Tressa</option>
-    <option value="Jackie">Jackie</option>
-  </select>
-  <div class="pill-group">
-    <button class="pill active" data-filter="all"       onclick="setPill(this)">All <span class="pill-count" id="cAll"></span></button>
-    <button class="pill"        data-filter="new"       onclick="setPill(this)">New <span class="pill-count" id="cNew"></span></button>
-    <button class="pill"        data-filter="yourturn"  onclick="setPill(this)">Your Turn <span class="pill-count" id="cYourTurn"></span></button>
-    <button class="pill"        data-filter="theirturn" onclick="setPill(this)">Their Turn <span class="pill-count" id="cTheirTurn"></span></button>
-    <button class="pill"        data-filter="quoted"    onclick="setPill(this)">Quoted <span class="pill-count" id="cQuoted"></span></button>
-    <button class="pill"        data-filter="booked"    onclick="setPill(this)">Booked <span class="pill-count" id="cBooked"></span></button>
+  <div class="toolbar">
+    <div class="updated-label" id="updatedLabel"></div>
+    <button class="btn-refresh" onclick="loadInquiries()">↻ Refresh</button>
   </div>
-</div>
 
-<div class="list-wrap" id="listWrap">
-  <div class="loading-msg"><div class="spinner"></div>Loading inquiries…</div>
-</div>
+  <div class="filters">
+    <select class="filter-select" id="artistFilter" onchange="loadInquiries()">
+      <option value="">All Artists</option>
+      <option value="Tressa">Tressa</option>
+      <option value="Jackie">Jackie</option>
+    </select>
+    <div class="pill-group">
+      <button class="pill active" data-filter="all"       onclick="setPill(this)">All <span class="pill-count" id="cAll"></span></button>
+      <button class="pill"        data-filter="new"       onclick="setPill(this)">New <span class="pill-count" id="cNew"></span></button>
+      <button class="pill"        data-filter="yourturn"  onclick="setPill(this)">Your Turn <span class="pill-count" id="cYourTurn"></span></button>
+      <button class="pill"        data-filter="theirturn" onclick="setPill(this)">Their Turn <span class="pill-count" id="cTheirTurn"></span></button>
+      <button class="pill"        data-filter="quoted"    onclick="setPill(this)">Quoted <span class="pill-count" id="cQuoted"></span></button>
+      <button class="pill"        data-filter="booked"    onclick="setPill(this)">Booked <span class="pill-count" id="cBooked"></span></button>
+    </div>
+  </div>
+
+  <div class="list-wrap" id="listWrap">
+    <div class="loading-msg"><div class="spinner"></div>Loading inquiries…</div>
+  </div>
+
+</div><!-- /page-wrap -->
 
 <script>
 const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
@@ -239,27 +253,24 @@ function getFiltered() {
 }
 
 function renderList() {
-  var open    = allInquiries.filter(function(i){ return i.status !== 'closed' && i.status !== 'archived'; });
+  var open     = allInquiries.filter(function(i){ return i.status !== 'closed' && i.status !== 'archived'; });
   var filtered = getFiltered();
 
-  // Pill counts always reflect open inquiries
-  document.getElementById('cAll').textContent      = open.length;
-  document.getElementById('cNew').textContent      = open.filter(function(i){ return i.status==='new'; }).length;
-  document.getElementById('cYourTurn').textContent = open.filter(function(i){ return i.needsReply===true; }).length;
-  document.getElementById('cTheirTurn').textContent= open.filter(function(i){ return i.needsReply===false; }).length;
-  document.getElementById('cQuoted').textContent   = open.filter(function(i){ return i.status==='quoted'; }).length;
-  document.getElementById('cBooked').textContent   = open.filter(function(i){ return i.status==='booked'; }).length;
+  document.getElementById('cAll').textContent       = open.length;
+  document.getElementById('cNew').textContent       = open.filter(function(i){ return i.status==='new'; }).length;
+  document.getElementById('cYourTurn').textContent  = open.filter(function(i){ return i.needsReply===true; }).length;
+  document.getElementById('cTheirTurn').textContent = open.filter(function(i){ return i.needsReply===false; }).length;
+  document.getElementById('cQuoted').textContent    = open.filter(function(i){ return i.status==='quoted'; }).length;
+  document.getElementById('cBooked').textContent    = open.filter(function(i){ return i.status==='booked'; }).length;
 
-  var openCount = filtered.length;
+  var openCount = filtered.filter(function(i){ return i.status!=='closed'&&i.status!=='archived'; }).length;
   document.getElementById('heroSub').textContent = openCount + ' open inquir' + (openCount===1?'y':'ies');
 
-  // Split into sections
   var yourTurn  = filtered.filter(function(i){ return i.needsReply===true; });
   var theirTurn = filtered.filter(function(i){ return i.needsReply===false; });
   var closed    = filtered.filter(function(i){ return i.needsReply===null||i.needsReply===undefined; });
 
   var html = '';
-
   if (!filtered.length) {
     html = '<div class="empty-state">No inquiries match these filters.</div>';
   } else {
@@ -276,7 +287,6 @@ function renderList() {
       closed.forEach(function(i){ html += rowHtml(i, true); });
     }
   }
-
   document.getElementById('listWrap').innerHTML = html;
 }
 
@@ -292,14 +302,11 @@ function rowHtml(inq, theirTurn) {
   var initials = (inq.clientName||'?').split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase();
   var href = 'pii-inquiry-thread.html?inquiryId=' + encodeURIComponent(inq.inquiryId) +
              (inq.artist ? '&artist=' + encodeURIComponent(inq.artist) : '');
-
   var metaParts = [inq.placement, inq.style, inq.artist].filter(Boolean).join(' · ');
-
   var statusClass = {
     'new':'status-new','in_progress':'status-progress','quoted':'status-quoted',
     'booked':'status-booked','closed':'status-closed','archived':'status-archived'
   }[inq.status] || 'status-new';
-
   var quoteBadge = inq.status==='quoted' ? '<span class="quote-badge">✓ Quote Sent</span>' : '';
   var dateLabel  = inq.submittedAt ? new Date(inq.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
 

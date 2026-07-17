@@ -19,7 +19,7 @@
   --gold: #a1005a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: var(--ink); }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
 
 /* ── NAV ── */
 .header {
@@ -39,99 +39,99 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 /* ── TOOLBAR ── */
 .toolbar {
   background: var(--white); border-bottom: 1px solid var(--border);
-  padding: 14px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
 }
-.toolbar-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; font-style: italic; flex: 1; }
+.toolbar-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; font-style: italic; flex: 1; min-width: 120px; }
 .filter-group { display: flex; align-items: center; gap: 8px; }
-.filter-group label { font-size: 11.5px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.3px; }
+.filter-group label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.4px; }
 .filter-group select {
-  padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px;
-  font-size: 13px; font-family: inherit; background: white;
+  padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: inherit; background: white; cursor: pointer;
 }
 .filter-group select:focus { outline: none; border-color: var(--pink); }
 .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
 .pill {
   padding: 5px 14px; border-radius: 999px; border: 1.5px solid var(--border);
   font-size: 12.5px; font-weight: 600; background: white; cursor: pointer; color: var(--gray);
+  transition: all 0.15s;
 }
-.pill.active { background: var(--pink-lt); border-color: var(--pink); color: var(--ink); }
-.pill:hover { border-color: var(--pink); }
-.count-badge {
-  background: var(--pink-lt); color: var(--ink); border-radius: 999px;
-  padding: 1px 7px; font-size: 11px; font-weight: 700; margin-left: 4px;
-}
+.pill.active { background: var(--pink); border-color: var(--pink); color: white; }
+.pill:hover:not(.active) { border-color: var(--pink); color: var(--ink); }
+.pill .cnt { font-size: 11px; margin-left: 3px; opacity: 0.8; }
 
-/* ── LOADING / ERROR / EMPTY ── */
+/* ── STATE SCREENS ── */
 .state-screen {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 40vh; gap: 12px; color: var(--gray);
+  min-height: 40vh; gap: 12px; color: var(--gray); font-size: 14px;
 }
 .spinner {
-  width: 32px; height: 32px; border: 3px solid var(--pink-lt);
+  width: 30px; height: 30px; border: 3px solid var(--pink-lt);
   border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── INQUIRY LIST ── */
-.list-wrap { max-width: 1000px; margin: 0 auto; padding: 20px 20px 60px; }
+/* ── LIST ── */
+.list-wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+
 .section-group { margin-bottom: 28px; }
 .section-head {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--gray); margin-bottom: 10px; padding: 0 4px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--gray); margin-bottom: 10px; padding: 0 2px;
+  display: flex; align-items: center; gap: 6px;
 }
+.section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+/* ── INQUIRY CARD — appointment-style compact ── */
 .inquiry-row {
-  background: var(--white); border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 14px 18px; margin-bottom: 8px; display: grid;
-  grid-template-columns: 1fr auto; gap: 12px; align-items: start;
-  text-decoration: none; color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--pink);
+  border-radius: 10px;
+  padding: 12px 16px 12px 14px;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
 }
-.inquiry-row:hover { border-color: var(--pink); box-shadow: 0 2px 8px rgba(212,116,143,0.15); }
-.inquiry-row.priority { border-left: 4px solid #ef4444; }
+.inquiry-row:hover { box-shadow: 0 2px 10px rgba(212,116,143,0.15); border-color: var(--pink); }
+.inquiry-row.their-turn { border-left-color: var(--border); }
+.inquiry-row.their-turn:hover { border-left-color: var(--gray); border-color: var(--border); }
 
-.row-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.row-name { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.priority-badge {
-  display: inline-block; font-size: 10px; font-weight: 700;
-  background: #fee2e2; color: #b91c1c; padding: 3px 8px;
-  border-radius: 999px; text-transform: uppercase; letter-spacing: 0.3px; margin-left: 6px;
-  vertical-align: middle;
-}
-.row-meta { font-size: 12px; color: var(--gray); }
-.row-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.row-body { flex: 1; min-width: 0; }
+.row-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.row-sub { font-size: 11.5px; color: var(--gray); margin-top: 3px; }
+.row-chips { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
 .chip-sm {
-  font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
+  font-size: 11.5px; padding: 2px 9px; border-radius: 6px;
   background: var(--gray-lt); border: 1px solid var(--border); color: var(--ink);
+  white-space: nowrap;
 }
-.chip-sm.coverup { background: var(--cream); border-color: var(--pink-lt); }
+.chip-sm.coverup { background: var(--cream); border-color: var(--pink-lt); color: var(--gold); }
 
-.row-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-.sla-badge {
-  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+.row-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+
+/* status chips */
+.st {
+  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
   text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
 }
-.sla-badge.overdue  { background: #fee2e2; color: #b91c1c; }
-.sla-badge.urgent   { background: #fde68a; color: #7c5800; }
-.sla-badge.ok       { background: #d1fae5; color: #065f46; }
-.sla-badge.none     { background: var(--gray-lt); color: var(--gray); }
-.status-chip {
-  font-size: 11.5px; padding: 3px 10px; border-radius: 999px; font-weight: 600;
-  background: var(--gray-lt); color: var(--gray);
-}
-.status-chip.new       { background: #ede9fe; color: #5b21b6; }
-.status-chip.in-progress { background: #dbeafe; color: #1d4ed8; }
-.status-chip.quoted    { background: #fef3c7; color: #92400e; }
-.status-chip.booked    { background: #d1fae5; color: #065f46; }
-.status-chip.quoted    { background: #d1fae5; color: #065f46; }
-.status-chip.closed    { background: var(--gray-lt); color: var(--gray); }
-.open-arrow { font-size: 18px; color: var(--gray); align-self: center; }
+.st.new        { background: #ede9fe; color: #5b21b6; }
+.st.in-progress { background: #dbeafe; color: #1d4ed8; }
+.st.quoted     { background: #d1fae5; color: #065f46; }
+.st.booked     { background: #d1fae5; color: #065f46; }
+.st.closed     { background: var(--gray-lt); color: var(--gray); }
+.st.default    { background: var(--gray-lt); color: var(--gray); }
+
+.row-arrow { font-size: 16px; color: var(--border); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1 class="serif" style="font-family:'Cormorant Garamond',serif;">Pretty in Ink</h1>
+  <h1>Pretty in Ink</h1>
   <nav>
     <a href="pii-inquiry-inbox.html" class="active">Inquiries</a>
     <a href="pii-appointments.html">Appointments</a>
@@ -150,11 +150,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
     </select>
   </div>
   <div class="filter-pills" id="statusPills">
-    <button class="pill active" data-status="" onclick="setPillFilter(this)">All <span class="count-badge" id="countAll">0</span></button>
-    <button class="pill" data-status="new" onclick="setPillFilter(this)">New</button>
-    <button class="pill" data-status="in-progress" onclick="setPillFilter(this)">In Progress</button>
-    <button class="pill" data-status="quoted" onclick="setPillFilter(this)">Quoted</button>
-    <button class="pill" data-status="booked" onclick="setPillFilter(this)">Booked</button>
+    <button class="pill active" data-status="" onclick="setPillFilter(this)">All <span class="cnt" id="cntAll"></span></button>
+    <button class="pill" data-status="new" onclick="setPillFilter(this)">New <span class="cnt" id="cntNew"></span></button>
+    <button class="pill" data-status="in-progress" onclick="setPillFilter(this)">In Progress <span class="cnt" id="cntInProgress"></span></button>
+    <button class="pill" data-status="quoted" onclick="setPillFilter(this)">Quoted <span class="cnt" id="cntQuoted"></span></button>
+    <button class="pill" data-status="booked" onclick="setPillFilter(this)">Booked <span class="cnt" id="cntBooked"></span></button>
   </div>
 </div>
 
@@ -167,26 +167,23 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-lt); color: va
 </div>
 
 <script>
-// ── CONFIG ───────────────────────────────────────────────────────
 const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwUU2aV5fMpjMWieN8j28pnRW8B4ZgjepdVgONbTKzbONETzmUsjKT-JswnwnT_13Eq/exec';
 
-// ── URL PARAM ────────────────────────────────────────────────────
-const urlParams = new URLSearchParams(location.search);
+const urlParams     = new URLSearchParams(location.search);
 const DEFAULT_ARTIST = urlParams.get('artist') || '';
 
-// ── STATE ────────────────────────────────────────────────────────
-let allInquiries  = [];
-let activeStatus  = '';
+let allInquiries = [];
+let activeStatus = '';
 let cbId = 0;
 
-// ── JSONP ────────────────────────────────────────────────────────
+// ── JSONP ────────────────────────────────────────────────────
 function jsonp(url) {
   return new Promise(function(resolve, reject) {
     var cb    = 'piiInbox_' + (++cbId);
     var sep   = url.includes('?') ? '&' : '?';
     var el    = document.createElement('script');
     el.src    = url + sep + 'callback=' + cb;
-    var timer = setTimeout(function() { cleanup(); reject(new Error('Timed out')); }, 20000);
+    var timer = setTimeout(function() { cleanup(); reject(new Error('Timed out')); }, 25000);
     window[cb] = function(data) { cleanup(); clearTimeout(timer); resolve(data); };
     el.onerror = function() { cleanup(); clearTimeout(timer); reject(new Error('Network error')); };
     function cleanup() { if (el.parentNode) el.parentNode.removeChild(el); delete window[cb]; }
@@ -194,17 +191,15 @@ function jsonp(url) {
   });
 }
 
-// ── INIT ─────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────
 async function initFixed() {
-  if (DEFAULT_ARTIST) {
-    document.getElementById('artistFilter').value = DEFAULT_ARTIST;
-  }
+  if (DEFAULT_ARTIST) document.getElementById('artistFilter').value = DEFAULT_ARTIST;
+  var artist = document.getElementById('artistFilter').value;
   try {
-    var artist = document.getElementById('artistFilter').value;
-    var qs = 'action=getInquiries&artist=' + encodeURIComponent(artist) + '&status=';
-    var res = await jsonp(EXEC_URL + '?' + qs);
+    var res = await jsonp(EXEC_URL + '?action=getInquiries&artist=' + encodeURIComponent(artist) + '&status=');
     if (!res.success) { showState('Could not load inquiries: ' + (res.error || '')); return; }
     allInquiries = res.inquiries || [];
+    updateCounts();
     renderList();
   } catch (e) {
     showState('Error: ' + e.message);
@@ -213,12 +208,12 @@ async function initFixed() {
 
 function showState(msg) {
   document.getElementById('stateScreen').innerHTML =
-    '<div style="color:#6b7280;font-size:14px;text-align:center;padding:20px;">' + msg + '</div>';
+    '<div style="color:var(--gray);text-align:center;padding:20px;">' + msg + '</div>';
   document.getElementById('stateScreen').style.display = 'flex';
   document.getElementById('listContent').style.display = 'none';
 }
 
-// ── FILTERS ──────────────────────────────────────────────────────
+// ── FILTERS ──────────────────────────────────────────────────
 function setPillFilter(el) {
   document.querySelectorAll('.pill').forEach(function(p) { p.classList.remove('active'); });
   el.classList.add('active');
@@ -227,124 +222,119 @@ function setPillFilter(el) {
 }
 
 async function applyFilters() {
-  showState('Loading…');
-  document.getElementById('stateScreen').innerHTML =
-    '<div class="spinner"></div><div>Loading…</div>';
+  document.getElementById('stateScreen').innerHTML = '<div class="spinner"></div><div>Loading…</div>';
   document.getElementById('stateScreen').style.display = 'flex';
+  document.getElementById('listContent').style.display = 'none';
   await initFixed();
 }
 
-// ── RENDER ───────────────────────────────────────────────────────
+function updateCounts() {
+  var counts = { '': 0, 'new': 0, 'in-progress': 0, 'quoted': 0, 'booked': 0 };
+  allInquiries.forEach(function(inq) {
+    counts['']++;
+    if (counts[inq.status] !== undefined) counts[inq.status]++;
+  });
+  setCount('cntAll', counts['']);
+  setCount('cntNew', counts['new']);
+  setCount('cntInProgress', counts['in-progress']);
+  setCount('cntQuoted', counts['quoted']);
+  setCount('cntBooked', counts['booked']);
+}
+function setCount(id, n) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = n > 0 ? n : '';
+}
+
+// ── RENDER ───────────────────────────────────────────────────
 function renderList() {
-  var list = document.getElementById('listContent');
+  var list   = document.getElementById('listContent');
   var screen = document.getElementById('stateScreen');
-  var artist = document.getElementById('artistFilter').value;
 
   var filtered = allInquiries.filter(function(inq) {
     if (activeStatus && inq.status !== activeStatus) return false;
-    if (artist && inq.artist.toLowerCase() !== artist.toLowerCase()) return false;
     return true;
   });
 
-  // Update "All" count
-  document.getElementById('countAll').textContent = allInquiries.length;
-
   if (!filtered.length) {
-    screen.innerHTML = '<div style="color:#6b7280;font-size:14px;">No inquiries match these filters.</div>';
-    screen.style.display = 'flex';
-    list.style.display = 'none';
+    showState('No inquiries match these filters.');
     return;
   }
 
   screen.style.display = 'none';
   list.style.display = 'block';
 
-  // Split into Your Turn / Their Turn / Closed
-  var yourTurn   = filtered.filter(function(i) { return i.needsReply === true; });
-  var theirTurn  = filtered.filter(function(i) { return i.needsReply === false; });
-  var closed     = filtered.filter(function(i) { return i.needsReply === null; });
+  var yourTurn  = filtered.filter(function(i) { return i.needsReply === true; });
+  var theirTurn = filtered.filter(function(i) { return i.needsReply === false; });
+  var closed    = filtered.filter(function(i) { return i.needsReply === null || i.needsReply === undefined; });
 
   var html = '';
+
   if (yourTurn.length) {
     html += '<div class="section-group">';
-    html += '<div class="section-head">👋 Your Turn — awaiting your response (' + yourTurn.length + ')</div>';
-    yourTurn.forEach(function(inq) { html += rowHtml(inq); });
+    html += '<div class="section-head">👋 Your Turn &nbsp;·&nbsp; ' + yourTurn.length + ' awaiting response</div>';
+    yourTurn.forEach(function(inq) { html += rowHtml(inq, false); });
     html += '</div>';
   }
   if (theirTurn.length) {
     html += '<div class="section-group">';
-    html += '<div class="section-head">⏳ Their Turn — waiting on client (' + theirTurn.length + ')</div>';
-    theirTurn.forEach(function(inq) { html += rowHtml(inq); });
+    html += '<div class="section-head">⏳ Their Turn &nbsp;·&nbsp; ' + theirTurn.length + ' waiting on client</div>';
+    theirTurn.forEach(function(inq) { html += rowHtml(inq, true); });
     html += '</div>';
   }
   if (closed.length) {
     html += '<div class="section-group">';
-    html += '<div class="section-head" style="color:#9ca3af;">Closed / Archived (' + closed.length + ')</div>';
-    closed.forEach(function(inq) { html += rowHtml(inq); });
+    html += '<div class="section-head" style="color:#9ca3af;">Closed / Archived &nbsp;·&nbsp; ' + closed.length + '</div>';
+    closed.forEach(function(inq) { html += rowHtml(inq, true); });
     html += '</div>';
   }
 
   list.innerHTML = html;
 }
 
-function rowHtml(inq) {
+function rowHtml(inq, theirTurn) {
   var href = 'pii-inquiry-thread.html?inquiryId=' + encodeURIComponent(inq.inquiryId) +
     (inq.artist ? '&artist=' + encodeURIComponent(inq.artist) : '');
-
-  var priorityBadge = inq.isPriority
-    ? '<span class="priority-badge">⚡ ' + escHtml(inq.timing) + '</span>'
-    : '';
 
   var submittedLabel = inq.submittedAt
     ? new Date(inq.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     : '';
 
-  var slaBadge = '';
-  if (inq.slaDueAt) {
-    var due  = new Date(inq.slaDueAt);
-    var diffH = (due - Date.now()) / 36e5;
-    if (diffH < 0) {
-      slaBadge = '<span class="sla-badge overdue">⚠️ Overdue</span>';
-    } else if (diffH < 12) {
-      slaBadge = '<span class="sla-badge urgent">⏳ Due in ' + Math.round(diffH) + 'h</span>';
-    } else if (diffH < 48) {
-      slaBadge = '<span class="sla-badge urgent">Due in ' + Math.round(diffH) + 'h</span>';
-    } else {
-      slaBadge = '<span class="sla-badge ok">✓ ' + Math.round(diffH / 24) + 'd left</span>';
-    }
-  } else {
-    slaBadge = '<span class="sla-badge none">No SLA set</span>';
-  }
+  var subParts = [];
+  if (inq.source)      subParts.push(escHtml(inq.source));
+  if (inq.artist)      subParts.push(escHtml(inq.artist));
+  if (submittedLabel)  subParts.push('Submitted ' + submittedLabel);
+  var subLine = subParts.join(' · ');
 
-  var statusClass = (inq.status || 'new').toLowerCase().replace(/\s+/g, '-');
   var chips = '';
-  if (inq.placement) chips += '<span class="chip-sm">' + escHtml(inq.placement) + '</span>';
-  if (inq.style)     chips += '<span class="chip-sm">' + escHtml(inq.style) + '</span>';
-  if (inq.coverupType && inq.coverupType !== 'none') chips += '<span class="chip-sm coverup">Coverup</span>';
+  if (inq.placement)    chips += '<span class="chip-sm">' + escHtml(inq.placement) + '</span>';
+  if (inq.style)        chips += '<span class="chip-sm">' + escHtml(inq.style) + '</span>';
   if (inq.sizeEstimate) chips += '<span class="chip-sm">' + escHtml(inq.sizeEstimate) + '</span>';
+  if (inq.isCoverup)    chips += '<span class="chip-sm coverup">Coverup</span>';
 
-  return `<a class="inquiry-row${inq.isPriority ? ' priority' : ''}" href="${escHtml(href)}">
-    <div class="row-main">
-      <div class="row-name">${escHtml(inq.clientName || inq.clientId)}${priorityBadge}</div>
-      <div class="row-meta">${escHtml(inq.source || '')}${inq.artist ? ' · ' + escHtml(inq.artist) : ''} · Submitted ${submittedLabel}</div>
-      <div class="row-chips">${chips}</div>
-    </div>
-    <div class="row-aside">
-      ${inq.status === 'quoted' ? '<span class="status-chip quoted">✓ Quote Sent</span>' : '<span class="status-chip ' + statusClass + '">' + escHtml(inq.status || 'new') + '</span>'}
-      ${slaBadge}
-    </div>
-  </a>`;
+  // Status label
+  var stLabel = inq.status === 'quoted' ? '✓ Quote Sent' :
+                inq.status === 'in-progress' ? 'In Progress' :
+                inq.status ? inq.status.charAt(0).toUpperCase() + inq.status.slice(1) : 'New';
+  var stClass = inq.status || 'new';
+
+  return '<a class="inquiry-row' + (theirTurn ? ' their-turn' : '') + '" href="' + escHtml(href) + '">' +
+    '<div class="row-body">' +
+      '<div class="row-name">' + escHtml(inq.clientName || inq.clientId || '—') + '</div>' +
+      (subLine ? '<div class="row-sub">' + subLine + '</div>' : '') +
+      (chips   ? '<div class="row-chips">' + chips + '</div>' : '') +
+    '</div>' +
+    '<div class="row-aside">' +
+      '<span class="st ' + escHtml(stClass) + '">' + escHtml(stLabel) + '</span>' +
+    '</div>' +
+    '<span class="row-arrow">›</span>' +
+  '</a>';
 }
 
 function escHtml(s) {
   return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── START ────────────────────────────────────────────────────────
 initFixed();
 </script>
 </body>
